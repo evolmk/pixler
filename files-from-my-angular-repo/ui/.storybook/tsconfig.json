@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "strict": false,
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "types": ["react"],
+    "rootDir": ".."
+  },
+  "files": ["./main.ts", "./preview.ts", "./manager.tsx"],
+  "include": [
+    "../src/**/*",
+    "../storybook-host/**/*"
+  ]
+}

@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+@import '@angular/cdk/overlay-prebuilt.css';
+@import '@lazar/ui-styles/globals.css';
+@source '../src';
+
+/* Ensure Storybook canvas background respects dark mode */
+body.sb-show-main,
+.sb-show-main #storybook-root {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+/* Toast stories: override fixed → absolute so toasts render inside the story preview */
+.toast-story-wrapper {
+  position: relative;
+  min-height: 160px;
+}
+.toast-story-wrapper ui-toaster ol {
+  position: absolute !important;
+}
