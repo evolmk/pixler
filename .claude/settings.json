@@ -1,0 +1,109 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(mkdir *)",
+      "Bash(touch *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git mv *)",
+      "Bash(git rm *)",
+      "Bash(git checkout *)",
+      "Bash(git stash *)",
+      "Bash(pnpm install)",
+      "Bash(pnpm -w *)",
+      "Bash(pnpm --filter *)",
+      "Bash(pnpm -r *)",
+      "Bash(pnpm exec *)",
+      "Bash(turbo *)",
+      "Bash(gh pr create *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./secrets.*.json)",
+      "Read(./.mcp.json)",
+      "Bash(rm * * -rf*)"
+    ],
+    "ask": [
+      "Bash(rm*)",
+      "Bash(git push*)",
+      "Bash(git reset --hard*)"
+    ]
+  },
+  "enabledMcpjsonServers": [],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/clear-skill-log.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/lock-on-prompt.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/track-slash-skill.sh\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/check-ui-skill.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/track-skill.sh\"",
+            "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/lock-on-tool.sh\"",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/lock-on-stop.sh\""
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node \"$CLAUDE_PROJECT_DIR/.claude/scripts/context-bar.js\""
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
+}
