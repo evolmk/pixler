@@ -53,21 +53,22 @@ behavior (color-scheme + dark/light globals), same custom demo pages, converted 
 ### Package infrastructure
 
 - [ ] `packages/ui/package.json` rewritten:
-  - `"exports"`: `{ "./components/*": "./src/components/*.tsx", "./lib/*": "./src/lib/*.ts", "./hooks/*": "./src/hooks/*.ts" }`
-  - deps: `react`, `react-dom`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`
-    (component-specific deps like `@radix-ui/*`, `vaul`, `sonner`, `cmdk` are added automatically by
-    the shadcn CLI as each component is installed)
-  - `devDependencies`: `@types/react`, `@types/react-dom`, `typescript`, `tailwindcss`
-  - scripts: `"ui": "pnpm dlx shadcn@latest add"`, `"typecheck": "tsc --noEmit"`, `"lint": "tsc --noEmit"`
-  - remove the old `main` / `types` / `tsc build` setup (package is source-only)
+    - `"exports"`:
+      `{ "./components/*": "./src/components/*.tsx", "./lib/*": "./src/lib/*.ts", "./hooks/*": "./src/hooks/*.ts" }`
+    - deps: `react`, `react-dom`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`
+      (component-specific deps like `@radix-ui/*`, `vaul`, `sonner`, `cmdk` are added automatically by
+      the shadcn CLI as each component is installed)
+    - `devDependencies`: `@types/react`, `@types/react-dom`, `typescript`, `tailwindcss`
+    - scripts: `"ui": "pnpm dlx shadcn@latest add"`, `"typecheck": "tsc --noEmit"`, `"lint": "tsc --noEmit"`
+    - remove the old `main` / `types` / `tsc build` setup (package is source-only)
 - [ ] `packages/ui/src/lib/utils.ts` — `cn()` = `twMerge(clsx(inputs))`
 - [ ] `packages/ui/components.json` — shadcn config:
-  - `style: "new-york"`, `rsc: false`, `tsx: true`, `iconLibrary: "lucide"`
-  - `tailwind: { config: "", css: "../ui-styles/src/css/globals.css", baseColor: "neutral", cssVariables: true }`
-  - aliases → `components: "@pixler/ui/components"`, `utils: "@pixler/ui/lib/utils"`,
-    `hooks: "@pixler/ui/hooks"`, `lib: "@pixler/ui/lib"`, `ui: "@pixler/ui/components"`
-  - **Verify the CLI does not overwrite the existing M02 tokens** in the referenced css file; tokens
-    are owned by M02 and already complete.
+    - `style: "new-york"`, `rsc: false`, `tsx: true`, `iconLibrary: "lucide"`
+    - `tailwind: { config: "", css: "../ui-styles/src/css/globals.css", baseColor: "neutral", cssVariables: true }`
+    - aliases → `components: "@pixler/ui/components"`, `utils: "@pixler/ui/lib/utils"`,
+      `hooks: "@pixler/ui/hooks"`, `lib: "@pixler/ui/lib"`, `ui: "@pixler/ui/components"`
+    - **Verify the CLI does not overwrite the existing M02 tokens** in the referenced css file; tokens
+      are owned by M02 and already complete.
 - [ ] `packages/ui/tsconfig.json` — `jsx: "react-jsx"`, `lib: ["ES2022","DOM"]`,
   `paths: { "@pixler/ui/*": ["./src/*"] }`, source-only (no `composite`/`outDir` emit)
 
@@ -106,12 +107,12 @@ Add via `pnpm --filter @pixler/ui ui <name>` (the `ui` script above). Install th
   consumers for future design-system pages. **Not** a pure markdown parser — accepts both
   markdown prose (`markdown` field, rendered via `react-markdown`) and live React content
   (`examples` field) so component proofs render alongside their description. Layout details:
-  - Three-column desktop: left rail (`w-56`, sticky), main column (`max-w-[760px]`), no right column
-  - Top sticky breadcrumb / brand strip with current section indicator (scroll-spy)
-  - Section block pattern: small numbered overline (`"01 — OVERVIEW"`) → `text-4xl` title →
-    lead paragraph → live `examples` block (color grids, type specimens, button rows, etc.)
-  - Generous whitespace, subtle `border-t border-border` between sections, no shadows on examples
-  - Mobile collapses the left rail into an `<AdaptiveSheet>` triggered by a sticky "On this page" button
+    - Three-column desktop: left rail (`w-56`, sticky), main column (`max-w-[760px]`), no right column
+    - Top sticky breadcrumb / brand strip with current section indicator (scroll-spy)
+    - Section block pattern: small numbered overline (`"01 — OVERVIEW"`) → `text-4xl` title →
+      lead paragraph → live `examples` block (color grids, type specimens, button rows, etc.)
+    - Generous whitespace, subtle `border-t border-border` between sections, no shadows on examples
+    - Mobile collapses the left rail into an `<AdaptiveSheet>` triggered by a sticky "On this page" button
 
 ### Hooks — Pixler-specific
 
@@ -145,19 +146,20 @@ for a static build that can be served behind `/storybook` later.
   `@storybook/react-vite`, `@storybook/addon-docs`, `@storybook/addon-themes`, `vite`,
   `@vitejs/plugin-react`, `@tailwindcss/vite`, `react-markdown`, `remark-gfm`, `rehype-slug`,
   `rehype-autolink-headings`
-- [ ] `packages/ui/.storybook/main.ts` — framework `@storybook/react-vite`; `stories: ["../src/**/*.stories.@(ts|tsx|mdx)"]`;
+- [ ] `packages/ui/.storybook/main.ts` — framework `@storybook/react-vite`;
+  `stories: ["../src/**/*.stories.@(ts|tsx|mdx)"]`;
   addons `['@storybook/addon-docs', '@storybook/addon-themes']`; `viteFinal` adds `@tailwindcss/vite`
   and imports `@pixler/ui-styles/src/css/globals.css` so previews are tokenized identically to `apps/web`
 - [ ] `packages/ui/.storybook/preview.tsx` — port from `files-from-my-angular-repo/ui/.storybook/preview.ts`,
   converted to React. Provides:
-  - `withThemeByClassName` (Light/Dark via `.dark` on `<html>`)
-  - `colorScheme` toolbar global → sets `data-color-scheme` on `<html>` (11 values: forest, graphite,
-    catppuccin, tokyo-night, nord, rose-pine, solarized, mono, plus any extra schemes — must include
-    every value listed in `_specs/spec-ui/spec-ui-tokens.md` §Themes)
-  - `storySort` enforcing `Demos → Components → Hooks` group order; within `Demos`, order is
-    `Showcase → Style Guide → Design → Design.md → Shadcn-case` (Shadcn-case sits last as the
-    recipe gallery after the reference docs; Design.md sits next to Design since both render
-    long-form design-system content)
+    - `withThemeByClassName` (Light/Dark via `.dark` on `<html>`)
+    - `colorScheme` toolbar global → sets `data-color-scheme` on `<html>` (11 values: forest, graphite,
+      catppuccin, tokyo-night, nord, rose-pine, solarized, mono, plus any extra schemes — must include
+      every value listed in `_specs/spec-ui/spec-ui-tokens.md` §Themes)
+    - `storySort` enforcing `Demos → Components → Hooks` group order; within `Demos`, order is
+      `Showcase → Style Guide → Design → Design.md → Shadcn-case` (Shadcn-case sits last as the
+      recipe gallery after the reference docs; Design.md sits next to Design since both render
+      long-form design-system content)
 - [ ] `packages/ui/.storybook/manager.ts` — sets a Pixler-branded sidebar title (`"Pixler UI"`)
   and brand color from `--brand` (`#16a355`)
 - [ ] `packages/ui/tsconfig.json` — add `"include": ["src/**/*", ".storybook/**/*"]`
@@ -166,10 +168,10 @@ for a static build that can be served behind `/storybook` later.
 
 - [ ] Every shadcn component installed above gets a colocated `*.stories.tsx` next to the component
   (`packages/ui/src/components/button.stories.tsx`, etc.). Each story must:
-  - export a `Meta` with `title: "Components/<Group>/<Name>"` (Group = Actions, Forms, Display,
-    Feedback, Overlay, Navigation, Data, Layout — matches Angular reference grouping)
-  - cover every CVA `variant` and `size` as a separate named story
-  - include at least one disabled/loading state where applicable
+    - export a `Meta` with `title: "Components/<Group>/<Name>"` (Group = Actions, Forms, Display,
+      Feedback, Overlay, Navigation, Data, Layout — matches Angular reference grouping)
+    - cover every CVA `variant` and `size` as a separate named story
+    - include at least one disabled/loading state where applicable
 - [ ] Each Pixler-specific primitive (EmptyState, Spinner, Kbd, Stepper, SegmentedControl,
   ResizableSplit) gets the same treatment under `title: "Components/Pixler/<Name>"`
 
@@ -184,16 +186,16 @@ for a static build that can be served behind `/storybook` later.
   **Render in the grid** (built by M03 — full shadcn catalog + Pixler-specific + standard shadcn
   compositions):
 
-  - Direct shadcn primitives: Accordion, Alert, Alert Dialog, Aspect Ratio, Avatar, Badge,
-    Breadcrumb, Button, Calendar, Card, Carousel, Chart, Checkbox, Collapsible, Command,
-    Context Menu, Dialog, Drawer, Dropdown Menu, Hover Card, Input, Input OTP, Label, Menubar,
-    Navigation Menu, Pagination, Popover, Progress, Radio Group, Resizable, Scroll Area, Select,
-    Separator, Sheet, Sidebar, Skeleton, Slider, Switch, Table, Tabs, Textarea, Toast (Sonner),
-    Toggle, Toggle Group, Tooltip
-  - Standard shadcn compositions (no new install — composed inline from primitives above):
-    Combobox (Popover + Command), Date Picker (Popover + Calendar), Form Field (Form primitive),
-    Searchbox (Input + Command)
-  - Pixler-specific: EmptyState, Kbd, ResizableSplit, SegmentedControl, Spinner, Stepper
+    - Direct shadcn primitives: Accordion, Alert, Alert Dialog, Aspect Ratio, Avatar, Badge,
+      Breadcrumb, Button, Calendar, Card, Carousel, Chart, Checkbox, Collapsible, Command,
+      Context Menu, Dialog, Drawer, Dropdown Menu, Hover Card, Input, Input OTP, Label, Menubar,
+      Navigation Menu, Pagination, Popover, Progress, Radio Group, Resizable, Scroll Area, Select,
+      Separator, Sheet, Sidebar, Skeleton, Slider, Switch, Table, Tabs, Textarea, Toast (Sonner),
+      Toggle, Toggle Group, Tooltip
+    - Standard shadcn compositions (no new install — composed inline from primitives above):
+      Combobox (Popover + Command), Date Picker (Popover + Calendar), Form Field (Form primitive),
+      Searchbox (Input + Command)
+    - Pixler-specific: EmptyState, Kbd, ResizableSplit, SegmentedControl, Spinner, Stepper
 
   **At the bottom of the page**, render a section titled **"Not yet ported from lazar_2026"** —
   a single alphabetical bullet list (muted text, no live components, just names) so the gap vs.
@@ -215,15 +217,15 @@ for a static build that can be served behind `/storybook` later.
 - [ ] **`design.stories.tsx`** — `title: "Demos/Design"`. Renders the **canonical Pixler design
   system doc** (`_specs/spec-ui/spec-ui-design-system.md`) as a styled long-form page resembling
   Google Material Design 3 docs (m3.material.io) / GitHub Primer docs:
-  - Import the `.md` as a raw string (`?raw` Vite suffix) and feed through `react-markdown`
-    with `remark-gfm` (tables), `rehype-slug` + `rehype-autolink-headings` (deep links)
-  - Layout: max-width 880px main column on white, with a sticky right-side TOC (generated from
-    H2/H3 via `rehype-slug` ids), 14px Inter body, hero H1 with brand-green rule underneath,
-    code blocks in `bg-muted text-foreground`, inline `code` in `bg-muted/60 rounded px-1`
-  - All custom components (e.g. the Hero Numbers, Eyebrow + brand-rule signature, Stat chip
-    examples cited in the spec) render **live** inline beneath their description so the page
-    is both reference doc and visual gallery
-  - Add a small "Edit on GitHub" link in the header pointing at the source `.md` path
+    - Import the `.md` as a raw string (`?raw` Vite suffix) and feed through `react-markdown`
+      with `remark-gfm` (tables), `rehype-slug` + `rehype-autolink-headings` (deep links)
+    - Layout: max-width 880px main column on white, with a sticky right-side TOC (generated from
+      H2/H3 via `rehype-slug` ids), 14px Inter body, hero H1 with brand-green rule underneath,
+      code blocks in `bg-muted text-foreground`, inline `code` in `bg-muted/60 rounded px-1`
+    - All custom components (e.g. the Hero Numbers, Eyebrow + brand-rule signature, Stat chip
+      examples cited in the spec) render **live** inline beneath their description so the page
+      is both reference doc and visual gallery
+    - Add a small "Edit on GitHub" link in the header pointing at the source `.md` path
 - [ ] **`design-md.stories.tsx`** — `title: "Demos/Design.md"`. Editorial walkthrough of the
   Pixler design system rendered through the new reusable **`<DesignMdViewer>`** component (spec'd
   above under Pixler-specific). Visual reference is `_docs/screenshots/design-md-template.jpg` —
@@ -231,29 +233,29 @@ for a static build that can be served behind `/storybook` later.
 
   Build out a `sections` config covering (numbers + eyebrows match the screenshot's rhythm):
 
-  - **01 — Overview** — one-paragraph intro to Pixler's design language, brand hex, the "developer
-    tool, not consumer SaaS" stance. No live examples.
-  - **02 — Foundations / Color** — full color story: brand greens (`brand`, `brand-light`,
-    `brand-dark`), neutral surface ramp, status colors (error / warning / success / info). Each
-    color rendered as a labeled swatch card with role + token name.
-  - **03 — Typography** — Inter specimens at scale (display 6xl/7xl numerals like the screenshot's
-    `4.81`), the full type scale (xs → 4xl) with role labels, weight ladder (light → extrabold),
-    eyebrow + brand-rule signature live.
-  - **04 — Buttons** — every CVA variant + size as a live grid (matches the "Three product tabs"
-    row in the screenshot). Side-by-side: default / outline / ghost / destructive / link, with
-    sizes sm → lg.
-  - **05 — Tabs & Segmented** — pill-tabs row, segmented control row, bottom-tabs preview (live
-    `<BottomTabs>` rendered inside a phone-frame mock).
-  - **06 — Cards & Surfaces** — card variants with corner-radius grid (`rounded-md` → `rounded-xl`)
-    rendered as photo-like swatches, plus the Pixler "Empty State" composition live.
-  - **07 — Forms** — input states (default / focus / error / disabled), floating-label pattern,
-    checkbox + switch + radio rows, date-cell grid (calendar primitive styled like screenshot's
-    "circular day cells").
-  - **08 — Patterns** — three Pixler-specific compositions rendered live: workspace row, PR
-    checks row, chat message bubble. Mirrors the screenshot's "listing detail" + "reviews" +
-    "what this place offers" pattern blocks.
-  - **09 — Responsive & Touch Targets** — breakpoint table from `spec-ui-responsive.md`, plus
-    min-touch-target swatches (`h-11` / `py-3` / `size="icon-sm"`).
+    - **01 — Overview** — one-paragraph intro to Pixler's design language, brand hex, the "developer
+      tool, not consumer SaaS" stance. No live examples.
+    - **02 — Foundations / Color** — full color story: brand greens (`brand`, `brand-light`,
+      `brand-dark`), neutral surface ramp, status colors (error / warning / success / info). Each
+      color rendered as a labeled swatch card with role + token name.
+    - **03 — Typography** — Inter specimens at scale (display 6xl/7xl numerals like the screenshot's
+      `4.81`), the full type scale (xs → 4xl) with role labels, weight ladder (light → extrabold),
+      eyebrow + brand-rule signature live.
+    - **04 — Buttons** — every CVA variant + size as a live grid (matches the "Three product tabs"
+      row in the screenshot). Side-by-side: default / outline / ghost / destructive / link, with
+      sizes sm → lg.
+    - **05 — Tabs & Segmented** — pill-tabs row, segmented control row, bottom-tabs preview (live
+      `<BottomTabs>` rendered inside a phone-frame mock).
+    - **06 — Cards & Surfaces** — card variants with corner-radius grid (`rounded-md` → `rounded-xl`)
+      rendered as photo-like swatches, plus the Pixler "Empty State" composition live.
+    - **07 — Forms** — input states (default / focus / error / disabled), floating-label pattern,
+      checkbox + switch + radio rows, date-cell grid (calendar primitive styled like screenshot's
+      "circular day cells").
+    - **08 — Patterns** — three Pixler-specific compositions rendered live: workspace row, PR
+      checks row, chat message bubble. Mirrors the screenshot's "listing detail" + "reviews" +
+      "what this place offers" pattern blocks.
+    - **09 — Responsive & Touch Targets** — breakpoint table from `spec-ui-responsive.md`, plus
+      min-touch-target swatches (`h-11` / `py-3` / `size="icon-sm"`).
 
   Page renders by feeding the above `sections` config into `<DesignMdViewer>` — no per-page
   layout code, only content. Proves the component is genuinely reusable. Must retint correctly
@@ -268,48 +270,48 @@ for a static build that can be served behind `/storybook` later.
   Recipes to render (one cell each, top-to-bottom within each column):
 
   **Column 1**
-  - Payment Method form (Card): Name on Card (Label + Input), Card Number + CVV (Input row),
-    Month + Year (Select row), Separator, Billing Address section with Checkbox
-    "Same as shipping address", Comments Textarea, Button Submit + Button Cancel ghost
+    - Payment Method form (Card): Name on Card (Label + Input), Card Number + CVV (Input row),
+      Month + Year (Select row), Separator, Billing Address section with Checkbox
+      "Same as shipping address", Comments Textarea, Button Submit + Button Cancel ghost
 
   **Column 2**
-  - Empty State card (dashed border): AvatarGroup (3 avatars), "No Team Members" headline,
-    body text, Button "+ Invite Members"
-  - Status Badges row with spinner icons: Syncing, Updating, Loading
-  - Message composer: Input with leading `+` icon, placeholder "Send a message…", trailing mic icon
-  - Price Range Slider with label "Price Range" + helper "Set your budget range ($200 – 800)."
-  - Searchbox: Input with leading search icon, trailing "12 results" muted text
-  - URL Input with leading `https://` addon and trailing info icon (Input group composition)
-  - Ask/Search/Chat Textarea + footer row with `+ Auto` badge, "52% used" muted text, and a
-    rounded-full send Button (chevron-up icon)
-  - Username-confirmed Input: value `@shadcn`, trailing brand-green check icon
+    - Empty State card (dashed border): AvatarGroup (3 avatars), "No Team Members" headline,
+      body text, Button "+ Invite Members"
+    - Status Badges row with spinner icons: Syncing, Updating, Loading
+    - Message composer: Input with leading `+` icon, placeholder "Send a message…", trailing mic icon
+    - Price Range Slider with label "Price Range" + helper "Set your budget range ($200 – 800)."
+    - Searchbox: Input with leading search icon, trailing "12 results" muted text
+    - URL Input with leading `https://` addon and trailing info icon (Input group composition)
+    - Ask/Search/Chat Textarea + footer row with `+ Auto` badge, "52% used" muted text, and a
+      rounded-full send Button (chevron-up icon)
+    - Username-confirmed Input: value `@shadcn`, trailing brand-green check icon
 
   **Column 3**
-  - URL bar Input with leading info icon and trailing star (favicon) icon
-  - Two-factor authentication Card: title + subtitle + Button "Enable" trailing
-  - Profile-verified row Card: leading check-circle icon, "Your profile has been verified.",
-    trailing chevron-right
-  - Section separator with centered "Appearance Settings" label (Separator + inset Label)
-  - Compute Environment large-card RadioGroup: Kubernetes (selected, with description) +
-    Virtual Machine (with "Coming soon" hint) — each card is fully clickable, radio dot
-    top-right
-  - Number of GPUs row: Label "Number of GPUs" + helper "You can add more later." + Stepper
-    (value 8)
-  - Wallpaper Tinting row: Label + helper + Switch
+    - URL bar Input with leading info icon and trailing star (favicon) icon
+    - Two-factor authentication Card: title + subtitle + Button "Enable" trailing
+    - Profile-verified row Card: leading check-circle icon, "Your profile has been verified.",
+      trailing chevron-right
+    - Section separator with centered "Appearance Settings" label (Separator + inset Label)
+    - Compute Environment large-card RadioGroup: Kubernetes (selected, with description) +
+      Virtual Machine (with "Coming soon" hint) — each card is fully clickable, radio dot
+      top-right
+    - Number of GPUs row: Label "Number of GPUs" + helper "You can add more later." + Stepper
+      (value 8)
+    - Wallpaper Tinting row: Label + helper + Switch
 
   **Column 4**
-  - "Add context" Input with leading `@` icon
-  - "Ask, search, or make anything…" Input with leading attach + globe icons and trailing
-    circular send Button
-  - Pill toolbar row: leading back-arrow Button, Buttons "Archive" "Report" "Snooze", trailing
-    `⋯` menu Button
-  - "I agree to the terms and conditions" Checkbox styled as a full-width selected/highlighted
-    row (subtle muted background, brand check)
-  - Pagination row: numbers 1, 2, 3 + prev/next arrows + trailing Select labeled "Copilot"
-  - "How did you hear about us?" RadioGroup as pill-style chips: Social Media (selected),
-    Search Engine, Referral, Other
-  - Loading-state Card (dashed border): Spinner, "Processing your request" title, "Please wait
-    while we process your request. Do not refresh the page." body, Button Cancel
+    - "Add context" Input with leading `@` icon
+    - "Ask, search, or make anything…" Input with leading attach + globe icons and trailing
+      circular send Button
+    - Pill toolbar row: leading back-arrow Button, Buttons "Archive" "Report" "Snooze", trailing
+      `⋯` menu Button
+    - "I agree to the terms and conditions" Checkbox styled as a full-width selected/highlighted
+      row (subtle muted background, brand check)
+    - Pagination row: numbers 1, 2, 3 + prev/next arrows + trailing Select labeled "Copilot"
+    - "How did you hear about us?" RadioGroup as pill-style chips: Social Media (selected),
+      Search Engine, Referral, Other
+    - Loading-state Card (dashed border): Spinner, "Processing your request" title, "Please wait
+      while we process your request. Do not refresh the page." body, Button Cancel
 
   All cells must retint with the toolbar `colorScheme` + `theme` globals (uses only semantic
   tokens — `bg-card`, `border-border`, `text-foreground`, `bg-primary`, etc.; no hard-coded

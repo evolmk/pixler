@@ -22,7 +22,7 @@
 ## Products vs. Parts Grid
 
 | Aspect               | Products                             | Parts                                 |
-| -------------------- | ------------------------------------ | ------------------------------------- |
+|----------------------|--------------------------------------|---------------------------------------|
 | Layout               | Single-column wide cards (1 per row) | Multi-column grid (4 cols at xl)      |
 | Card style           | Horizontal: image left + info right  | Vertical: image top + info below      |
 | Items per page       | 12                                   | 20                                    |
@@ -44,7 +44,8 @@
 
 ## Landing Page Pattern
 
-Each landing page (main `/catalog`, products, parts) follows: breadcrumb → hero/header → category card grid (tint-cycling icons, priority-sorted) → featured/popular carousel → CTA. The main catalog landing adds a search bar in the hero with client-side autocomplete (300ms debounce, ≥2 chars, grouped results).
+Each landing page (main
+`/catalog`, products, parts) follows: breadcrumb → hero/header → category card grid (tint-cycling icons, priority-sorted) → featured/popular carousel → CTA. The main catalog landing adds a search bar in the hero with client-side autocomplete (300ms debounce, ≥2 chars, grouped results).
 
 ## Planned Improvements
 

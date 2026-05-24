@@ -2,7 +2,8 @@
 
 **Created:** 2026-05-15
 
-**When to read:** Writing any UI string — labels, CTAs, empty states, error messages, page titles, descriptions, tooltips. This spec governs all copy in Pixler.
+**When to read:
+** Writing any UI string — labels, CTAs, empty states, error messages, page titles, descriptions, tooltips. This spec governs all copy in Pixler.
 
 ---
 
@@ -10,8 +11,10 @@
 
 Pixler copy reads like a **developer tool** — not marketing, not a friendly assistant.
 
-- **Grounded, precise, declarative.** "Terminal multiplexer with integrated Linear sync and project-scoped workspaces." Not "Built to make coding easier!"
-- **Developer-to-developer.** Assumes the reader knows what a repo, branch, workspace, terminal session, or API token is.
+- **Grounded, precise, declarative.
+  ** "Terminal multiplexer with integrated Linear sync and project-scoped workspaces." Not "Built to make coding easier!"
+- **Developer-to-developer.
+  ** Assumes the reader knows what a repo, branch, workspace, terminal session, or API token is.
 - **Information-dense.** Status, metrics, and identifiers are always visible — never abstracted away.
 - **Confident, never apologetic.** "No results" — not "Sorry, we couldn't find anything."
 
@@ -19,14 +22,14 @@ Pixler copy reads like a **developer tool** — not marketing, not a friendly as
 
 ## Casing & Punctuation
 
-| Context                    | Rule                          | Example                                       |
-| -------------------------- | ----------------------------- | --------------------------------------------- |
-| Navigation labels          | Title Case                    | "Projects", "My Workspaces"                   |
+| Context                    | Rule                          | Example                                        |
+|----------------------------|-------------------------------|------------------------------------------------|
+| Navigation labels          | Title Case                    | "Projects", "My Workspaces"                    |
 | Page titles                | Title Case                    | "Terminal Sessions"                            |
-| Overlines / eyebrows       | UPPERCASE WITH WIDE TRACKING  | "PROJECT OVERVIEW · WORKSPACE 01"             |
-| Body copy / descriptions   | Sentence case                 | "Integrated terminal with project-scoped…"    |
+| Overlines / eyebrows       | UPPERCASE WITH WIDE TRACKING  | "PROJECT OVERVIEW · WORKSPACE 01"              |
+| Body copy / descriptions   | Sentence case                 | "Integrated terminal with project-scoped…"     |
 | CTAs (primary / secondary) | Title Case, verb-first        | "Create Project", "Open Terminal", "View Diff" |
-| Tertiary actions           | Sentence case                 | "Remove workspace · Duplicate project"        |
+| Tertiary actions           | Sentence case                 | "Remove workspace · Duplicate project"         |
 | Identifiers                | Verbatim, hyphens preserved   | `proj-abc-123`                                 |
 | Em-dash elaboration        | Em-dash (no spaces or spaced) | "Git-integrated — syncs with Linear"           |
 | Bullet lists               | No terminal punctuation       | `· Projects · Workspaces · Terminal`           |
@@ -36,7 +39,8 @@ Pixler copy reads like a **developer tool** — not marketing, not a friendly as
 ## Pronoun & Address
 
 - **Second person ("you", "your")** sparingly — only on auth/account screens: "Your projects", "Your workspaces".
-- **Imperative mood** for CTAs: "Create Project", "Open Terminal", "View Diff" — verb-first, never "Click here" or "Click to create".
+- **Imperative mood
+  ** for CTAs: "Create Project", "Open Terminal", "View Diff" — verb-first, never "Click here" or "Click to create".
 - **Never first-person.** No "We're excited to…", no "Our team…", no "We offer…".
 
 ---
@@ -51,23 +55,24 @@ Pixler copy reads like a **developer tool** — not marketing, not a friendly as
 
 ## Emoji
 
-**Never.** Use Lucide icons instead. Emoji breaks the developer-tool feel instantly. Strip emoji from any user-provided copy before rendering.
+**Never.
+** Use Lucide icons instead. Emoji breaks the developer-tool feel instantly. Strip emoji from any user-provided copy before rendering.
 
 ---
 
 ## Examples (lifted from the live site)
 
-| Context          | Copy                                                                                 |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| Eyebrow label    | `WORKSPACE`                                                                          |
-| Identifier       | `proj-abc-123`                                                                       |
-| Page title       | `Terminal Session — Workspace Alpha`                                                 |
-| Primary CTA      | `Create Project` (weight 500, brand-green fill, `rounded-md` — never pill)           |
-| Secondary CTA    | `Open Terminal`                                                                      |
-| Tertiary actions | `Remove Workspace · Duplicate Project · Share Link`                                  |
-| Footer column    | `Tools → Projects · Workspaces · Terminal · Linear · GitHub`                         |
-| Empty state      | `No projects yet.` then `Create your first project →`                                |
-| Error message    | `Invalid project ID.` (not "Oops! We couldn't find that.")                           |
+| Context          | Copy                                                                       |
+|------------------|----------------------------------------------------------------------------|
+| Eyebrow label    | `WORKSPACE`                                                                |
+| Identifier       | `proj-abc-123`                                                             |
+| Page title       | `Terminal Session — Workspace Alpha`                                       |
+| Primary CTA      | `Create Project` (weight 500, brand-green fill, `rounded-md` — never pill) |
+| Secondary CTA    | `Open Terminal`                                                            |
+| Tertiary actions | `Remove Workspace · Duplicate Project · Share Link`                        |
+| Footer column    | `Tools → Projects · Workspaces · Terminal · Linear · GitHub`               |
+| Empty state      | `No projects yet.` then `Create your first project →`                      |
+| Error message    | `Invalid project ID.` (not "Oops! We couldn't find that.")                 |
 
 ---
 
@@ -82,4 +87,5 @@ Pixler copy reads like a **developer tool** — not marketing, not a friendly as
 
 ---
 
-> **Cross-links:** `spec-ui-typography.md` → casing rules, display type, tabular figures · `spec-ui-design-system.md` → full voice summary
+> **Cross-links:** `spec-ui-typography.md` → casing rules, display type, tabular figures ·
+`spec-ui-design-system.md` → full voice summary

@@ -5,7 +5,13 @@
 Defined in `@theme inline` in `globals.css`:
 
 ```css
---font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+--font-sans:
+
+'Inter'
+,
+ui-sans-serif, system-ui, sans-serif
+
+;
 ```
 
 Usage: `font-sans` (default body font).
@@ -15,7 +21,7 @@ Usage: `font-sans` (default body font).
 Standard Tailwind v4 type scale with common usage patterns:
 
 | Class       | Size | Line Height | Usage                                           |
-| ----------- | ---- | ----------- | ----------------------------------------------- |
+|-------------|------|-------------|-------------------------------------------------|
 | `text-xs`   | 12px | 16px        | Badges, labels, timestamps, captions            |
 | `text-sm`   | 14px | 20px        | Body text, table cells, descriptions, nav items |
 | `text-base` | 16px | 24px        | Default body, inputs, buttons                   |
@@ -28,7 +34,7 @@ Standard Tailwind v4 type scale with common usage patterns:
 ## Font Weights
 
 | Class           | Weight | Usage                                         |
-| --------------- | ------ | --------------------------------------------- |
+|-----------------|--------|-----------------------------------------------|
 | `font-normal`   | 400    | Body text, descriptions                       |
 | `font-medium`   | 500    | Nav items, table headers, labels, card titles |
 | `font-semibold` | 600    | Section headings, stat values                 |
@@ -37,7 +43,7 @@ Standard Tailwind v4 type scale with common usage patterns:
 ## Tracking (Letter Spacing)
 
 | Class             | Usage                                             |
-| ----------------- | ------------------------------------------------- |
+|-------------------|---------------------------------------------------|
 | `tracking-tight`  | Page titles, large headings                       |
 | `tracking-normal` | Body text (default)                               |
 | `tracking-wide`   | Uppercase labels (sidebar groups, section labels) |
@@ -52,7 +58,8 @@ The overline + brand-rule pattern is the primary section-introduction signature 
 <div class="bg-brand h-[2px] w-10"></div>
 ```
 
-`class="eyebrow"` resolves to: 11px / weight 600 / uppercase / letter-spacing 0.025em. Registered via `@utility` in `globals.css`. **Always pair with a color class** — the utility does not set color.
+`class="eyebrow"` resolves to: 11px / weight 600 / uppercase / letter-spacing 0.025em. Registered via `@utility` in
+`globals.css`. **Always pair with a color class** — the utility does not set color.
 
 ## Display Type
 
@@ -63,18 +70,19 @@ For hero numbers (workspace identifiers, display stats):
 <span class="text-7xl font-bold leading-[0.9] tracking-[-0.02em]">WS-01</span>
 ```
 
-Use `text-6xl` or `text-7xl`. Always `leading-[0.9]` and `-0.02em` tracking for display weight. Not for page titles (those use `text-3xl font-bold tracking-tight`).
+Use `text-6xl` or `text-7xl`. Always `leading-[0.9]` and
+`-0.02em` tracking for display weight. Not for page titles (those use `text-3xl font-bold tracking-tight`).
 
 ## Casing Rules
 
 | Context              | Rule                        | Example                                              |
-| -------------------- | --------------------------- | ---------------------------------------------------- |
+|----------------------|-----------------------------|------------------------------------------------------|
 | Navigation labels    | Title Case                  | "Projects", "My Workspaces"                          |
 | Page titles          | Title Case                  | "Terminal Sessions"                                  |
 | Overlines / eyebrows | UPPERCASE                   | "PROJECT OVERVIEW · WORKSPACE 01"                    |
 | Body / descriptions  | Sentence case               | "Integrated terminal with project-scoped workspaces" |
 | CTAs                 | Title Case (verb-first)     | "Create Project", "Open Terminal", "View Diff"       |
-| Identifiers          | Verbatim, hyphens preserved | `pixler/eng-101-fix-auth`                             |
+| Identifiers          | Verbatim, hyphens preserved | `pixler/eng-101-fix-auth`                            |
 | Em-dash usage        | Inline elaboration          | "Git-integrated — syncs with Linear"                 |
 | Bullet lists         | No terminal punctuation     | `· Projects · Workspaces · Terminal`                 |
 
@@ -83,6 +91,7 @@ Use `text-6xl` or `text-7xl`. Always `leading-[0.9]` and `-0.02em` tracking for 
 Use `tabular-nums` for any column of numbers that needs alignment: token counts, session durations, timestamps.
 
 ```html
+
 <td class="tabular-nums">1,495</td>
 <td class="tabular-nums">2h 15m</td>
 ```
@@ -110,6 +119,7 @@ Use `tabular-nums` for any column of numbers that needs alignment: token counts,
 ### Stat Value
 
 ```html
+
 <div class="text-2xl font-bold">$1.2M</div>
 ```
 
@@ -128,6 +138,7 @@ Use `tabular-nums` for any column of numbers that needs alignment: token counts,
 ### Table Header
 
 ```html
+
 <th class="text-sm font-medium text-muted-foreground">Customer</th>
 ```
 
@@ -140,7 +151,7 @@ Use `tabular-nums` for any column of numbers that needs alignment: token counts,
 ## Truncation
 
 | Class          | Behavior                  |
-| -------------- | ------------------------- |
+|----------------|---------------------------|
 | `truncate`     | Single line with ellipsis |
 | `line-clamp-2` | Two lines with ellipsis   |
 | `line-clamp-3` | Three lines with ellipsis |
@@ -148,7 +159,7 @@ Use `tabular-nums` for any column of numbers that needs alignment: token counts,
 ## Semantic Text Colors
 
 | Class                     | Usage                       |
-| ------------------------- | --------------------------- |
+|---------------------------|-----------------------------|
 | `text-foreground`         | Primary body text           |
 | `text-muted-foreground`   | Secondary/muted text        |
 | `text-primary`            | Links, active items         |

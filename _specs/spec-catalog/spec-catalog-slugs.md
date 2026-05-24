@@ -2,7 +2,8 @@
 
 ## Field Architecture
 
-Both Product and Part share: `slug` (auto from name, manually overridable), `slugUrl` (derived: `{category.slugUrl}/{slug}`), `category` (ObjectId ref to shared `categories` collection).
+Both Product and Part share: `slug` (auto from name, manually overridable), `slugUrl` (derived:
+`{category.slugUrl}/{slug}`), `category` (ObjectId ref to shared `categories` collection).
 
 - `slug` uniqueness: per-collection with `-2`, `-3` collision suffix
 - Manual override detection: `slug !== slugify(name)` — no extra boolean field
@@ -12,9 +13,12 @@ Both Product and Part share: `slug` (auto from name, manually overridable), `slu
 
 **On create:** auto-generate `slug` from name if not provided, compose `slugUrl`.
 
-**On update:** if slug manually provided → use it; elif name changed AND slug was auto-generated → re-derive; then recompose `slugUrl` if slug or category changed.
+**On update:
+** if slug manually provided → use it; elif name changed AND slug was auto-generated → re-derive; then recompose
+`slugUrl` if slug or category changed.
 
-**Category rename cascade:** when a Category's name changes → re-derive its `slugUrl` → re-derive `slugUrl` on all Products and Parts in that category (`cascadeSlugUrl()` in categories service).
+**Category rename cascade:** when a Category's name changes → re-derive its `slugUrl` → re-derive
+`slugUrl` on all Products and Parts in that category (`cascadeSlugUrl()` in categories service).
 
 ## Guest URL Structure
 
@@ -23,7 +27,8 @@ Both Product and Part share: `slug` (auto from name, manually overridable), `slu
 /catalog/parts/:categorySlug/:partSlug        → Part detail
 ```
 
-Link construction: `slugUrl || slug || id`. Detail pages resolved via `/v1/{products|parts}/public/by-slug-url/:categorySlug/:itemSlug`.
+Link construction: `slugUrl || slug || id`. Detail pages resolved via
+`/v1/{products|parts}/public/by-slug-url/:categorySlug/:itemSlug`.
 
 ## Admin Slug Editor
 

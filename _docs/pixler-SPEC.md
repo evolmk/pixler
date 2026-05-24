@@ -11,7 +11,9 @@
 
 ### 1.1 What Pixler is
 
-Pixler is a **local-first desktop application** that orchestrates Claude Code (and other agent CLIs) to take software tickets from “Todo” to “Merged PR” end-to-end. Each teammate runs their own copy via `npx pixler`. The app boots a local Node.js server and opens a browser to `localhost:7777`.
+Pixler is a **local-first desktop application
+** that orchestrates Claude Code (and other agent CLIs) to take software tickets from “Todo” to “Merged PR” end-to-end. Each teammate runs their own copy via
+`npx pixler`. The app boots a local Node.js server and opens a browser to `localhost:7777`.
 
 Conceptually it sits in the same category as Conductor.build, but is open-source, cross-platform (Mac/Windows/Linux), built on a stack the Lazar team already uses, and adds opinionated features around Linear-driven workflows, plan-file durability, and token-efficient agent communication.
 
@@ -19,7 +21,8 @@ Conceptually it sits in the same category as Conductor.build, but is open-source
 
 - Shipped as an npm package, executed via `npx pixler`
 - Pixler itself is free
-- All LLM compute is delegated to **already-authenticated CLIs on the user’s machine**: `claude`, `codex`, `gemini`, plus `gh` for GitHub
+- All LLM compute is delegated to **already-authenticated CLIs on the user’s machine**: `claude`, `codex`,
+  `gemini`, plus `gh` for GitHub
 - This keeps cost on the user’s existing Pro/Max/Codex subscription
 - Pixler never holds an LLM API key and never makes its own LLM API calls in v1/v2
 
@@ -40,30 +43,30 @@ Pixler is working when:
 
 ## 2. Stack
 
-|Layer                   |Choice                                            |Rationale                                                                                                                                           |
-|------------------------|--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-|Backend                 |NestJS (Node)                                     |Matches Lazar muscle memory; clean DI for orchestrator modules                                                                                      |
-|Frontend                |React 19 + Vite + TypeScript                      |Motion (motion.dev) + assistant-ui + future React Native path                                                                                       |
-|Styling                 |Tailwind v4 + CSS variables + `@pixler/ui-styles`  |Runtime theme switching with no rebuild                                                                                                             |
-|Animation               |Motion (motion.dev)                               |Gold standard for declarative React animation                                                                                                       |
-|Gestures                |`@use-gesture/react`                              |Multi-touch, pinch, fling, with Motion integration                                                                                                  |
-|Drawers/sheets          |Vaul                                              |Finger-tracked dismiss with velocity-and-distance physics — implement using `GoogleChrome/modern-web-guidance`                                      |
-|Command palette         |cmdk                                              |Vercel’s primitive; fuzzy search everything                                                                                                         |
-|Primitives              |Radix UI                                          |Accessibility + unstyled by default                                                                                                                 |
-|Chat UI                 |**assistant-ui**                                  |Production chat primitives (Thread, Message, Composer, ActionBar); streaming, markdown, code blocks, attachments out-of-box; theme via CSS variables|
-|Icons                   |Lucide React                                      |Matches Lazar                                                                                                                                       |
-|State                   |Zustand (UI) + TanStack Query (server)            |Local UI state + reactive cache                                                                                                                     |
-|Realtime                |Socket.io                                         |Stream PTY output + agent events                                                                                                                    |
-|Terminal                |node-pty + xterm.js                               |Spawn native shells, render in browser                                                                                                              |
-|Local DB                |better-sqlite3                                    |Industry standard for local desktop apps                                                                                                            |
-|Settings file           |JSON at `~/.config/pixler/config.json`            |Human-editable, version-controllable per user                                                                                                       |
-|Git                     |simple-git + native `git worktree`                |Native git is faster and more reliable than libgit2                                                                                                 |
-|Linear (Pixler internal)|`@linear/sdk` (GraphQL)                           |For sync, status transitions, attachments                                                                                                           |
-|Linear (agent-facing)   |**Thin Pixler CLI wrapper** (default) + MCP option|CLI is ~98% cheaper in tokens than MCP, user can switch                                                                                             |
-|GitHub                  |`gh` CLI (shells out, uses existing auth)         |Zero schema cost, leverages user’s existing auth                                                                                                    |
-|Mobile (v3+)            |Expo + React Native + Reanimated 3 + NativeWind   |Read-only companion                                                                                                                                 |
-|Repo layout             |Turborepo + pnpm workspaces, standalone           |Mirrors Lazar patterns                                                                                                                              |
-|Distribution            |npm package with `bin` entry                      |`npx pixler` boots server + opens browser                                                                                                           |
+| Layer                    | Choice                                             | Rationale                                                                                                                                            |
+|--------------------------|----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Backend                  | NestJS (Node)                                      | Matches Lazar muscle memory; clean DI for orchestrator modules                                                                                       |
+| Frontend                 | React 19 + Vite + TypeScript                       | Motion (motion.dev) + assistant-ui + future React Native path                                                                                        |
+| Styling                  | Tailwind v4 + CSS variables + `@pixler/ui-styles`  | Runtime theme switching with no rebuild                                                                                                              |
+| Animation                | Motion (motion.dev)                                | Gold standard for declarative React animation                                                                                                        |
+| Gestures                 | `@use-gesture/react`                               | Multi-touch, pinch, fling, with Motion integration                                                                                                   |
+| Drawers/sheets           | Vaul                                               | Finger-tracked dismiss with velocity-and-distance physics — implement using `GoogleChrome/modern-web-guidance`                                       |
+| Command palette          | cmdk                                               | Vercel’s primitive; fuzzy search everything                                                                                                          |
+| Primitives               | Radix UI                                           | Accessibility + unstyled by default                                                                                                                  |
+| Chat UI                  | **assistant-ui**                                   | Production chat primitives (Thread, Message, Composer, ActionBar); streaming, markdown, code blocks, attachments out-of-box; theme via CSS variables |
+| Icons                    | Lucide React                                       | Matches Lazar                                                                                                                                        |
+| State                    | Zustand (UI) + TanStack Query (server)             | Local UI state + reactive cache                                                                                                                      |
+| Realtime                 | Socket.io                                          | Stream PTY output + agent events                                                                                                                     |
+| Terminal                 | node-pty + xterm.js                                | Spawn native shells, render in browser                                                                                                               |
+| Local DB                 | better-sqlite3                                     | Industry standard for local desktop apps                                                                                                             |
+| Settings file            | JSON at `~/.config/pixler/config.json`             | Human-editable, version-controllable per user                                                                                                        |
+| Git                      | simple-git + native `git worktree`                 | Native git is faster and more reliable than libgit2                                                                                                  |
+| Linear (Pixler internal) | `@linear/sdk` (GraphQL)                            | For sync, status transitions, attachments                                                                                                            |
+| Linear (agent-facing)    | **Thin Pixler CLI wrapper** (default) + MCP option | CLI is ~98% cheaper in tokens than MCP, user can switch                                                                                              |
+| GitHub                   | `gh` CLI (shells out, uses existing auth)          | Zero schema cost, leverages user’s existing auth                                                                                                     |
+| Mobile (v3+)             | Expo + React Native + Reanimated 3 + NativeWind    | Read-only companion                                                                                                                                  |
+| Repo layout              | Turborepo + pnpm workspaces, standalone            | Mirrors Lazar patterns                                                                                                                               |
+| Distribution             | npm package with `bin` entry                       | `npx pixler` boots server + opens browser                                                                                                            |
 
 ### 2.1 Repo structure
 
@@ -85,7 +88,9 @@ pixler/
 
 ### 2.2 Design tokens approach
 
-Tokens live in `@pixler/ui-styles` and are consumed by both web (Tailwind + CSS variables) and future mobile (NativeWind). The package is generated from Lazar’s existing Tailwind preset as the starting point (the “Forest” theme), with the other 7 themes following the same token shape. The Angular source of truth for token values is in `files-from-my-angular-repo/ui-styles/src/globals.css`.
+Tokens live in
+`@pixler/ui-styles` and are consumed by both web (Tailwind + CSS variables) and future mobile (NativeWind). The package is generated from Lazar’s existing Tailwind preset as the starting point (the “Forest” theme), with the other 7 themes following the same token shape. The Angular source of truth for token values is in
+`files-from-my-angular-repo/ui-styles/src/globals.css`.
 
 -----
 
@@ -97,32 +102,38 @@ A workspace is the primary unit. One workspace = one ticket (or chat session) + 
 
 ### 3.2 Plan file
 
-Markdown file at `/docs/plans/<TICKET-ID>.md` in the repo. Created by the planner agent, lives on the branch, gets committed and merged. The plan file ties Linear ↔ GitHub together and lets the workflow survive across machines. Section 5 covers storage modes in detail.
+Markdown file at
+`/docs/plans/<TICKET-ID>.md` in the repo. Created by the planner agent, lives on the branch, gets committed and merged. The plan file ties Linear ↔ GitHub together and lets the workflow survive across machines. Section 5 covers storage modes in detail.
 
 ### 3.3 Worktree
 
-Each workspace gets an isolated git worktree at `<repo>/../pixler-worktrees/<workspace-name>/`. Branch naming defaults to `pixler/<workspace-name>` (configurable per project).
+Each workspace gets an isolated git worktree at
+`<repo>/../pixler-worktrees/<workspace-name>/`. Branch naming defaults to
+`pixler/<workspace-name>` (configurable per project).
 
 ### 3.4 Setup script
 
-Bash script that runs once when a workspace is created. Copies `.env`, installs deps, seeds databases, generates per-workspace identifiers. Configured per project, committed to the repo in `pixler.json` so teammates share it.
+Bash script that runs once when a workspace is created. Copies
+`.env`, installs deps, seeds databases, generates per-workspace identifiers. Configured per project, committed to the repo in
+`pixler.json` so teammates share it.
 
 ### 3.5 Run script
 
-Optional script that launches the workspace’s dev environment (`pnpm dev`, `pnpm api:dev`, etc.). Uses `$PIXLER_PORT` so multiple workspaces run side-by-side without port collisions.
+Optional script that launches the workspace’s dev environment (`pnpm dev`, `pnpm api:dev`, etc.). Uses
+`$PIXLER_PORT` so multiple workspaces run side-by-side without port collisions.
 
 ### 3.6 Pixler environment variables
 
 Available in setup, run, and archive scripts:
 
-|Variable                |Description                                             |
-|------------------------|--------------------------------------------------------|
-|`$PIXLER_ROOT_PATH`     |Original repo root                                      |
-|`$PIXLER_WORKSPACE_PATH`|This workspace’s worktree path                          |
-|`$PIXLER_WORKSPACE_NAME`|This workspace’s name (used for per-workspace resources)|
-|`$PIXLER_PORT`          |Auto-assigned port for this workspace                   |
-|`$PIXLER_TICKET_ID`     |Linear/GitHub issue ID (if applicable)                  |
-|`$PIXLER_BRANCH`        |Branch name                                             |
+| Variable                 | Description                                              |
+|--------------------------|----------------------------------------------------------|
+| `$PIXLER_ROOT_PATH`      | Original repo root                                       |
+| `$PIXLER_WORKSPACE_PATH` | This workspace’s worktree path                           |
+| `$PIXLER_WORKSPACE_NAME` | This workspace’s name (used for per-workspace resources) |
+| `$PIXLER_PORT`           | Auto-assigned port for this workspace                    |
+| `$PIXLER_TICKET_ID`      | Linear/GitHub issue ID (if applicable)                   |
+| `$PIXLER_BRANCH`         | Branch name                                              |
 
 -----
 
@@ -144,13 +155,13 @@ EXECUTING ──→ VALIDATING ──→ PR_OPEN ──→ DONE
 
 ### 4.2 Phase commands
 
-|Phase     |Default command (configurable per project + per role)                                    |
-|----------|-----------------------------------------------------------------------------------------|
-|Planning  |`claude --permission-mode plan "Work ticket [details]. Write plan to docs/plans/<id>.md"`|
-|Reviewing |`codex exec "Review this plan: [contents]. Reply REJECTED with critique or APPROVED."`   |
-|Executing |`claude --execute "Implement plan at docs/plans/<id>.md"`                                |
-|Validating|`claude --execute "/review"`                                                             |
-|PR        |`gh pr create --fill --body-file <generated-body>`                                       |
+| Phase      | Default command (configurable per project + per role)                                     |
+|------------|-------------------------------------------------------------------------------------------|
+| Planning   | `claude --permission-mode plan "Work ticket [details]. Write plan to docs/plans/<id>.md"` |
+| Reviewing  | `codex exec "Review this plan: [contents]. Reply REJECTED with critique or APPROVED."`    |
+| Executing  | `claude --execute "Implement plan at docs/plans/<id>.md"`                                 |
+| Validating | `claude --execute "/review"`                                                              |
+| PR         | `gh pr create --fill --body-file <generated-body>`                                        |
 
 All commands run inside the worktree’s cwd. All output streams to the chat/terminal UI via WebSocket.
 
@@ -170,16 +181,18 @@ Plan → review loops are capped at 3 iterations before human intervention. Conf
 
 ### 4.5 Mode: Chat vs Terminal
 
-Both modes use the same underlying `claude` (or `codex`) interactive CLI spawned via node-pty. They differ only in UI presentation. Both bill against the user’s subscription.
+Both modes use the same underlying `claude` (or
+`codex`) interactive CLI spawned via node-pty. They differ only in UI presentation. Both bill against the user’s subscription.
 
-|Mode                |UI                                                     |Use when                                                                             |
-|--------------------|-------------------------------------------------------|-------------------------------------------------------------------------------------|
-|**Chat** *(default)*|assistant-ui polished chat panel, styled like claude.ai|You want a conversational interface, message history, markdown rendering, attachments|
-|**Terminal**        |Raw xterm.js Big Terminal view of the `claude` CLI     |You want full control over Claude Code’s slash commands, status line, raw output     |
+| Mode                 | UI                                                      | Use when                                                                              |
+|----------------------|---------------------------------------------------------|---------------------------------------------------------------------------------------|
+| **Chat** *(default)* | assistant-ui polished chat panel, styled like claude.ai | You want a conversational interface, message history, markdown rendering, attachments |
+| **Terminal**         | Raw xterm.js Big Terminal view of the `claude` CLI      | You want full control over Claude Code’s slash commands, status line, raw output      |
 
 The mode picker appears in the New Workspace dialog. Users can switch modes mid-workspace (the underlying process is the same).
 
-A future v3 **Headless** mode will use `claude -p` (non-interactive Agent SDK), which on/after June 15, 2026 bills against a separate Agent SDK credit pool ($20/$100/$200 monthly depending on plan, metered at API rates after credit is exhausted). The mode picker shows a clear warning when Headless is selected.
+A future v3 **Headless** mode will use
+`claude -p` (non-interactive Agent SDK), which on/after June 15, 2026 bills against a separate Agent SDK credit pool ($20/$100/$200 monthly depending on plan, metered at API rates after credit is exhausted). The mode picker shows a clear warning when Headless is selected.
 
 -----
 
@@ -187,11 +200,11 @@ A future v3 **Headless** mode will use `claude -p` (non-interactive Agent SDK), 
 
 ### 5.1 Three storage modes
 
-|Mode          |Where the plan lives                                                           |Best for                                                          |
-|--------------|-------------------------------------------------------------------------------|------------------------------------------------------------------|
-|**File**      |`/docs/plans/<TICKET>.md` committed to branch                                  |Complex features, multi-step work                                 |
-|**Inline**    |Appended to Linear ticket description, delimited by HTML comment markers       |Simple tickets, rename/cleanup tasks                              |
-|**Attachment**|Uploaded to Linear via `fileUpload` mutation; rolling pair (current + previous)|Medium tickets, want plan visible in Linear without polluting repo|
+| Mode           | Where the plan lives                                                            | Best for                                                           |
+|----------------|---------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| **File**       | `/docs/plans/<TICKET>.md` committed to branch                                   | Complex features, multi-step work                                  |
+| **Inline**     | Appended to Linear ticket description, delimited by HTML comment markers        | Simple tickets, rename/cleanup tasks                               |
+| **Attachment** | Uploaded to Linear via `fileUpload` mutation; rolling pair (current + previous) | Medium tickets, want plan visible in Linear without polluting repo |
 
 ### 5.2 Default behavior
 
@@ -199,17 +212,18 @@ Global default storage method: **Auto** — Pixler picks per ticket complexity.
 
 Auto-recommendation signals:
 
-|Signal                                                              |Suggested mode|
-|--------------------------------------------------------------------|--------------|
-|Description < 200 chars, no acceptance criteria, no sub-tasks       |Inline        |
-|Description has acceptance criteria OR estimate ≥ 3 OR has sub-tasks|File          |
-|Description medium-length, no sub-tasks, labeled “bug” or “chore”   |Attachment    |
-|Has a `pixler:plan-file` / `pixler:plan-inline` label               |Forced        |
-|Project setting overrides default                                   |Project wins  |
+| Signal                                                               | Suggested mode |
+|----------------------------------------------------------------------|----------------|
+| Description < 200 chars, no acceptance criteria, no sub-tasks        | Inline         |
+| Description has acceptance criteria OR estimate ≥ 3 OR has sub-tasks | File           |
+| Description medium-length, no sub-tasks, labeled “bug” or “chore”    | Attachment     |
+| Has a `pixler:plan-file` / `pixler:plan-inline` label                | Forced         |
+| Project setting overrides default                                    | Project wins   |
 
 ### 5.3 Big-plan prompt
 
-When a plan starts as **inline** but exceeds thresholds (default: > 3 tasks OR > 500 chars approach), Pixler **blocks** and forces a choice:
+When a plan starts as **inline** but exceeds thresholds (default: > 3 tasks OR > 500 chars approach), Pixler **blocks
+** and forces a choice:
 
 ```
 ┌─ Plan exceeds inline thresholds ──────────────────────┐
@@ -239,14 +253,15 @@ When a plan starts as **inline** but exceeds thresholds (default: > 3 tasks OR >
 
 ### 5.4 Attachment versioning (rolling pair)
 
-|Plan revision|Linear attachments after this revision is committed                    |
-|-------------|-----------------------------------------------------------------------|
-|v1           |`plan-v1.md` (only)                                                    |
-|v2           |`plan-v2.md` (current) + `plan-v1.md` (previous)                       |
-|v3           |`plan-v3.md` (current) + `plan-v2.md` (previous) — `plan-v1.md` deleted|
-|v4           |`plan-v4.md` (current) + `plan-v3.md` (previous) — `plan-v2.md` deleted|
+| Plan revision | Linear attachments after this revision is committed                     |
+|---------------|-------------------------------------------------------------------------|
+| v1            | `plan-v1.md` (only)                                                     |
+| v2            | `plan-v2.md` (current) + `plan-v1.md` (previous)                        |
+| v3            | `plan-v3.md` (current) + `plan-v2.md` (previous) — `plan-v1.md` deleted |
+| v4            | `plan-v4.md` (current) + `plan-v3.md` (previous) — `plan-v2.md` deleted |
 
-Always max two attachments past v1. Old ones deleted via Linear’s `attachmentDelete` mutation immediately after the new one uploads.
+Always max two attachments past v1. Old ones deleted via Linear’s
+`attachmentDelete` mutation immediately after the new one uploads.
 
 Frontmatter tracks both:
 
@@ -280,22 +295,27 @@ reviewer: codex
 # ENG-101: Fix Auth Redirect
 
 ## Acceptance Criteria
+
 [Copied from Linear]
 
 ## Approach
+
 [Planner's prose]
 
 ## Tasks
+
 - [ ] Analyze /auth/callback endpoint
 - [ ] Inject JWT into cookie with proper SameSite
 - [ ] Add E2E test
 - [ ] Update docs
 
 ## Peer Review
+
 **Verdict:** APPROVED (round 1)
 [Reviewer's full critique]
 
 ## Execution Log
+
 - 14:02 Created: src/auth/callback.controller.ts
 - 14:05 Modified: src/auth/auth.service.ts
 - 14:09 Tests passing
@@ -311,6 +331,7 @@ For inline storage, Pixler appends to the Linear ticket description below the us
 
 ---
 <!-- pixler-plan:start revision=2 -->
+
 ## Plan (Pixler)
 
 **Approach:** [...]
@@ -318,6 +339,7 @@ For inline storage, Pixler appends to the Linear ticket description below the us
 - [x] Replace all call sites
 - [x] Update tests
 - [ ] Update docs
+
 <!-- pixler-plan:end -->
 ```
 
@@ -346,11 +368,11 @@ PAT auth in v1; OAuth in v2.
 
 ### 6.4 State transitions
 
-|Event          |Linear state           |
-|---------------|-----------------------|
-|Workspace start|Todo → In Progress     |
-|PR open        |In Progress → In Review|
-|PR merge       |In Review → Done       |
+| Event           | Linear state            |
+|-----------------|-------------------------|
+| Workspace start | Todo → In Progress      |
+| PR open         | In Progress → In Review |
+| PR merge        | In Review → Done        |
 
 State name mapping is configurable per global and per project (your team may use different names).
 
@@ -372,15 +394,16 @@ Clicking the link triggers OS URL-scheme handling, opens (or focuses) Pixler, an
 
 ### 6.7 CLI vs MCP for agents
 
-|Mode                           |Tokens per op                                  |Reliability          |Recommended     |
-|-------------------------------|-----------------------------------------------|---------------------|----------------|
-|**Pixler Linear CLI** (default)|~80 tokens (–help text)                        |100%                 |✓               |
-|**Linear MCP server**          |~5,000–15,000 tokens per turn (schema overhead)|~72% on complex tasks|Power users only|
-|**Both**                       |CLI for cheap ops, MCP for richer interactions |—                    |—               |
+| Mode                            | Tokens per op                                   | Reliability           | Recommended      |
+|---------------------------------|-------------------------------------------------|-----------------------|------------------|
+| **Pixler Linear CLI** (default) | ~80 tokens (–help text)                         | 100%                  | ✓                |
+| **Linear MCP server**           | ~5,000–15,000 tokens per turn (schema overhead) | ~72% on complex tasks | Power users only |
+| **Both**                        | CLI for cheap ops, MCP for richer interactions  | —                     | —                |
 
 Default ships with Pixler Linear CLI. Project Settings → Integrations lets the user switch to MCP or enable both.
 
-Pixler itself always uses `@linear/sdk` internally for sync, status transitions, attachments — never goes through an agent.
+Pixler itself always uses
+`@linear/sdk` internally for sync, status transitions, attachments — never goes through an agent.
 
 ### 6.8 Pixler Linear CLI commands
 
@@ -395,7 +418,8 @@ The `@pixler/linear-cli` package exposes thin commands agents call via bash:
 - `pixler attachment upload <ticket-id> <file>` — upload, returns `att_id`
 - `pixler attachment delete <att-id>` — delete
 
-Each command’s `--help` is short and tight (~80 tokens), so the agent learns the surface on first use and never re-reads.
+Each command’s
+`--help` is short and tight (~80 tokens), so the agent learns the surface on first use and never re-reads.
 
 -----
 
@@ -403,7 +427,8 @@ Each command’s `--help` is short and tight (~80 tokens), so the agent learns t
 
 ### 7.1 Auth
 
-Uses `gh` CLI from the user’s terminal environment. Pixler verifies via `gh auth status` and surfaces a re-auth helper if missing.
+Uses `gh` CLI from the user’s terminal environment. Pixler verifies via
+`gh auth status` and surfaces a re-auth helper if missing.
 
 ### 7.2 Repo onboarding
 
@@ -452,25 +477,27 @@ All panes resizable. Any pane can go full-bleed. Big Terminal mode goes full-ble
 
 - **Icon-first.** No labels when shape is obvious. Tooltips on long hover for discoverability.
 - **3-dot overflow** on every panel header for secondary actions, keeping primary surfaces clean.
-- **Settings opens as a Vaul side drawer** (~480px from right) — not a modal, not a full page. You can settings-while-doing.
+- **Settings opens as a Vaul side drawer
+  ** (~480px from right) — not a modal, not a full page. You can settings-while-doing.
 - **Toggles over checkboxes**, segmented controls over radios, steppers over number inputs.
 - **All transitions Framer-Motion’d** so the UI feels kinetic, not static.
 - **Theme picker is a grid of 16 swatches** (8 themes × light/dark) with live hover preview.
 
 ### 8.3 Workspace naming
 
-|Source                                      |Default name                                                              |
-|--------------------------------------------|--------------------------------------------------------------------------|
-|From Linear/GitHub issue                    |`<label-short>-<id>-<3-word-slug>` (e.g., `bug-eng-101-fix-auth-redirect`)|
-|If derived name collides with open workspace|Fall back to color name                                                   |
-|From scratch (no ticket)                    |Color name                                                                |
+| Source                                       | Default name                                                               |
+|----------------------------------------------|----------------------------------------------------------------------------|
+| From Linear/GitHub issue                     | `<label-short>-<id>-<3-word-slug>` (e.g., `bug-eng-101-fix-auth-redirect`) |
+| If derived name collides with open workspace | Fall back to color name                                                    |
+| From scratch (no ticket)                     | Color name                                                                 |
 
 **Color name pool** (~50 names, alphabetical, picked round-robin from unused):
 `amber`, `cerulean`, `coral`, `crimson`, `indigo`, `lavender`, `mint`, `ochre`, `slate`, `teal`, …
 
 Each color name subtly tints the workspace’s accent in the sidebar.
 
-Users can rename freely. Branch names follow the workspace name (`pixler/<workspace-name>`) unless overridden in project settings.
+Users can rename freely. Branch names follow the workspace name (
+`pixler/<workspace-name>`) unless overridden in project settings.
 
 ### 8.4 Gesture and touch UX
 
@@ -564,20 +591,22 @@ Two surfaces:
 
 ### 9.1 8 themes × light/dark = 16 variants
 
-|Theme                                            |Description                                                        |
-|-------------------------------------------------|-------------------------------------------------------------------|
-|**Forest** *(default; sourced from Lazar tokens)*|Green-primary palette from Lazar’s design system                   |
-|**Graphite**                                     |Neutral grays, blue accent — Linear-ish                            |
-|**Catppuccin**                                   |Frappé (dark) / Latte (light) — matches existing terminal aesthetic|
-|**Tokyo Night**                                  |Deep blues + magenta accent                                        |
-|**Nord**                                         |Cool blue-gray, minimal                                            |
-|**Rosé Pine**                                    |Warm muted, beloved in dev circles                                 |
-|**Solarized**                                    |Classic high-readability palette                                   |
-|**Mono**                                         |Pure grayscale, accent-free — for minimalists                      |
+| Theme                                             | Description                                                         |
+|---------------------------------------------------|---------------------------------------------------------------------|
+| **Forest** *(default; sourced from Lazar tokens)* | Green-primary palette from Lazar’s design system                    |
+| **Graphite**                                      | Neutral grays, blue accent — Linear-ish                             |
+| **Catppuccin**                                    | Frappé (dark) / Latte (light) — matches existing terminal aesthetic |
+| **Tokyo Night**                                   | Deep blues + magenta accent                                         |
+| **Nord**                                          | Cool blue-gray, minimal                                             |
+| **Rosé Pine**                                     | Warm muted, beloved in dev circles                                  |
+| **Solarized**                                     | Classic high-readability palette                                    |
+| **Mono**                                          | Pure grayscale, accent-free — for minimalists                       |
 
 ### 9.2 Implementation
 
-All themes driven by CSS custom properties. Theme switch = single attribute flip on `<html>`, zero re-render, no flash. Tokens read via Tailwind utility classes (`bg-base`, `text-primary`, etc.). Tokens live in `@pixler/ui-styles` for cross-product sharing with Lazar and future mobile.
+All themes driven by CSS custom properties. Theme switch = single attribute flip on
+`<html>`, zero re-render, no flash. Tokens read via Tailwind utility classes (`bg-base`,
+`text-primary`, etc.). Tokens live in `@pixler/ui-styles` for cross-product sharing with Lazar and future mobile.
 
 ### 9.3 Mode selection
 
@@ -602,42 +631,42 @@ Both the xterm.js terminal and the assistant-ui chat panel read from the same CS
 
 Opened via the gear icon in the top bar. Icon-rail left, content right.
 
-|Category          |Contains                                                                                                                                                                                                           |
-|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|**Account**       |Sign-in (future), privacy controls, telemetry opt-in (default on with prominent disclosure), crash reporting                                                                                                       |
-|**Models**        |Which Claude Code models appear in the picker, which Codex models, default model per role (planner/reviewer/executor), API key/env var management                                                                  |
-|**Providers**     |Path to `claude` binary, path to `codex`, path to `gemini`, path to `gh`. Auto-detect button. Re-auth shortcuts (helps user authenticate if missing).                                                              |
-|**Env**           |Environment variables passed to every agent process. Key-value editor with secret masking.                                                                                                                         |
-|**Linear**        |PAT, default workspace, default team, default project, sync interval, **status name mapping** (which Linear states = “Todo” / “In Progress” / “In Review” / “Done”)                                                |
-|**Git**           |Default branch naming template, commit message template, PR template, auto-merge behavior, automerge-on-green toggle, default base branch                                                                          |
-|**Plans**         |**Default storage method** (file/inline/attachment/**auto** — default), file directory, inline thresholds, attachment versioning                                                                                   |
-|**Appearance**    |Theme + mode (light/dark/system), density (compact/comfortable/spacious), font (UI + monospace), terminal theme sync, sidebar width default, animation level (full/reduced/off — respects OS prefer-reduced-motion)|
-|**Keyboard**      |Full shortcut editor with conflict detection, presets (Default / Vim / Emacs-ish)                                                                                                                                  |
-|**Notifications** |System notifications on/off per event, sound, do-not-disturb hours                                                                                                                                                 |
-|**Terminal**      |Default shell, font, font size, cursor style, scrollback lines, copy-on-select, paste warning, tool version manager detection                                                                                      |
-|**External Tools**|Default IDE, detected IDEs list, custom IDE config, `pixler://` URL scheme registration status                                                                                                                     |
-|**Storage**       |Worktree base directory, plan cache directory, log retention, **disk usage breakdown** (see 10.5), “Reset all prompts”, **“Reset all settings”** (type `RESET`), **“Wipe database”** (type `WIPE EVERYTHING`)      |
-|**Experimental**  |Big Terminal toggles, gesture sensitivity, beta features                                                                                                                                                           |
-|**About**         |Version, check for updates, changelog link, license, “Submit feedback”                                                                                                                                             |
+| Category           | Contains                                                                                                                                                                                                            |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Account**        | Sign-in (future), privacy controls, telemetry opt-in (default on with prominent disclosure), crash reporting                                                                                                        |
+| **Models**         | Which Claude Code models appear in the picker, which Codex models, default model per role (planner/reviewer/executor), API key/env var management                                                                   |
+| **Providers**      | Path to `claude` binary, path to `codex`, path to `gemini`, path to `gh`. Auto-detect button. Re-auth shortcuts (helps user authenticate if missing).                                                               |
+| **Env**            | Environment variables passed to every agent process. Key-value editor with secret masking.                                                                                                                          |
+| **Linear**         | PAT, default workspace, default team, default project, sync interval, **status name mapping** (which Linear states = “Todo” / “In Progress” / “In Review” / “Done”)                                                 |
+| **Git**            | Default branch naming template, commit message template, PR template, auto-merge behavior, automerge-on-green toggle, default base branch                                                                           |
+| **Plans**          | **Default storage method** (file/inline/attachment/**auto** — default), file directory, inline thresholds, attachment versioning                                                                                    |
+| **Appearance**     | Theme + mode (light/dark/system), density (compact/comfortable/spacious), font (UI + monospace), terminal theme sync, sidebar width default, animation level (full/reduced/off — respects OS prefer-reduced-motion) |
+| **Keyboard**       | Full shortcut editor with conflict detection, presets (Default / Vim / Emacs-ish)                                                                                                                                   |
+| **Notifications**  | System notifications on/off per event, sound, do-not-disturb hours                                                                                                                                                  |
+| **Terminal**       | Default shell, font, font size, cursor style, scrollback lines, copy-on-select, paste warning, tool version manager detection                                                                                       |
+| **External Tools** | Default IDE, detected IDEs list, custom IDE config, `pixler://` URL scheme registration status                                                                                                                      |
+| **Storage**        | Worktree base directory, plan cache directory, log retention, **disk usage breakdown** (see 10.5), “Reset all prompts”, **“Reset all settings”** (type `RESET`), **“Wipe database”** (type `WIPE EVERYTHING`)       |
+| **Experimental**   | Big Terminal toggles, gesture sensitivity, beta features                                                                                                                                                            |
+| **About**          | Version, check for updates, changelog link, license, “Submit feedback”                                                                                                                                              |
 
 ### 10.3 Project (Repository) Settings categories
 
 Opened via the gear icon next to the project name in the project switcher.
 
-|Category          |Contains                                                                                                                                                                         |
-|------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|**General**       |Display name, **icon** (auto-detects `icon.png`/`logo.svg`/`favicon.ico` in repo root, override with `.ico`/`.png` upload), description, **“Reset to defaults”** button          |
-|**Preferences**   |Free-form instructions appended to every agent’s system prompt for this repo (Pixler-only, doesn’t replace `AGENTS.md`/`CLAUDE.md`)                                              |
-|**Scripts**       |Setup script editor (syntax highlighted), run script editor, archive script. **Variables reference panel** showing all `$PIXLER_*` env vars with click-to-copy.                  |
-|**Files to copy** |Declarative list of gitignored files/globs to copy into each workspace (`.env`, `.env.local`, `serviceAccount.json`, etc.)                                                       |
-|**Integrations**  |Linear: CLI / MCP / Both (default CLI). GitHub: confirm `gh` auth status. Per-project Linear team/project filter, status mapping override, label filters.                        |
-|**Git**           |Branch template override, base branch, PR template override, auto-merge toggle, merge strategy (squash/merge/rebase)                                                             |
-|**Plans**         |Storage method override, plan directory, inline thresholds, **“Reset prompts”** button (clears “don’t ask again” flags for this project)                                         |
-|**Models**        |Override which models are used for planner/reviewer/executor in this repo                                                                                                        |
-|**MCP** *(v3)*    |MCP servers available to agents in this repo                                                                                                                                     |
-|**Workspaces**    |Max parallel agents, worktree directory override, **remove-confirmation silence window** preference                                                                              |
-|**Theme override**|Per-project theme + mode override                                                                                                                                                |
-|**Danger**        |**Remove project from Pixler** (modal confirm — keeps repo on disk), **Delete project** (type project name to confirm — also deletes worktrees + cloned repo if Pixler cloned it)|
+| Category           | Contains                                                                                                                                                                          |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **General**        | Display name, **icon** (auto-detects `icon.png`/`logo.svg`/`favicon.ico` in repo root, override with `.ico`/`.png` upload), description, **“Reset to defaults”** button           |
+| **Preferences**    | Free-form instructions appended to every agent’s system prompt for this repo (Pixler-only, doesn’t replace `AGENTS.md`/`CLAUDE.md`)                                               |
+| **Scripts**        | Setup script editor (syntax highlighted), run script editor, archive script. **Variables reference panel** showing all `$PIXLER_*` env vars with click-to-copy.                   |
+| **Files to copy**  | Declarative list of gitignored files/globs to copy into each workspace (`.env`, `.env.local`, `serviceAccount.json`, etc.)                                                        |
+| **Integrations**   | Linear: CLI / MCP / Both (default CLI). GitHub: confirm `gh` auth status. Per-project Linear team/project filter, status mapping override, label filters.                         |
+| **Git**            | Branch template override, base branch, PR template override, auto-merge toggle, merge strategy (squash/merge/rebase)                                                              |
+| **Plans**          | Storage method override, plan directory, inline thresholds, **“Reset prompts”** button (clears “don’t ask again” flags for this project)                                          |
+| **Models**         | Override which models are used for planner/reviewer/executor in this repo                                                                                                         |
+| **MCP** *(v3)*     | MCP servers available to agents in this repo                                                                                                                                      |
+| **Workspaces**     | Max parallel agents, worktree directory override, **remove-confirmation silence window** preference                                                                               |
+| **Theme override** | Per-project theme + mode override                                                                                                                                                 |
+| **Danger**         | **Remove project from Pixler** (modal confirm — keeps repo on disk), **Delete project** (type project name to confirm — also deletes worktrees + cloned repo if Pixler cloned it) |
 
 ### 10.4 Workspace-level controls
 
@@ -677,14 +706,14 @@ Each row shows path on hover, has a copy-path button, click opens in Finder/Expl
 
 ### 10.6 Reset confirmation tiers
 
-|Action                                         |Confirmation                                  |
-|-----------------------------------------------|----------------------------------------------|
-|Reset prompts (don’t-ask-again flags)          |Single click                                  |
-|Remove workspace                               |Modal with **“Silence for 1 minute”** checkbox|
-|Remove project (keeps repo)                    |Modal with Confirm button                     |
-|Delete project (also deletes worktrees + clone)|Type project name to confirm                  |
-|Reset all global settings                      |Type `RESET` to confirm                       |
-|Wipe database (factory reset)                  |Type `WIPE EVERYTHING` to confirm             |
+| Action                                          | Confirmation                                   |
+|-------------------------------------------------|------------------------------------------------|
+| Reset prompts (don’t-ask-again flags)           | Single click                                   |
+| Remove workspace                                | Modal with **“Silence for 1 minute”** checkbox |
+| Remove project (keeps repo)                     | Modal with Confirm button                      |
+| Delete project (also deletes worktrees + clone) | Type project name to confirm                   |
+| Reset all global settings                       | Type `RESET` to confirm                        |
+| Wipe database (factory reset)                   | Type `WIPE EVERYTHING` to confirm              |
 
 ### 10.7 Team config sharing
 
@@ -700,9 +729,12 @@ your-repo/
 
 `pixler.json` covers: setup/run scripts, files to copy, plan directory, branch template, models per role, Linear team/project, plan storage defaults.
 
-When a teammate clones a repo with `pixler.json`, Pixler shows a **diff view** comparing team config to their current settings. They cherry-pick what to import — no aggressive auto-apply.
+When a teammate clones a repo with `pixler.json`, Pixler shows a **diff view
+** comparing team config to their current settings. They cherry-pick what to import — no aggressive auto-apply.
 
-**Personal settings** (theme, keyboard shortcuts, notification prefs) stay global and never get touched by repo config — only **workflow** settings come from `pixler.json`.
+**Personal settings
+** (theme, keyboard shortcuts, notification prefs) stay global and never get touched by repo config — only **workflow
+** settings come from `pixler.json`.
 
 ### 10.8 Agent instructions inheritance
 
@@ -710,13 +742,16 @@ Pixler reads existing agent-instruction files at workspace creation, in priority
 
 1. `AGENTS.md` (Codex-native, increasingly cross-agent standard) — used here, matches Mike’s current convention
 1. `CLAUDE.md` (Claude Code’s native) — fallback if `AGENTS.md` missing
-1. `.pixler/instructions.md` *(v2 feature)* — Pixler-only layer for orchestration-specific instructions that shouldn’t shape Claude’s general behavior
+1. `.pixler/instructions.md` *(v2
+   feature)* — Pixler-only layer for orchestration-specific instructions that shouldn’t shape Claude’s general behavior
 
 All applicable files are concatenated and passed to every agent in the workspace as a system-prompt prefix.
 
 ### 10.9 Published JSON schema *(v2 / beta)*
 
-When Pixler exits beta and has a public domain, ship a JSON schema at a stable URL (e.g., `https://pixler.dev/schemas/config.json`) so editors autocomplete and validate `pixler.json`. Schema-aware editors (VS Code, JetBrains) pick it up automatically.
+When Pixler exits beta and has a public domain, ship a JSON schema at a stable URL (e.g.,
+`https://pixler.dev/schemas/config.json`) so editors autocomplete and validate
+`pixler.json`. Schema-aware editors (VS Code, JetBrains) pick it up automatically.
 
 -----
 
@@ -736,7 +771,8 @@ Designed to take under 90 seconds. Each step is a Vaul drawer panel sliding in f
 #### Step 2 — Connect Tools
 
 - **Git** — checks `git config user.name` and `user.email`; if missing, walks user through setting them
-- **Claude Code** — detects `claude` on PATH; shows version if found (“Claude Code 2.1.59 detected”); if missing, shows install command + copy button + “Re-check” button; detects subscription type (Pro/Max/API key) and surfaces which is active
+- **Claude Code** — detects
+  `claude` on PATH; shows version if found (“Claude Code 2.1.59 detected”); if missing, shows install command + copy button + “Re-check” button; detects subscription type (Pro/Max/API key) and surfaces which is active
 - **gh CLI** — checks `gh auth status`; if missing, walks user through `gh auth login`
 - **(Optional)** Codex / Gemini for peer review with the same auto-detection pattern
 - Big “Re-check all” button
@@ -756,18 +792,21 @@ Designed to take under 90 seconds. Each step is a Vaul drawer panel sliding in f
 - Three big tiles: **Open local folder** / **Clone from GitHub** / **Skip for now**
 - Local: file picker → detects git remote, default branch, package manager
 - GitHub: paste URL → clone with progress
-- Once added: tiny “Project Settings” preview shows key defaults (plan storage = auto, branch template = `pixler/<workspace>`)
+- Once added: tiny “Project Settings” preview shows key defaults (plan storage = auto, branch template =
+  `pixler/<workspace>`)
 - “Finish — let’s go →”
 
 #### Step 5 — Telemetry consent
 
 - Single toggle: **“Help improve Pixler by sharing anonymous usage data”** — checked by default
-- Expandable “What gets sent?” showing exact fields (feature usage counts, error rates, model selection patterns — **no code, no prompts, no ticket content**)
+- Expandable “What gets sent?” showing exact fields (feature usage counts, error rates, model selection patterns — **no
+  code, no prompts, no ticket content**)
 - “Finish”
 
 ### 11.2 Post-onboarding nudge
 
-User lands on the empty workspaces view with a single CTA: **”+ Create your first workspace”** — clicking opens a guided variant of the New Workspace dialog with inline hints that fade after first use.
+User lands on the empty workspaces view with a single CTA: **”+ Create your first workspace”
+** — clicking opens a guided variant of the New Workspace dialog with inline hints that fade after first use.
 
 ### 11.3 Re-runnable
 
@@ -784,12 +823,14 @@ The 5-hour rolling rate-limit window means burning tokens cheaply matters more t
 ### 12.2 Built-in token-saving defaults
 
 - **CLI > MCP** for Linear and similar integrations (~98% reduction)
-- **`.claudeignore`** seeded with `node_modules/`, `dist/`, `.next/`, `*.lock`, build artifacts on first workspace creation
+- **`.claudeignore`** seeded with `node_modules/`, `dist/`, `.next/`,
+  `*.lock`, build artifacts on first workspace creation
 - **Auto `/clear`** when switching workspaces
 - **Auto `/compact`** suggestion when session approaches context limit
 - **Plan mode default on** for tickets above complexity threshold (prevents costly rework)
 - **Per-project MCP allowlist** *(v3)* — only load MCP schemas the project actually uses
-- **Haiku for refactor/doc/cleanup tasks** suggestion when Pixler detects a simple change is needed; Sonnet for planning; Opus when explicitly requested
+- **Haiku for refactor/doc/cleanup tasks
+  ** suggestion when Pixler detects a simple change is needed; Sonnet for planning; Opus when explicitly requested
 
 ### 12.3 Token health panel
 
@@ -804,7 +845,8 @@ Settings → Usage shows:
 
 ### 12.4 Status bar (always visible)
 
-Top-right pill: `73% / 4h 12m` — current 5-hour window + time to reset. Color shifts green → yellow → red as you approach the limit. Click to expand into a popover with model breakdown.
+Top-right pill:
+`73% / 4h 12m` — current 5-hour window + time to reset. Color shifts green → yellow → red as you approach the limit. Click to expand into a popover with model breakdown.
 
 ### 12.5 Pre-flight check before spawning parallel agents
 
@@ -828,7 +870,8 @@ Auto-snapshots taken at key points so users can roll back if an agent goes off t
 
 ### 13.3 How they work
 
-Each checkpoint is a labeled `git stash push` of working-tree state + a snapshot of the workspace state (chat history, plan revision, todo state) stored in SQLite. Rollback re-applies the stash and restores workspace state.
+Each checkpoint is a labeled
+`git stash push` of working-tree state + a snapshot of the workspace state (chat history, plan revision, todo state) stored in SQLite. Rollback re-applies the stash and restores workspace state.
 
 ### 13.4 UI
 
@@ -840,14 +883,14 @@ Each checkpoint is a labeled `git stash push` of working-tree state + a snapshot
 
 ## 14. Build phases
 
-|Phase                          |Duration|Deliverable                                                                                                                                                                  |
-|-------------------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|**1. Shell**                   |2 weeks |`npx pixler` boots, opens browser, streams a live PTY into xterm.js. Theme system with 2 themes wired (Forest from Lazar + Graphite). Vaul settings drawer skeleton. ⌘K stub.|
-|**2. Projects + Linear**       |2 weeks |Add project (local + GitHub clone). Linear PAT auth, ticket list, state transitions. Project Settings UI. `pixler.json` read/write. Pixler Linear CLI wrapper.               |
-|**3. Orchestrator + worktrees**|2 weeks |Workspace creation, setup scripts, run scripts, plan → review → execute → PR loop. Plan file format with all 3 storage modes. End-to-end ticket-to-PR demo. Checkpoints.     |
-|**4. Chat UI + diff viewer**   |2 weeks |assistant-ui chat panel, Monaco diff viewer, Checks tab, slash commands, activity feed, Run/Open App button, IDE launcher.                                                   |
-|**5. Polish + theming**        |2 weeks |All 8 themes, gesture polish, keyboard shortcuts, archive/restore, command palette completion, deep links, token health panel.                                               |
-|**6. Internal release**        |1 week  |Ship to the team. Telemetry, crash reporting, README, onboarding video.                                                                                                      |
+| Phase                           | Duration | Deliverable                                                                                                                                                                   |
+|---------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **1. Shell**                    | 2 weeks  | `npx pixler` boots, opens browser, streams a live PTY into xterm.js. Theme system with 2 themes wired (Forest from Lazar + Graphite). Vaul settings drawer skeleton. ⌘K stub. |
+| **2. Projects + Linear**        | 2 weeks  | Add project (local + GitHub clone). Linear PAT auth, ticket list, state transitions. Project Settings UI. `pixler.json` read/write. Pixler Linear CLI wrapper.                |
+| **3. Orchestrator + worktrees** | 2 weeks  | Workspace creation, setup scripts, run scripts, plan → review → execute → PR loop. Plan file format with all 3 storage modes. End-to-end ticket-to-PR demo. Checkpoints.      |
+| **4. Chat UI + diff viewer**    | 2 weeks  | assistant-ui chat panel, Monaco diff viewer, Checks tab, slash commands, activity feed, Run/Open App button, IDE launcher.                                                    |
+| **5. Polish + theming**         | 2 weeks  | All 8 themes, gesture polish, keyboard shortcuts, archive/restore, command palette completion, deep links, token health panel.                                                |
+| **6. Internal release**         | 1 week   | Ship to the team. Telemetry, crash reporting, README, onboarding video.                                                                                                       |
 
 **Estimated total to internal release: ~11 weeks.**
 
@@ -861,11 +904,16 @@ Workspaces, plan loop (file/inline/attachment), Linear+GitHub via CLI, Chat mode
 
 ### v2
 
-Headless mode (Agent SDK with credit-pool billing), `.pixler/instructions.md` Pixler-only instruction layer, Pixler status bar above terminal with token usage, real-time CI via GitHub webhooks, HTML inline preview for static content, agent personalities, published JSON schema for `pixler.json`, Linear OAuth (replacing PAT-only).
+Headless mode (Agent SDK with credit-pool billing),
+`.pixler/instructions.md` Pixler-only instruction layer, Pixler status bar above terminal with token usage, real-time CI via GitHub webhooks, HTML inline preview for static content, agent personalities, published JSON schema for
+`pixler.json`, Linear OAuth (replacing PAT-only).
 
 ### v3
 
-Multi-repo `/add-dir`, MCP server config per repo, multi-agent collaboration (experimental), Spotlight testing, submit-a-prompt feedback channel, **mobile read-only companion** (Expo + Reanimated), enterprise managed-settings file (`~/.config/pixler/managed.json` with schema-locked controls).
+Multi-repo
+`/add-dir`, MCP server config per repo, multi-agent collaboration (experimental), Spotlight testing, submit-a-prompt feedback channel,
+**mobile read-only companion** (Expo + Reanimated), enterprise managed-settings file (
+`~/.config/pixler/managed.json` with schema-locked controls).
 
 -----
 
@@ -886,7 +934,8 @@ Intentionally not in Pixler’s scope, at any version:
 
 These need decisions before / during v1 implementation:
 
-1. **Lazar Tailwind tokens import** — Mike to share preset files; will be extracted into `@pixler/ui-styles` as the Forest theme anchor
+1. **Lazar Tailwind tokens import** — Mike to share preset files; will be extracted into
+   `@pixler/ui-styles` as the Forest theme anchor
 1. **Branding / logo direction** — pending
 1. **License** — MIT or Apache 2.0 for open-source vs closed-source-but-free (Conductor’s model)
 1. **Domain for published JSON schema** — pending (used only in v2)
@@ -896,18 +945,18 @@ These need decisions before / during v1 implementation:
 
 ## 18. Glossary
 
-|Term                    |Meaning                                                                                              |
-|------------------------|-----------------------------------------------------------------------------------------------------|
-|**Workspace**           |One ticket + one worktree + one branch + one agent. Pixler’s primary unit.                           |
-|**Plan file**           |`/docs/plans/<TICKET>.md` (or Linear inline/attachment). Source of truth for what the agent is doing.|
-|**Worktree**            |Isolated git working directory at `<repo>/../pixler-worktrees/<name>/`.                              |
-|**Setup script**        |Bash script that prepares a fresh workspace (deps, .env, etc.)                                       |
-|**Run script**          |Bash script that starts the workspace’s dev environment.                                             |
-|**Checkpoint**          |Auto-snapshot of working tree + workspace state for rollback.                                        |
-|**Big Terminal**        |Full-bleed terminal mode (raw `claude` CLI).                                                         |
-|**Chat mode**           |Polished assistant-ui chat panel over the same `claude` CLI.                                         |
-|**Headless mode** *(v3)*|Non-interactive `claude -p` runs; bills against Agent SDK credit pool.                               |
-|**Peer gate**           |The plan review loop where a second LLM reviews the planner’s output.                                |
-|**`pixler.json`**       |Repo-committed team workflow config.                                                                 |
-|**`@pixler/ui-styles`**    |Shared design token package (themes, spacing, typography).                                           |
-|**Color name**          |Workspace identifier when no ticket-derived name exists or there’s a collision.                      |
+| Term                     | Meaning                                                                                               |
+|--------------------------|-------------------------------------------------------------------------------------------------------|
+| **Workspace**            | One ticket + one worktree + one branch + one agent. Pixler’s primary unit.                            |
+| **Plan file**            | `/docs/plans/<TICKET>.md` (or Linear inline/attachment). Source of truth for what the agent is doing. |
+| **Worktree**             | Isolated git working directory at `<repo>/../pixler-worktrees/<name>/`.                               |
+| **Setup script**         | Bash script that prepares a fresh workspace (deps, .env, etc.)                                        |
+| **Run script**           | Bash script that starts the workspace’s dev environment.                                              |
+| **Checkpoint**           | Auto-snapshot of working tree + workspace state for rollback.                                         |
+| **Big Terminal**         | Full-bleed terminal mode (raw `claude` CLI).                                                          |
+| **Chat mode**            | Polished assistant-ui chat panel over the same `claude` CLI.                                          |
+| **Headless mode** *(v3)* | Non-interactive `claude -p` runs; bills against Agent SDK credit pool.                                |
+| **Peer gate**            | The plan review loop where a second LLM reviews the planner’s output.                                 |
+| **`pixler.json`**        | Repo-committed team workflow config.                                                                  |
+| **`@pixler/ui-styles`**  | Shared design token package (themes, spacing, typography).                                            |
+| **Color name**           | Workspace identifier when no ticket-derived name exists or there’s a collision.                       |

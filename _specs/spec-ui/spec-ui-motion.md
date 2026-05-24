@@ -1,15 +1,17 @@
 # Motion Rules
 
-**When to read:** When building any page or component. Function over flair — motion communicates state change, never decoration.
+**When to read:
+** When building any page or component. Function over flair — motion communicates state change, never decoration.
 
 ## Core rule
 
-**200ms ease for all transitions.** Apply via `transition-all duration-200 ease` to: hover states, scroll-state headers, dropdown open/close, any visual state change.
+**200ms ease for all transitions.** Apply via
+`transition-all duration-200 ease` to: hover states, scroll-state headers, dropdown open/close, any visual state change.
 
 ## Allowed motion
 
 | Pattern                | Implementation                                                                |
-| ---------------------- | ----------------------------------------------------------------------------- |
+|------------------------|-------------------------------------------------------------------------------|
 | Header scroll collapse | White → White (blurred bg), 70px → 50px, `duration-200 ease`                  |
 | Dropdown open/close    | Fade in/out with opacity, `duration-200 ease`                                 |
 | Skeleton → content     | `<Skeleton>` with `animate-pulse`, swap on load                               |

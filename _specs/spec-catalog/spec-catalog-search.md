@@ -12,7 +12,7 @@ Route: `/catalog/search?q=term&type=all|products|parts` — URL state synced bid
 ## Result Card Differences
 
 | Element    | Product                | Part                               |
-| ---------- | ---------------------- | ---------------------------------- |
+|------------|------------------------|------------------------------------|
 | Type badge | "Product" (green tint) | "Part" (brand tint)                |
 | Subtitle   | Category name          | Part number (mono) · Category name |
 | Price      | —                      | Auth-gated (approved + verified)   |

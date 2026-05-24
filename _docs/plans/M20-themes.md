@@ -15,24 +15,34 @@ Finish the theming story from SPEC §9: ship all eight themes (Forest, Graphite,
 ## Deliverables
 
 - [ ] `packages/ui-styles/src/themes/`:
-  - `catppuccin.ts` — Latte (light) / Frappé (dark)
-  - `tokyo-night.ts`
-  - `nord.ts`
-  - `rose-pine.ts`
-  - `solarized.ts`
-  - `mono.ts`
-  - Each one matches the same shape as `forest.ts`/`graphite.ts` from M02 (base, surface, primary, accent, text, border, success/warning/danger, terminal palette, syntax palette)
-- [ ] Update `apps/web/src/styles/theme.css` with the additional `[data-theme="…"][data-mode="…"]` selectors (8 themes × 2 modes = 16 blocks)
+    - `catppuccin.ts` — Latte (light) / Frappé (dark)
+    - `tokyo-night.ts`
+    - `nord.ts`
+    - `rose-pine.ts`
+    - `solarized.ts`
+    - `mono.ts`
+    - Each one matches the same shape as `forest.ts`/
+      `graphite.ts` from M02 (base, surface, primary, accent, text, border, success/warning/danger, terminal palette, syntax palette)
+- [ ] Update `apps/web/src/styles/theme.css` with the additional
+  `[data-theme="…"][data-mode="…"]` selectors (8 themes × 2 modes = 16 blocks)
 - [ ] **Theme picker grid** in Settings → Appearance:
-  - 16 swatches in a 4×4 grid (theme × mode)
-  - Each swatch is a small preview: shows base + elevated + primary + accent + a typography sample
-  - Hover preview: applies the theme to the entire app temporarily; on click, persists via `useSetting('appearance.theme', …)` + `appearance.mode`
-  - Star indicator on the currently active swatch
-- [ ] **Per-project theme override** (SPEC §9.3) — Project Settings → Theme override panel reuses the same grid; project setting beats global
-- [ ] **Terminal palette + chat code-block theme** verified across all 8: ensure Shiki uses an appropriately matched grammar theme (`catppuccin-frappe`, `tokyo-night`, `nord`, etc. — Shiki ships several of these natively; for Forest/Graphite/Mono fall back to closest match)
-- [ ] **Monaco theme sync**: register custom Monaco themes generated from token values for at least each `mode` per `theme` (one Monaco theme per active selection is enough — register on theme change)
-- [ ] **Animation level** setting (`appearance.animationLevel: 'full' | 'reduced' | 'off'`) implemented — `reduced` honors OS preference; `off` strips all Motion animations
-- [ ] **Density** setting (`appearance.density`) — sets a CSS-variable `--pixler-density` that components read for padding/font-size scaling
+    - 16 swatches in a 4×4 grid (theme × mode)
+    - Each swatch is a small preview: shows base + elevated + primary + accent + a typography sample
+    - Hover preview: applies the theme to the entire app temporarily; on click, persists via
+      `useSetting('appearance.theme', …)` + `appearance.mode`
+    - Star indicator on the currently active swatch
+- [ ] **Per-project theme override
+  ** (SPEC §9.3) — Project Settings → Theme override panel reuses the same grid; project setting beats global
+- [ ] **Terminal palette + chat code-block theme
+  ** verified across all 8: ensure Shiki uses an appropriately matched grammar theme (`catppuccin-frappe`,
+  `tokyo-night`,
+  `nord`, etc. — Shiki ships several of these natively; for Forest/Graphite/Mono fall back to closest match)
+- [ ] **Monaco theme sync**: register custom Monaco themes generated from token values for at least each `mode` per
+  `theme` (one Monaco theme per active selection is enough — register on theme change)
+- [ ] **Animation level** setting (`appearance.animationLevel: 'full' | 'reduced' | 'off'`) implemented —
+  `reduced` honors OS preference; `off` strips all Motion animations
+- [ ] **Density** setting (`appearance.density`) — sets a CSS-variable
+  `--pixler-density` that components read for padding/font-size scaling
 
 ## Acceptance
 

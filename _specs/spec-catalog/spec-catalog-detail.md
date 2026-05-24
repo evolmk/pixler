@@ -2,12 +2,13 @@
 
 ## Image Gallery (both pages)
 
-Both product and part detail pages use `ui-carousel` with horizontal thumbnails below. Click opens `ui-lightbox` at current index. Single image: no carousel chrome, click still opens lightbox. No images: placeholder icon.
+Both product and part detail pages use `ui-carousel` with horizontal thumbnails below. Click opens
+`ui-lightbox` at current index. Single image: no carousel chrome, click still opens lightbox. No images: placeholder icon.
 
 ## Product Detail vs. Part Detail
 
 | Aspect          | Product Detail                                                 | Part Detail                                                 |
-| --------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
+|-----------------|----------------------------------------------------------------|-------------------------------------------------------------|
 | Layout          | 2-column grid: images left, info right                         | Same                                                        |
 | Primary info    | Group name, product name, abbreviation, description            | Category, part number (mono, prominent), name, SKU          |
 | Price           | Not shown                                                      | Auth-gated (approved + verified). Sign-in prompt for guests |

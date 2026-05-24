@@ -12,21 +12,27 @@ Implement SPEC §8.7: a Monaco-based diff viewer in the center pane's Diff tab t
 ## Deliverables
 
 - [ ] api `DiffModule`:
-  - `GET /api/workspaces/:id/diff` — returns `{ files: [{ path, status, additions, deletions, hunks: [{ header, lines }] }] }` via `git diff` (uncommitted changes vs base branch's merge-base, switchable to `HEAD` etc.)
-  - `GET /api/workspaces/:id/diff/file?path=&against=workdir|index|head` — single-file blob pair for Monaco
-  - `POST /api/workspaces/:id/diff/stage` body `{ path, hunks: number[] }` — `git add -p` style staging
-  - `POST /api/workspaces/:id/diff/unstage` — opposite
-  - **Live updates**: a file watcher (chokidar) on the worktree emits `diff.changed` events when files change so the UI doesn't have to poll
+    - `GET /api/workspaces/:id/diff` — returns
+      `{ files: [{ path, status, additions, deletions, hunks: [{ header, lines }] }] }` via
+      `git diff` (uncommitted changes vs base branch's merge-base, switchable to `HEAD` etc.)
+    - `GET /api/workspaces/:id/diff/file?path=&against=workdir|index|head` — single-file blob pair for Monaco
+    - `POST /api/workspaces/:id/diff/stage` body `{ path, hunks: number[] }` — `git add -p` style staging
+    - `POST /api/workspaces/:id/diff/unstage` — opposite
+    - **Live updates**: a file watcher (chokidar) on the worktree emits
+      `diff.changed` events when files change so the UI doesn't have to poll
 - [ ] **Diff tab UI**:
-  - Left rail: file tree with status badges (added/modified/deleted), per-file additions/deletions
-  - Right area: Monaco `DiffEditor` for the selected file
-  - Toolbar: side-by-side / unified toggle, "Show whitespace", per-file search input
-  - Bottom strip: hunk list with checkboxes for staging; "Stage selected" / "Unstage selected" actions
-  - Pinch-to-zoom support placeholder (real gesture wires in M24)
-  - Language detection for syntax highlighting (Monaco's built-in mapping by file extension)
-  - Updates live as the agent writes files — Monaco diff re-mounts efficiently using the same model
-- [ ] **Settings → Appearance** add diff-specific options: word-wrap, render-whitespace, theme syncs with `pixler.theme` (use Monaco's `vs-dark`/`vs` baseline tinted with our CSS vars where possible; otherwise pick the closer of the two per mode)
-- [ ] **Keyboard shortcut**: `⌘+Shift+D` toggles full-bleed diff view (uses M06's full-bleed mechanism for the center pane)
+    - Left rail: file tree with status badges (added/modified/deleted), per-file additions/deletions
+    - Right area: Monaco `DiffEditor` for the selected file
+    - Toolbar: side-by-side / unified toggle, "Show whitespace", per-file search input
+    - Bottom strip: hunk list with checkboxes for staging; "Stage selected" / "Unstage selected" actions
+    - Pinch-to-zoom support placeholder (real gesture wires in M24)
+    - Language detection for syntax highlighting (Monaco's built-in mapping by file extension)
+    - Updates live as the agent writes files — Monaco diff re-mounts efficiently using the same model
+- [ ] **Settings → Appearance** add diff-specific options: word-wrap, render-whitespace, theme syncs with
+  `pixler.theme` (use Monaco's `vs-dark`/
+  `vs` baseline tinted with our CSS vars where possible; otherwise pick the closer of the two per mode)
+- [ ] **Keyboard shortcut**:
+  `⌘+Shift+D` toggles full-bleed diff view (uses M06's full-bleed mechanism for the center pane)
 
 ## Acceptance
 

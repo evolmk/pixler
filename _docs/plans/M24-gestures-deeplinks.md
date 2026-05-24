@@ -14,33 +14,38 @@ Implement the gesture + motion details from SPEC §8.2/§8.4 + the deep-link sur
 
 - [ ] `apps/web/package.json` adds `@use-gesture/react`
 - [ ] **Gesture wiring**:
-  - **Swipe-to-archive** on workspace sidebar cards: drag horizontally; on `> 50%` displacement or velocity-flick, fire archive; smooth Motion spring-back / spring-out animation
-  - **Pull-to-refresh** on the Linear ticket list section: drag down past threshold; triggers `POST /api/linear/sync`
-  - **Long-press** workspace card → opens the context menu (already in M08; here we add the gesture path)
-  - **Pinch-to-zoom** Monaco diff (M17 placeholder becomes real here): pinch scales the editor font-size with a clamp
+    - **Swipe-to-archive** on workspace sidebar cards: drag horizontally; on
+      `> 50%` displacement or velocity-flick, fire archive; smooth Motion spring-back / spring-out animation
+    - **Pull-to-refresh** on the Linear ticket list section: drag down past threshold; triggers `POST /api/linear/sync`
+    - **Long-press** workspace card → opens the context menu (already in M08; here we add the gesture path)
+    - **Pinch-to-zoom** Monaco diff (M17 placeholder becomes real here): pinch scales the editor font-size with a clamp
 - [ ] **Animation pass**:
-  - Audit every modal, drawer, dropdown, tab change for Motion exit + enter
-  - Stagger entrance animations for the sidebar workspace list (small `delay` per item)
-  - Theme switch transition: 200ms fade on `--pixler-bg` swap (use `transition: background-color`)
-  - Respect `appearance.animationLevel` from M20 globally
+    - Audit every modal, drawer, dropdown, tab change for Motion exit + enter
+    - Stagger entrance animations for the sidebar workspace list (small `delay` per item)
+    - Theme switch transition: 200ms fade on `--pixler-bg` swap (use `transition: background-color`)
+    - Respect `appearance.animationLevel` from M20 globally
 - [ ] **Deep link infra**:
-  - Boot script registers `pixler://` URL scheme:
-    - macOS: install a tiny `.app` shim that posts the URL to the running api at `POST /api/deeplink`; if no Pixler running, boot it then forward
-    - Windows: registry entry `HKCU\Software\Classes\pixler`
-    - Linux: `xdg-mime` + `.desktop` file
-  - `apps/api/src/deeplink/deeplink.module.ts`:
-    - `POST /api/deeplink` body `{ url }` — parses `pixler://workspace/<id>`, `pixler://project/<id>`, `pixler://ticket/<identifier>`
-    - Emits `deeplink.received` event; the web app navigates accordingly and focuses the window
-  - Status displayed in **Settings → External Tools** "URL scheme registration status" — "Registered" / "Not registered (Register)"
+    - Boot script registers `pixler://` URL scheme:
+        - macOS: install a tiny `.app` shim that posts the URL to the running api at
+          `POST /api/deeplink`; if no Pixler running, boot it then forward
+        - Windows: registry entry `HKCU\Software\Classes\pixler`
+        - Linux: `xdg-mime` + `.desktop` file
+    - `apps/api/src/deeplink/deeplink.module.ts`:
+        - `POST /api/deeplink` body `{ url }` — parses `pixler://workspace/<id>`, `pixler://project/<id>`,
+          `pixler://ticket/<identifier>`
+        - Emits `deeplink.received` event; the web app navigates accordingly and focuses the window
+    - Status displayed in **Settings → External Tools
+      ** "URL scheme registration status" — "Registered" / "Not registered (Register)"
 - [ ] **Linear deep-link comments** (SPEC §6.6):
-  - On workspace creation, post a Linear comment:
-    ```
-    🎼 Open in Pixler → pixler://workspace/<workspace-id>
-       Plan: docs/plans/<TICKET>.md (file)
-    ```
-  - Use the M11 `pixler ticket comment` CLI internally (or the M10 LinearService directly — either is fine)
-  - Toggle in Project Settings → Integrations: "Post deep-link comments to Linear" (default on)
-- [ ] **Image preview file tab** (SPEC §8.5): clicking an image in a chat message opens it in a dedicated file tab with click-to-fullscreen
+    - On workspace creation, post a Linear comment:
+      ```
+      🎼 Open in Pixler → pixler://workspace/<workspace-id>
+         Plan: docs/plans/<TICKET>.md (file)
+      ```
+    - Use the M11 `pixler ticket comment` CLI internally (or the M10 LinearService directly — either is fine)
+    - Toggle in Project Settings → Integrations: "Post deep-link comments to Linear" (default on)
+- [ ] **Image preview file tab
+  ** (SPEC §8.5): clicking an image in a chat message opens it in a dedicated file tab with click-to-fullscreen
 
 ## Acceptance
 
