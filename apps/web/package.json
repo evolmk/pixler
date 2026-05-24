@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@pixler/shared-types": "workspace:*",
+    "@pixler/ui": "workspace:*",
     "@pixler/ui-styles": "workspace:*",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/react-query": "^5.100.14",
