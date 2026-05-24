@@ -1,5 +1,6 @@
 # Milestone Tracker
 
+**Most Recent Plan ID:** M26
 **Last Plan Completed:** M05-sqlite-settings
 **Next Plan:** M03-ui-kit
 
@@ -32,3 +33,4 @@
 - [ ] **M23** — Token health
 - [ ] **M24** — Gestures + deep links
 - [ ] **M25** — Ship
+- [ ] **M26** — Playwright E2E smoke suite

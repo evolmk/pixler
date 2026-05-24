@@ -7,8 +7,9 @@ style: Radix + CVA + `cn()`) that every app in the monorepo consumes via subpath
 (`import { Button } from '@pixler/ui/components/button'`). Install the **full shadcn component
 catalog** plus a handful of Pixler-specific primitives. Components read all color/spacing from
 the existing `@pixler/ui-styles` token contract — no tokens are duplicated into this package.
-Ship a **Storybook gallery** alongside the package with four custom landing pages (Showcase,
-Style Guide, Shadcn-case, Design) for visual review across all 11 color schemes × light/dark.
+Ship a **Storybook gallery** alongside the package with five custom landing pages (Showcase,
+Style Guide, Design, Design.md, Shadcn-case) for visual review across all 11 color schemes ×
+light/dark.
 
 Pattern reference: `evgenius1424/turborepo-vite-shadcn-ui` (shared `ui` package + `pnpm ui add`
 workflow), but Pixler diverges on where tokens live (see Key decisions). Storybook structure
@@ -88,7 +89,35 @@ Add via `pnpm --filter @pixler/ui ui <name>` (the `ui` script above). Install th
 - [ ] `<Stepper value min max onChange>` — replaces bare number inputs
 - [ ] `<SegmentedControl options value onChange>` — pill wrapper over shadcn `toggle-group`
 - [ ] `<ResizableSplit direction sizes onResize>` — thin wrapper over shadcn `resizable`
-  (`ResizablePanelGroup`/`ResizablePanel`/`ResizableHandle`); keeps the name M06 references
+  (`ResizablePanelGroup`/`ResizablePanel`/`ResizableHandle`); keeps the name M06 references.
+  **Mobile behavior:** below `lg`, stacks panels vertically and hides the drag handle so the
+  3-pane desktop layout becomes a single scroll column on phone (no per-consumer breakpoint code).
+- [ ] `<AdaptiveSheet>` — picks Vaul `drawer` on `<md` (bottom-up, swipe-to-dismiss) and Radix
+  `sheet` on `≥md` (side-in). Same API surface in both modes so Settings, workspace details, and
+  ticket details share one component. Driven by `useMediaQuery('(min-width: 768px)')`.
+- [ ] `<BottomTabs items value onChange>` — fixed bottom tab bar for mobile. Replaces the center
+  Radix `tabs` on `<md` so the Chat / Plan / Diff / Checks / PR surfaces stay one-tap reachable
+  without horizontal scroll. Renders nothing on `≥md` (let the regular `tabs` show instead).
+- [ ] `<DesignMdViewer sections tocTitle?>` — reusable **Getdesign.md-style editorial previewer**.
+  See `_docs/screenshots/design-md-template.jpg` for the visual reference (Airbnb design-system
+  walkthrough aesthetic). API: takes a `sections` array of `{ number, eyebrow, title, lead,
+  markdown?, examples? }` and renders a sticky left-rail TOC + numbered editorial sections with
+  inline live React `examples`. Reused by the `Demos/Design.md` story (below) and available to
+  consumers for future design-system pages. **Not** a pure markdown parser — accepts both
+  markdown prose (`markdown` field, rendered via `react-markdown`) and live React content
+  (`examples` field) so component proofs render alongside their description. Layout details:
+  - Three-column desktop: left rail (`w-56`, sticky), main column (`max-w-[760px]`), no right column
+  - Top sticky breadcrumb / brand strip with current section indicator (scroll-spy)
+  - Section block pattern: small numbered overline (`"01 — OVERVIEW"`) → `text-4xl` title →
+    lead paragraph → live `examples` block (color grids, type specimens, button rows, etc.)
+  - Generous whitespace, subtle `border-t border-border` between sections, no shadows on examples
+  - Mobile collapses the left rail into an `<AdaptiveSheet>` triggered by a sticky "On this page" button
+
+### Hooks — Pixler-specific
+
+- [ ] `useMediaQuery(query: string): boolean` — generic responsive branching hook (lets components
+  branch on `md`/`lg`/`xl` independently — the shadcn-installed `useMobile` is single-breakpoint).
+  Lives at `packages/ui/src/hooks/use-media-query.ts`.
 
 ### App wiring
 
@@ -126,8 +155,9 @@ for a static build that can be served behind `/storybook` later.
     catppuccin, tokyo-night, nord, rose-pine, solarized, mono, plus any extra schemes — must include
     every value listed in `_specs/spec-ui/spec-ui-tokens.md` §Themes)
   - `storySort` enforcing `Demos → Components → Hooks` group order; within `Demos`, order is
-    `Showcase → Style Guide → Design → Shadcn-case` (Shadcn-case sits last as the recipe gallery
-    after the reference docs)
+    `Showcase → Style Guide → Design → Design.md → Shadcn-case` (Shadcn-case sits last as the
+    recipe gallery after the reference docs; Design.md sits next to Design since both render
+    long-form design-system content)
 - [ ] `packages/ui/.storybook/manager.ts` — sets a Pixler-branded sidebar title (`"Pixler UI"`)
   and brand color from `--brand` (`#16a355`)
 - [ ] `packages/ui/tsconfig.json` — add `"include": ["src/**/*", ".storybook/**/*"]`
@@ -194,6 +224,40 @@ for a static build that can be served behind `/storybook` later.
     examples cited in the spec) render **live** inline beneath their description so the page
     is both reference doc and visual gallery
   - Add a small "Edit on GitHub" link in the header pointing at the source `.md` path
+- [ ] **`design-md.stories.tsx`** — `title: "Demos/Design.md"`. Editorial walkthrough of the
+  Pixler design system rendered through the new reusable **`<DesignMdViewer>`** component (spec'd
+  above under Pixler-specific). Visual reference is `_docs/screenshots/design-md-template.jpg` —
+  Getdesign.md / Airbnb-style narrated case study, distinct from the dry `Demos/Design` doc page.
+
+  Build out a `sections` config covering (numbers + eyebrows match the screenshot's rhythm):
+
+  - **01 — Overview** — one-paragraph intro to Pixler's design language, brand hex, the "developer
+    tool, not consumer SaaS" stance. No live examples.
+  - **02 — Foundations / Color** — full color story: brand greens (`brand`, `brand-light`,
+    `brand-dark`), neutral surface ramp, status colors (error / warning / success / info). Each
+    color rendered as a labeled swatch card with role + token name.
+  - **03 — Typography** — Inter specimens at scale (display 6xl/7xl numerals like the screenshot's
+    `4.81`), the full type scale (xs → 4xl) with role labels, weight ladder (light → extrabold),
+    eyebrow + brand-rule signature live.
+  - **04 — Buttons** — every CVA variant + size as a live grid (matches the "Three product tabs"
+    row in the screenshot). Side-by-side: default / outline / ghost / destructive / link, with
+    sizes sm → lg.
+  - **05 — Tabs & Segmented** — pill-tabs row, segmented control row, bottom-tabs preview (live
+    `<BottomTabs>` rendered inside a phone-frame mock).
+  - **06 — Cards & Surfaces** — card variants with corner-radius grid (`rounded-md` → `rounded-xl`)
+    rendered as photo-like swatches, plus the Pixler "Empty State" composition live.
+  - **07 — Forms** — input states (default / focus / error / disabled), floating-label pattern,
+    checkbox + switch + radio rows, date-cell grid (calendar primitive styled like screenshot's
+    "circular day cells").
+  - **08 — Patterns** — three Pixler-specific compositions rendered live: workspace row, PR
+    checks row, chat message bubble. Mirrors the screenshot's "listing detail" + "reviews" +
+    "what this place offers" pattern blocks.
+  - **09 — Responsive & Touch Targets** — breakpoint table from `spec-ui-responsive.md`, plus
+    min-touch-target swatches (`h-11` / `py-3` / `size="icon-sm"`).
+
+  Page renders by feeding the above `sections` config into `<DesignMdViewer>` — no per-page
+  layout code, only content. Proves the component is genuinely reusable. Must retint correctly
+  across all 11 color schemes × light/dark.
 - [ ] **`shadcn-case.stories.tsx`** — `title: "Demos/Shadcn-case"`. shadcn.com-style "blocks"
   gallery: a **4-column masonry grid of self-contained recipe cards** showing M03 primitives
   composed into real-world UI snippets. Visual reference is the screenshot pasted in the M03
@@ -251,8 +315,9 @@ for a static build that can be served behind `/storybook` later.
   tokens — `bg-card`, `border-border`, `text-foreground`, `bg-primary`, etc.; no hard-coded
   colors). The grid uses CSS columns or a simple 4-col grid with each cell sized to content —
   do not force equal row heights.
-- [ ] `Showcase`, `Style Guide`, and `Shadcn-case` must all visually retint when the toolbar
-  `colorScheme` or `theme` global changes (proves the token contract works across all 22 surfaces)
+- [ ] `Showcase`, `Style Guide`, `Design.md`, and `Shadcn-case` must all visually retint when
+  the toolbar `colorScheme` or `theme` global changes (proves the token contract works across
+  all 22 surfaces). `Design` is intentionally white-canvas docs and exempt.
 
 ### Cross-cutting
 
@@ -267,11 +332,17 @@ for a static build that can be served behind `/storybook` later.
   `Demos/Showcase` page (enforced by `storySort`).
 - `pnpm --filter @pixler/ui build-storybook` produces a static `storybook-static/` build.
 - Toolbar `Color Scheme` global lists all 11 schemes from `_specs/spec-ui/spec-ui-tokens.md`;
-  switching any value retints the Showcase, Style Guide, and Shadcn-case pages instantly in both
-  Light and Dark.
+  switching any value retints the Showcase, Style Guide, Design.md, and Shadcn-case pages
+  instantly in both Light and Dark.
 - `Demos/Shadcn-case` renders the 4-column recipe grid matching the M03 task brief screenshot
   (Payment form, Empty state, Compute Environment radio cards, Pagination + Copilot, etc.) using
   only primitives built by M03 — no new components introduced.
+- `Demos/Design.md` renders through `<DesignMdViewer>` with the 9 sections listed above, sticky
+  left-rail TOC with scroll-spy works on desktop, and collapses into a triggered
+  `<AdaptiveSheet>` on `<lg`.
+- `<AdaptiveSheet>`, `<BottomTabs>`, `<ResizableSplit>` each have a story under
+  `Components/Pixler/*` that demonstrates the desktop ↔ mobile breakpoint behavior by resizing
+  the Storybook preview frame.
 - Every shadcn component installed above has a colocated `.stories.tsx` with at least one story
   per CVA variant and size; the sidebar group order is `Demos → Components/* → Hooks`.
 - `Demos/Design` renders the live contents of `_specs/spec-ui/spec-ui-design-system.md` with a
@@ -291,7 +362,12 @@ packages/ui/src/hooks/*.ts                    (shadcn-installed hooks, e.g. use-
 packages/ui/src/storybook-demos/showcase.stories.tsx
 packages/ui/src/storybook-demos/style-guide.stories.tsx
 packages/ui/src/storybook-demos/design.stories.tsx
+packages/ui/src/storybook-demos/design-md.stories.tsx
 packages/ui/src/storybook-demos/shadcn-case.stories.tsx
+packages/ui/src/components/design-md-viewer.tsx       (reusable Getdesign.md previewer)
+packages/ui/src/components/adaptive-sheet.tsx         (drawer<md / sheet>=md)
+packages/ui/src/components/bottom-tabs.tsx            (mobile bottom tab bar)
+packages/ui/src/hooks/use-media-query.ts              (generic responsive hook)
 packages/ui/.storybook/main.ts
 packages/ui/.storybook/preview.tsx
 packages/ui/.storybook/manager.ts
