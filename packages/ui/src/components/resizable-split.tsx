@@ -9,7 +9,7 @@ import { cn } from '@pixler/ui/lib/utils';
 interface ResizableSplitProps {
   direction?: 'horizontal' | 'vertical';
   sizes?: [number, number];
-  onResize?: (sizes: number[]) => void;
+  onResize?: (layout: { [id: string]: number }) => void;
   className?: string;
   children: [React.ReactNode, React.ReactNode];
 }

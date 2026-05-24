@@ -1,0 +1,1 @@
+import{r as s}from"./iframe-DiBmah8n.js";function i(e){const[r,n]=s.useState(()=>typeof window>"u"?!1:window.matchMedia(e).matches);return s.useEffect(()=>{const t=window.matchMedia(e);n(t.matches);const a=c=>n(c.matches);return t.addEventListener("change",a),()=>t.removeEventListener("change",a)},[e]),r}export{i as u};

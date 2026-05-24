@@ -52,7 +52,7 @@ behavior (color-scheme + dark/light globals), same custom demo pages, converted 
 
 ### Package infrastructure
 
-- [ ] `packages/ui/package.json` rewritten:
+- [x] `packages/ui/package.json` rewritten:
     - `"exports"`:
       `{ "./components/*": "./src/components/*.tsx", "./lib/*": "./src/lib/*.ts", "./hooks/*": "./src/hooks/*.ts" }`
     - deps: `react`, `react-dom`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`
@@ -61,22 +61,22 @@ behavior (color-scheme + dark/light globals), same custom demo pages, converted 
     - `devDependencies`: `@types/react`, `@types/react-dom`, `typescript`, `tailwindcss`
     - scripts: `"ui": "pnpm dlx shadcn@latest add"`, `"typecheck": "tsc --noEmit"`, `"lint": "tsc --noEmit"`
     - remove the old `main` / `types` / `tsc build` setup (package is source-only)
-- [ ] `packages/ui/src/lib/utils.ts` — `cn()` = `twMerge(clsx(inputs))`
-- [ ] `packages/ui/components.json` — shadcn config:
+- [x] `packages/ui/src/lib/utils.ts` — `cn()` = `twMerge(clsx(inputs))`
+- [x] `packages/ui/components.json` — shadcn config:
     - `style: "new-york"`, `rsc: false`, `tsx: true`, `iconLibrary: "lucide"`
     - `tailwind: { config: "", css: "../ui-styles/src/css/globals.css", baseColor: "neutral", cssVariables: true }`
     - aliases → `components: "@pixler/ui/components"`, `utils: "@pixler/ui/lib/utils"`,
       `hooks: "@pixler/ui/hooks"`, `lib: "@pixler/ui/lib"`, `ui: "@pixler/ui/components"`
     - **Verify the CLI does not overwrite the existing M02 tokens** in the referenced css file; tokens
       are owned by M02 and already complete.
-- [ ] `packages/ui/tsconfig.json` — `jsx: "react-jsx"`, `lib: ["ES2022","DOM"]`,
+- [x] `packages/ui/tsconfig.json` — `jsx: "react-jsx"`, `lib: ["ES2022","DOM"]`,
   `paths: { "@pixler/ui/*": ["./src/*"] }`, source-only (no `composite`/`outDir` emit)
 
 ### Components — full shadcn catalog
 
 Add via `pnpm --filter @pixler/ui ui <name>` (the `ui` script above). Install the complete set:
 
-- [ ] accordion, alert, alert-dialog, aspect-ratio, avatar, badge, breadcrumb, button, calendar,
+- [x] accordion, alert, alert-dialog, aspect-ratio, avatar, badge, breadcrumb, button, calendar,
   card, carousel, chart, checkbox, collapsible, command, context-menu, dialog, drawer,
   dropdown-menu, form, hover-card, input, input-otp, label, menubar, navigation-menu, pagination,
   popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar,
@@ -84,22 +84,22 @@ Add via `pnpm --filter @pixler/ui ui <name>` (the `ui` script above). Install th
 
 ### Components — Pixler-specific (hand-authored, no shadcn equivalent)
 
-- [ ] `<EmptyState icon title body action>` — used by M06 sidebar / M18 checks
-- [ ] `<Spinner>` — lucide `Loader2` + `animate-spin`, `currentColor`
-- [ ] `<Kbd>` — keyboard-shortcut chips (`<Kbd>⌘</Kbd>`)
-- [ ] `<Stepper value min max onChange>` — replaces bare number inputs
-- [ ] `<SegmentedControl options value onChange>` — pill wrapper over shadcn `toggle-group`
-- [ ] `<ResizableSplit direction sizes onResize>` — thin wrapper over shadcn `resizable`
+- [x] `<EmptyState icon title body action>` — used by M06 sidebar / M18 checks
+- [x] `<Spinner>` — lucide `Loader2` + `animate-spin`, `currentColor`
+- [x] `<Kbd>` — keyboard-shortcut chips (`<Kbd>⌘</Kbd>`)
+- [x] `<Stepper value min max onChange>` — replaces bare number inputs
+- [x] `<SegmentedControl options value onChange>` — pill wrapper over shadcn `toggle-group`
+- [x] `<ResizableSplit direction sizes onResize>` — thin wrapper over shadcn `resizable`
   (`ResizablePanelGroup`/`ResizablePanel`/`ResizableHandle`); keeps the name M06 references.
   **Mobile behavior:** below `lg`, stacks panels vertically and hides the drag handle so the
   3-pane desktop layout becomes a single scroll column on phone (no per-consumer breakpoint code).
-- [ ] `<AdaptiveSheet>` — picks Vaul `drawer` on `<md` (bottom-up, swipe-to-dismiss) and Radix
+- [x] `<AdaptiveSheet>` — picks Vaul `drawer` on `<md` (bottom-up, swipe-to-dismiss) and Radix
   `sheet` on `≥md` (side-in). Same API surface in both modes so Settings, workspace details, and
   ticket details share one component. Driven by `useMediaQuery('(min-width: 768px)')`.
-- [ ] `<BottomTabs items value onChange>` — fixed bottom tab bar for mobile. Replaces the center
+- [x] `<BottomTabs items value onChange>` — fixed bottom tab bar for mobile. Replaces the center
   Radix `tabs` on `<md` so the Chat / Plan / Diff / Checks / PR surfaces stay one-tap reachable
   without horizontal scroll. Renders nothing on `≥md` (let the regular `tabs` show instead).
-- [ ] `<DesignMdViewer sections tocTitle?>` — reusable **Getdesign.md-style editorial previewer**.
+- [x] `<DesignMdViewer sections tocTitle?>` — reusable **Getdesign.md-style editorial previewer**.
   See `_docs/screenshots/design-md-template.jpg` for the visual reference (Airbnb design-system
   walkthrough aesthetic). API: takes a `sections` array of `{ number, eyebrow, title, lead,
   markdown?, examples? }` and renders a sticky left-rail TOC + numbered editorial sections with
@@ -116,20 +116,20 @@ Add via `pnpm --filter @pixler/ui ui <name>` (the `ui` script above). Install th
 
 ### Hooks — Pixler-specific
 
-- [ ] `useMediaQuery(query: string): boolean` — generic responsive branching hook (lets components
+- [x] `useMediaQuery(query: string): boolean` — generic responsive branching hook (lets components
   branch on `md`/`lg`/`xl` independently — the shadcn-installed `useMobile` is single-breakpoint).
   Lives at `packages/ui/src/hooks/use-media-query.ts`.
 
 ### App wiring
 
-- [ ] `apps/web/package.json` — add `"@pixler/ui": "workspace:*"`
-- [ ] `apps/web/vite.config.ts` — add resolve alias `@pixler/ui` → `packages/ui/src` so subpath
+- [x] `apps/web/package.json` — add `"@pixler/ui": "workspace:*"`
+- [x] `apps/web/vite.config.ts` — add resolve alias `@pixler/ui` → `packages/ui/src` so subpath
   imports resolve to `.tsx` source with no build step
-- [ ] `apps/web/src/styles/app.css` — add
+- [x] `apps/web/src/styles/app.css` — add
   `@source "../../../../packages/ui/src/**/*.{ts,tsx}";` so Tailwind v4 scans ui components for
   class usage. **Critical:** without this, `@tailwindcss/vite` won't see classes used inside the
   workspace package and every component renders unstyled.
-- [ ] **No kitchen-sink route in `apps/web`** — Storybook (below) is the canonical gallery and
+- [x] **No kitchen-sink route in `apps/web`** — Storybook (below) is the canonical gallery and
   replaces the prior `__kitchen-sink.tsx` plan. Keeps `apps/web` routes for product surfaces only.
 
 ### Storybook — gallery + custom landing pages
@@ -140,17 +140,17 @@ for a static build that can be served behind `/storybook` later.
 
 **Infrastructure:**
 
-- [ ] `packages/ui/package.json` scripts: `"storybook": "storybook dev -p 6006"`,
+- [x] `packages/ui/package.json` scripts: `"storybook": "storybook dev -p 6006"`,
   `"build-storybook": "storybook build -o storybook-static"`
-- [ ] `packages/ui/package.json` devDeps (latest stable per LTS policy): `storybook`,
+- [x] `packages/ui/package.json` devDeps (latest stable per LTS policy): `storybook`,
   `@storybook/react-vite`, `@storybook/addon-docs`, `@storybook/addon-themes`, `vite`,
   `@vitejs/plugin-react`, `@tailwindcss/vite`, `react-markdown`, `remark-gfm`, `rehype-slug`,
   `rehype-autolink-headings`
-- [ ] `packages/ui/.storybook/main.ts` — framework `@storybook/react-vite`;
+- [x] `packages/ui/.storybook/main.ts` — framework `@storybook/react-vite`;
   `stories: ["../src/**/*.stories.@(ts|tsx|mdx)"]`;
   addons `['@storybook/addon-docs', '@storybook/addon-themes']`; `viteFinal` adds `@tailwindcss/vite`
   and imports `@pixler/ui-styles/src/css/globals.css` so previews are tokenized identically to `apps/web`
-- [ ] `packages/ui/.storybook/preview.tsx` — port from `files-from-my-angular-repo/ui/.storybook/preview.ts`,
+- [x] `packages/ui/.storybook/preview.tsx` — port from `files-from-my-angular-repo/ui/.storybook/preview.ts`,
   converted to React. Provides:
     - `withThemeByClassName` (Light/Dark via `.dark` on `<html>`)
     - `colorScheme` toolbar global → sets `data-color-scheme` on `<html>` (11 values: forest, graphite,
@@ -160,24 +160,24 @@ for a static build that can be served behind `/storybook` later.
       `Showcase → Style Guide → Design → Design.md → Shadcn-case` (Shadcn-case sits last as the
       recipe gallery after the reference docs; Design.md sits next to Design since both render
       long-form design-system content)
-- [ ] `packages/ui/.storybook/manager.ts` — sets a Pixler-branded sidebar title (`"Pixler UI"`)
+- [x] `packages/ui/.storybook/manager.ts` — sets a Pixler-branded sidebar title (`"Pixler UI"`)
   and brand color from `--brand` (`#16a355`)
-- [ ] `packages/ui/tsconfig.json` — add `"include": ["src/**/*", ".storybook/**/*"]`
+- [x] `packages/ui/tsconfig.json` — add `"include": ["src/**/*", ".storybook/**/*"]`
 
 **Component stories (one `.stories.tsx` per primitive):**
 
-- [ ] Every shadcn component installed above gets a colocated `*.stories.tsx` next to the component
+- [x] Every shadcn component installed above gets a colocated `*.stories.tsx` next to the component
   (`packages/ui/src/components/button.stories.tsx`, etc.). Each story must:
     - export a `Meta` with `title: "Components/<Group>/<Name>"` (Group = Actions, Forms, Display,
       Feedback, Overlay, Navigation, Data, Layout — matches Angular reference grouping)
     - cover every CVA `variant` and `size` as a separate named story
     - include at least one disabled/loading state where applicable
-- [ ] Each Pixler-specific primitive (EmptyState, Spinner, Kbd, Stepper, SegmentedControl,
+- [x] Each Pixler-specific primitive (EmptyState, Spinner, Kbd, Stepper, SegmentedControl,
   ResizableSplit) gets the same treatment under `title: "Components/Pixler/<Name>"`
 
 **Custom landing pages (`packages/ui/src/storybook-demos/`):**
 
-- [ ] **`showcase.stories.tsx`** — `title: "Demos/Showcase"`. Single comprehensive page rendering
+- [x] **`showcase.stories.tsx`** — `title: "Demos/Showcase"`. Single comprehensive page rendering
   every M03 component with every variant in a labeled grid. **Match the visual arrangement** of
   the Angular reference (`files-from-my-angular-repo/ui/src/storybook-demos/demo-showcase.stories.ts`
   — the screenshot pasted in the task brief): cell-per-component grid, name + variant labels,
@@ -207,14 +207,14 @@ for a static build that can be served behind `/storybook` later.
 
   Out of scope for M03 — these are tracked here only for visibility; future milestones may pull
   individual items into `@pixler/ui` as product surfaces need them.
-- [ ] **`style-guide.stories.tsx`** — `title: "Demos/Style Guide"`. Tailwind utility reference
+- [x] **`style-guide.stories.tsx`** — `title: "Demos/Style Guide"`. Tailwind utility reference
   covering: Semantic Colors, Brand & Status Colors, Text Colors, Typography Scale, Font Weights,
   Background + Text Combos, Borders & Radius (border colors + radius scale), Hover & Interactive
   States, Active/Focus States, Opacity Variants (`/0..100` step grid), Shadows
   (`shadow-none → shadow-2xl`), Spacing Scale (`0.5 → 24` bar chart), Component Comparison
   (Neutral / Brand / Error card variants), Primary vs Secondary vs Accent buttons, Status Colors
   pills. Port from `files-from-my-angular-repo/ui/src/storybook-demos/demo-style-guide.stories.ts`.
-- [ ] **`design.stories.tsx`** — `title: "Demos/Design"`. Renders the **canonical Pixler design
+- [x] **`design.stories.tsx`** — `title: "Demos/Design"`. Renders the **canonical Pixler design
   system doc** (`_specs/spec-ui/spec-ui-design-system.md`) as a styled long-form page resembling
   Google Material Design 3 docs (m3.material.io) / GitHub Primer docs:
     - Import the `.md` as a raw string (`?raw` Vite suffix) and feed through `react-markdown`
@@ -226,7 +226,7 @@ for a static build that can be served behind `/storybook` later.
       examples cited in the spec) render **live** inline beneath their description so the page
       is both reference doc and visual gallery
     - Add a small "Edit on GitHub" link in the header pointing at the source `.md` path
-- [ ] **`design-md.stories.tsx`** — `title: "Demos/Design.md"`. Editorial walkthrough of the
+- [x] **`design-md.stories.tsx`** — `title: "Demos/Design.md"`. Editorial walkthrough of the
   Pixler design system rendered through the new reusable **`<DesignMdViewer>`** component (spec'd
   above under Pixler-specific). Visual reference is `_docs/screenshots/design-md-template.jpg` —
   Getdesign.md / Airbnb-style narrated case study, distinct from the dry `Demos/Design` doc page.
@@ -260,7 +260,7 @@ for a static build that can be served behind `/storybook` later.
   Page renders by feeding the above `sections` config into `<DesignMdViewer>` — no per-page
   layout code, only content. Proves the component is genuinely reusable. Must retint correctly
   across all 11 color schemes × light/dark.
-- [ ] **`shadcn-case.stories.tsx`** — `title: "Demos/Shadcn-case"`. shadcn.com-style "blocks"
+- [x] **`shadcn-case.stories.tsx`** — `title: "Demos/Shadcn-case"`. shadcn.com-style "blocks"
   gallery: a **4-column masonry grid of self-contained recipe cards** showing M03 primitives
   composed into real-world UI snippets. Visual reference is the screenshot pasted in the M03
   task brief — match the column count, card spacing, soft borders, generous padding, and
@@ -317,14 +317,14 @@ for a static build that can be served behind `/storybook` later.
   tokens — `bg-card`, `border-border`, `text-foreground`, `bg-primary`, etc.; no hard-coded
   colors). The grid uses CSS columns or a simple 4-col grid with each cell sized to content —
   do not force equal row heights.
-- [ ] `Showcase`, `Style Guide`, `Design.md`, and `Shadcn-case` must all visually retint when
+- [x] `Showcase`, `Style Guide`, `Design.md`, and `Shadcn-case` must all visually retint when
   the toolbar `colorScheme` or `theme` global changes (proves the token contract works across
   all 22 surfaces). `Design` is intentionally white-canvas docs and exempt.
 
 ### Cross-cutting
 
-- [ ] Animation respects `prefers-reduced-motion` (both component code and Storybook stories)
-- [ ] Storybook builds with zero `console.error`/`console.warn` output in dev mode
+- [x] Animation respects `prefers-reduced-motion` (both component code and Storybook stories)
+- [x] Storybook builds with zero `console.error`/`console.warn` output in dev mode
 
 ## Acceptance
 

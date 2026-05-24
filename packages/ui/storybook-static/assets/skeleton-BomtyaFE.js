@@ -1,0 +1,1 @@
+import{j as t}from"./iframe-DiBmah8n.js";import{a as n}from"./utils-DclmTqRz.js";function s({className:e,...o}){return t.jsx("div",{"data-slot":"skeleton",className:n("animate-pulse rounded-md bg-accent",e),...o})}s.__docgenInfo={description:"",methods:[],displayName:"Skeleton"};export{s as S};

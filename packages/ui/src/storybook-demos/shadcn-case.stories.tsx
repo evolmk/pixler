@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../components/avatar';
 import { Spinner } from '../components/spinner';
 import { Stepper } from '../components/stepper';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../components/pagination';
-import { Mic, Plus, Send, Globe, Paperclip, Info, Star, ArrowLeft, Archive, BellOff, Snooze, MoreHorizontal, Search, Check, ChevronRight } from 'lucide-react';
+import { Mic, Plus, Send, Globe, Paperclip, Info, Star, ArrowLeft, Archive, Clock, MoreHorizontal, Search, Check, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const meta: Meta = { title: 'Demos/Shadcn-case', parameters: { layout: 'fullscreen' } };
@@ -287,7 +287,7 @@ function PillToolbar() {
       <Button variant="ghost" size="icon" className="size-8"><ArrowLeft className="size-4" /></Button>
       <div className="flex gap-1 ml-2">
         {['Archive', 'Report', 'Snooze'].map((label) => (
-          <Button key={label} variant="outline" size="sm">{label === 'Archive' ? <><Archive className="size-3.5 mr-1" />{label}</> : label === 'Snooze' ? <><Snooze className="size-3.5 mr-1" />{label}</> : label}</Button>
+          <Button key={label} variant="outline" size="sm">{label === 'Archive' ? <><Archive className="size-3.5 mr-1" />{label}</> : label === 'Snooze' ? <><Clock className="size-3.5 mr-1" />{label}</> : label}</Button>
         ))}
       </div>
       <Button variant="ghost" size="icon" className="size-8 ml-auto"><MoreHorizontal className="size-4" /></Button>
