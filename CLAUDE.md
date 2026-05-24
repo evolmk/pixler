@@ -1,17 +1,46 @@
-# Pixler
+# CLAUDE.md
 
-Local-first desktop app that orchestrates Claude Code (and other agent CLIs) to take software tickets from "Todo" to "Merged PR". See `_docs/pixler-SPEC.md` for the full product spec.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What is Pixler
+
+Local-first desktop app that orchestrates Claude Code (and other agent CLIs) to take software tickets from "Todo" to "Merged PR". Runs via `npx pixler` — boots a NestJS server and opens `localhost:7777` in the browser. See `_docs/pixler-SPEC.md` for the full product spec.
+
+## Current state
+
+**Pre-implementation.** The repo contains specs, plans, and reference material but no built application code yet. The monorepo scaffold (apps/, packages/, turbo.json, pnpm-workspace.yaml) will be created as part of milestone M01.
+
+## Build commands (once M01 is complete)
+
+```bash
+pnpm install                          # Install all workspace dependencies
+pnpm -w build                         # Build all apps + packages
+pnpm -w dev                           # Start api + web in dev mode (Vite on 5173, API on 7777)
+pnpm -w lint                          # Lint entire monorepo
+pnpm -w typecheck                     # TypeScript check all packages
+pnpm --filter @pixler/ui dev          # Run a single package in dev
+pnpm --filter @pixler/api test        # Run tests for a single package
+turbo run build --filter=@pixler/web  # Build a single target with Turborepo
+```
 
 ## Stack
 
-- **Backend:** NestJS (Node)
-- **Frontend:** React 19 + Vite + TypeScript
-- **Styling:** Tailwind v4 + CSS variables + `@pixler/ui-styles`
-- **Components:** `@pixler/ui` — React component library (shadcn/ui style: Radix UI + CVA + cn())
-- **Animation:** Framer Motion
-- **Icons:** Lucide React (never inline `<svg>`)
-- **State:** Zustand (UI) + TanStack Query (server)
-- **Monorepo:** Turborepo + pnpm workspaces
+| Layer | Tech |
+|-------|------|
+| Backend | NestJS (Node) + Socket.io + better-sqlite3 + node-pty + simple-git |
+| Frontend | React 19 + Vite + TypeScript |
+| Styling | Tailwind v4 + CSS variables + `@pixler/ui-styles` |
+| Components | `@pixler/ui` — Radix UI + CVA + cn() (shadcn/ui pattern) |
+| Animation | Motion (motion.dev, respect `prefers-reduced-motion`) |
+| Icons | Lucide React (never inline `<svg>`) |
+| State | Zustand (UI) + TanStack Query (server) |
+| Chat UI | assistant-ui |
+| Terminal | xterm.js + node-pty |
+| Monorepo | Turborepo + pnpm workspaces |
+
+## Dependency policy
+
+Always install the **latest stable/LTS** version of every package. Never use alpha, beta, RC, canary, or `@next` tagged releases unless explicitly approved. When a package offers an LTS track (e.g. Node, NestJS), prefer the current LTS over bleeding-edge major versions.
 
 ## Repo structure
 
@@ -26,45 +55,54 @@ pixler/
 │   ├── shared-types/           # DTOs, event types
 │   ├── orchestrator/           # Agent state-machine logic
 │   └── linear-cli/             # Thin Linear CLI for agents
-├── bin/
-│   └── pixler.js               # npx entry point
+├── bin/pixler.js               # npx entry point
 ├── _docs/
 │   ├── pixler-SPEC.md          # Full product spec
-│   ├── plans/                  # Milestone plans (M01–M25)
-│   └── screenshots/            # Reference screenshots
+│   └── plans/                  # Milestone plans (M01–M25)
 ├── _specs/
-│   └── spec-ui/                # UI specs (tokens, typography, motion, responsive, etc.)
-└── shared-packages-from-lazar-angular-app/   # REFERENCE ONLY — Angular source material
-    ├── design-system.md        # Lazar design system doc (Angular + B2B context)
-    ├── ui-components-library/  # Angular component library (shadcn-style, CVA + Tailwind)
-    └── ui-styles-library/      # Angular styles library (globals.css with CSS variables)
+│   ├── spec-ui/                # UI specs (tokens, typography, motion, responsive, etc.)
+│   └── spec-catalog/           # Catalog feature specs
+├── globals.css                 # Master CSS with all theme tokens (oklch)
+└── files-from-my-angular-repo/ # REFERENCE ONLY — Angular source material
 ```
 
-## Reference: Angular source material
+## Milestone plans
 
-`shared-packages-from-lazar-angular-app/` contains the original Angular component library and styles from the Lazar project. These are **reference only** — not imported or built. Use them for:
+Plans live in `_docs/plans/` (M01–M25). Each is self-contained and agent-runnable with: Goal, Depends on, Deliverables, Acceptance, Files, Out of scope. See `_docs/plans/README.md` for the dependency graph.
 
-- **Visual inspiration** — the Angular components are shadcn-based with CVA variants and the same token system. Look at their structure, variants, and styling decisions when building the React equivalents.
-- **Token values** — `ui-styles-library/src/globals.css` contains the production CSS variable values (oklch colors, semantic tokens, brand colors). These are the source of truth for the Forest theme.
-- **Component inventory** — `ui-components-library/src/components/` has ~80 components. When building `@pixler/ui`, check what exists in the Angular library for API inspiration.
+Critical path: `M01 → M02/M04/M05 → M03 → M06 → M07 → M08 → M09 → M13 → M14 → M15 → M25`
 
-Do NOT copy Angular patterns (signals, directives, standalone components) into React code. Convert to idiomatic React: functional components, hooks, forwardRef, JSX.
+## Angular reference material
 
-## Plans and milestones
+`files-from-my-angular-repo/` is **reference only** — not imported or built. Use for:
+- **Token values** — `ui-styles/src/globals.css` has production CSS variable values (oklch colors, semantic tokens)
+- **Component API inspiration** — `ui/src/components/` has ~80 shadcn-style Angular components with CVA variants
 
-Implementation plans live in `_docs/plans/` (M01–M25). Each plan is self-contained and agent-runnable. See `_docs/plans/README.md` for the dependency graph and execution order.
+Do NOT copy Angular patterns (signals, directives) into React. Convert to idiomatic React.
 
-## Component approach
+## Component conventions
 
-1. Start with shadcn/ui components as the foundation (React + Radix + CVA + Tailwind)
-2. Build `packages/ui/` as a reusable component library
-3. Reference `shared-packages-from-lazar-angular-app/ui-components-library/` for custom component inspiration — convert the patterns you like to React
-4. Components are single-file `.tsx` modules with colocated CVA variants and types
-5. Always use semantic tokens (`bg-primary`, `text-muted-foreground`) — never hardcoded colors
-
-## Conventions
-
+- Single-file `.tsx` modules in `packages/ui/src/components/` with colocated CVA variants and types
 - Use `cn()` (clsx + tailwind-merge) for all class merging
 - Use `forwardRef` on every component that renders a DOM element
-- Tailwind v4 CSS-first — theme tokens in CSS, no `theme()` in arbitrary values
-- Framer Motion for animations, respecting `prefers-reduced-motion`
+- Always use semantic tokens (`bg-primary`, `text-muted-foreground`) — never hardcoded colors
+- Favor composition (children, compound components) over prop drilling
+- Tailwind v4 CSS-first — no `theme()` in arbitrary values (that's TW3 syntax)
+
+## Theming
+
+- 8 color schemes × light/dark: Forest (default), Graphite, Catppuccin, Tokyo Night, Nord, Rosé Pine, Solarized, Mono
+- Color scheme via `data-color-scheme` on `<html>`, dark mode via `.dark` class
+- Brand hex: `#16a355` (Pixler green)
+- All colors use oklch — see `globals.css` and `_specs/spec-ui/spec-ui-tokens.md`
+
+## Design system specs
+
+Read these before building UI:
+- `_specs/spec-ui/spec-ui-tokens.md` — all CSS variable tokens and Tailwind mappings
+- `_specs/spec-ui/spec-ui-design-system.md` — layout, voice, and palette decisions
+- `_specs/spec-ui/spec-ui-typography.md` — Inter variable, 14px base, full type scale
+- `_specs/spec-ui/spec-ui-motion.md` — Motion (motion.dev) patterns
+- `_specs/spec-ui/spec-ui-layout-patterns.md` — page layout rules
+- `_specs/spec-ui/spec-ui-responsive.md` — breakpoints and mobile behavior
+- `_specs/spec-ui/spec-ui-tailwind-gotchas.md` — tricky CSS patterns with solutions

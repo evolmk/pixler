@@ -117,7 +117,7 @@ The plan lives at `docs/plans/<TICKET>.md` (or inline in Linear, or as an attach
 | Layer            | Tech                                                        |
 |------------------|-------------------------------------------------------------|
 | Backend          | NestJS · Socket.io · better-sqlite3 · node-pty · simple-git |
-| Frontend         | React 19 · Vite · TypeScript · Tailwind v4 · Framer Motion  |
+| Frontend         | React 19 · Vite · TypeScript · Tailwind v4 · Motion  |
 | Primitives       | Radix UI · Vaul · cmdk · Lucide                              |
 | Chat             | assistant-ui · Shiki                                         |
 | Diff             | Monaco                                                       |

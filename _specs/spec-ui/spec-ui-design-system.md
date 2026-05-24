@@ -1,8 +1,8 @@
-# Design System — Guest & Client Layout
+# Design System — Pixler
 
-> On-demand agent reference for building Guest and Client app UI.
+> On-demand agent reference for building Pixler UI.
 
-**Created:** 2026-03-31 · **Updated:** 2026-05-15 (M150 bundle integration)
+**Created:** 2026-03-31 · **Updated:** 2026-05-23 (adapted for Pixler)
 
 ---
 
@@ -19,7 +19,7 @@
 For full content spec see `spec-ui-content-voice.md`. Summary:
 
 - **Grounded, declarative, developer-to-developer.** Assumes reader knows repos, branches, workspaces, terminal sessions.
-- **Confident, never apologetic.** "Out of stock" not "Sorry, temporarily unavailable."
+- **Confident, never apologetic.** "No results" not "Sorry, we couldn't find anything."
 - **Casing:** Title Case for nav/page titles · UPPERCASE WITH WIDE TRACKING for overlines · Sentence case for body.
 - **Units:** durations human-readable (`2h 15m`) · counts with `tabular-nums`.
 - **Emoji: never.** Use Lucide icons.
@@ -59,12 +59,12 @@ Font: `Inter` (variable 400–800). Base `html` font-size `14px`. See `spec-ui-t
 
 **Eyebrow / overline signature:**
 
-```html
-<span class="eyebrow text-muted-foreground">ACCESSORIES</span>
-<div class="bg-brand h-[2px] w-10"></div>
+```tsx
+<span className="eyebrow text-muted-foreground">WORKSPACES</span>
+<div className="bg-brand h-[2px] w-10" />
 ```
 
-`class="eyebrow"` = 11px / 600 / uppercase / tracking-0.025em. Pair with a color class — does not set color itself.
+`className="eyebrow"` = 11px / 600 / uppercase / tracking-0.025em. Pair with a color class — does not set color itself.
 
 **Display type:** Hero numbers `text-6xl text-7xl leading-[0.9] tracking-[-0.02em]`.
 
@@ -79,7 +79,7 @@ Font: `Inter` (variable 400–800). Base `html` font-size `14px`. See `spec-ui-t
 Shadows reserved for z-layer elements only:
 
 - Dropdowns, popovers: `shadow-md`
-- Dialogs, megamenu panels, basket flyouts: `shadow-lg`
+- Dialogs, drawer panels: `shadow-lg`
 
 Cards: `rounded-lg border border-border bg-card` (10px radius). No accent border-stripes, no colored gradients inside cards.
 
@@ -106,7 +106,7 @@ All transitions: `transition-all duration-200 ease`. No springs, no bounces.
 | Default (top) | White       | 70px desktop / 60px mobile | Dark / green | Dark variant  |
 | Scrolled      | Brand green | 50px desktop / 44px mobile | White        | White variant |
 
-200ms smooth transition. Basket badges stay `bg-status-error` (red) in both states.
+200ms smooth transition. Count badges stay `bg-status-error` (red) in both states.
 
 ---
 
@@ -118,10 +118,9 @@ See `spec-ui-layout-signatures.md` for full recipes. Quick reference:
 | ---------------------------- | ------------------------------------------------------------------- |
 | Overline + brand-rule + hero | `eyebrow` → `bg-brand h-[2px] w-10` → `text-6xl leading-[0.9]`      |
 | Annotated diagram            | Callout pills: `bg-white/95 backdrop-blur rounded-full`             |
-| Spec chip                    | `bg-brand h-[2px] w-full` bottom underline (no pill background)     |
+| Stat chip                    | `bg-brand h-[2px] w-full` bottom underline (no pill background)     |
 | Action-group header          | Projects · Workspaces · Terminal — each with `bg-status-error` count badge |
 | Breadcrumb                   | At top of every detail page, ending in `font-semibold` current item |
-| Megamenu                     | Hover-triggered, reveals nested navigation on desktop               |
 
 ---
 
@@ -140,9 +139,9 @@ See `spec-ui-layout-signatures.md` for full recipes. Quick reference:
 | --------------------------------- | -------------- | ----- |
 | Inputs, buttons (incl. CTAs)      | `rounded-md`   | 8px   |
 | Cards, dialogs                    | `rounded-lg`   | 10px  |
-| Megamenu / large containers       | `rounded-xl`   | 14px  |
+| Large containers                  | `rounded-xl`   | 14px  |
 | Pills, badges, avatars            | `rounded-full` | —     |
-| Spec drawings / blueprint headers | `rounded-none` | —     |
+| Technical / blueprint headers     | `rounded-none` | —     |
 
 CTAs like "Create Project" use `rounded-md`. **Never `rounded-full` for buttons.**
 
@@ -154,16 +153,25 @@ See `spec-ui-motion.md`. Summary: 200ms ease for all transitions. No springs, pa
 
 ---
 
-## Apps & Layout Architecture
+## App Layout
 
-| App        | Layout                     | Header        | Sidebar             |
-| ---------- | -------------------------- | ------------- | ------------------- |
-| **Guest**  | Header + content + footer  | Public header | None                |
-| **Client** | Header + left nav + footer | Same header   | ~240px left nav     |
-| **Admin**  | `<AdminShell>`      | Shell header  | Accordion nav 220px |
-| **Portal** | `<AdminShell>`      | Shell header  | Accordion nav       |
+Pixler is a single web app with a three-pane layout (see SPEC §8.1):
 
-Client left nav: GitHub-settings pattern — grouped sections (Projects / Orders / Support / Account), icon + label, active item with left border accent + bg tint.
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ Pixler  [Project ▾]  [+ Workspace]            [⌘K] [⚙] [☾] [🔔]│
+├──────────────────────────────────────────────────────────────────┤
+│  WORKSPACES         │  CENTER                 │  CHAT/TERMINAL   │
+│  (left rail)        │  Tabs:                  │  (right)         │
+│                     │   Chat | Plan | Diff |  │                  │
+│  ● crimson   plan   │   Checks | PR           │  assistant-ui or │
+│  ◐ cerulean  exec   │                         │  xterm.js based  │
+│  ○ mint      queue  │  Bottom: composer       │  on mode         │
+│                     │                         │                  │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+All panes resizable. Settings opens as a Vaul side drawer (~480px from right). Command palette via `⌘K`.
 
 ---
 
@@ -171,7 +179,6 @@ Client left nav: GitHub-settings pattern — grouped sections (Projects / Orders
 
 - ❌ Don't hardcode `#16a355` — use `bg-brand` / `bg-primary`.
 - ❌ Don't add decorative shadows to cards — borders only.
-- ❌ Don't use native `<input type="date">` — always `ui-date-picker`.
 - ❌ Don't invent new card/button variants if a CVA variant fits.
 - ❌ Don't treat this like consumer SaaS. It's a **developer tool.**
 - ❌ Don't strip metadata in favor of whitespace — developers want IDs, statuses, and timestamps visible.

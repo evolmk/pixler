@@ -23,7 +23,7 @@ Standard Tailwind v4 type scale with common usage patterns:
 | `text-xl`   | 20px | 28px        | Section headers                                 |
 | `text-2xl`  | 24px | 32px        | Stat values, page sub-titles                    |
 | `text-3xl`  | 30px | 36px        | Page titles                                     |
-| `text-4xl`  | 36px | 40px        | Hero headings (rare in admin)                   |
+| `text-4xl`  | 36px | 40px        | Hero headings (rare in app)                     |
 
 ## Font Weights
 
@@ -44,7 +44,7 @@ Standard Tailwind v4 type scale with common usage patterns:
 
 ## Eyebrow / Overline Signature
 
-The overline + brand-rule pattern is the primary section-introduction signature in Guest/Client apps.
+The overline + brand-rule pattern is the primary section-introduction signature in Pixler.
 
 ```html
 <!-- eyebrow label + 40px green rule -->
@@ -56,35 +56,35 @@ The overline + brand-rule pattern is the primary section-introduction signature 
 
 ## Display Type
 
-For hero numbers (model designators, display stats in marketing sections):
+For hero numbers (workspace identifiers, display stats):
 
 ```html
-<!-- e.g. "LC-40", large stat value -->
-<span class="text-7xl font-bold leading-[0.9] tracking-[-0.02em]">LC-40</span>
+<!-- e.g. "WS-01", large stat value -->
+<span class="text-7xl font-bold leading-[0.9] tracking-[-0.02em]">WS-01</span>
 ```
 
 Use `text-6xl` or `text-7xl`. Always `leading-[0.9]` and `-0.02em` tracking for display weight. Not for page titles (those use `text-3xl font-bold tracking-tight`).
 
 ## Casing Rules
 
-| Context              | Rule                        | Example                                       |
-| -------------------- | --------------------------- | --------------------------------------------- |
-| Navigation labels    | Title Case                  | "Parts & Components"                          |
-| Page titles          | Title Case                  | "Cap Sorter Assembly"                         |
-| Overlines / eyebrows | UPPERCASE                   | "TECHNICAL SPEC SHEET · DRAWING 01"           |
-| Body / descriptions  | Sentence case               | "Heavy-duty fully automatic inline capper…"   |
-| CTAs                 | Title Case (verb-first)     | "Add to Cart", "Request Quote", "View Manual" |
-| Part numbers         | Verbatim, hyphens preserved | `CS-DL-L-ASM-ADJ-150-KNB`                     |
-| Em-dash usage        | Inline elaboration          | "3-jaw chuck — rated to 350 ft-lb"            |
-| Bullet lists         | No terminal punctuation     | `· Cap Elevator · Chuck Capper`               |
+| Context              | Rule                        | Example                                              |
+| -------------------- | --------------------------- | ---------------------------------------------------- |
+| Navigation labels    | Title Case                  | "Projects", "My Workspaces"                          |
+| Page titles          | Title Case                  | "Terminal Sessions"                                  |
+| Overlines / eyebrows | UPPERCASE                   | "PROJECT OVERVIEW · WORKSPACE 01"                    |
+| Body / descriptions  | Sentence case               | "Integrated terminal with project-scoped workspaces" |
+| CTAs                 | Title Case (verb-first)     | "Create Project", "Open Terminal", "View Diff"       |
+| Identifiers          | Verbatim, hyphens preserved | `pixler/eng-101-fix-auth`                             |
+| Em-dash usage        | Inline elaboration          | "Git-integrated — syncs with Linear"                 |
+| Bullet lists         | No terminal punctuation     | `· Projects · Workspaces · Terminal`                 |
 
 ## Tabular Figures
 
-Use `tabular-nums` for any column of numbers that needs alignment: prices, SKUs, dimensions, quantities.
+Use `tabular-nums` for any column of numbers that needs alignment: token counts, session durations, timestamps.
 
 ```html
-<td class="tabular-nums">$1,495</td>
-<td class="tabular-nums">CS-DL-L-ASM-ADJ-150-KNB</td>
+<td class="tabular-nums">1,495</td>
+<td class="tabular-nums">2h 15m</td>
 ```
 
 ## Common Typography Patterns

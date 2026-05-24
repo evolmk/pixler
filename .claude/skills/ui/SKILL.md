@@ -12,7 +12,7 @@ description: |
 
 # Pixler UI Design System Skill
 
-Pixler uses a **React 19 + Tailwind v4 + Radix UI + CVA** component stack with `cn()` (clsx + tailwind-merge) for class merging. Components live in `packages/ui/src/components/` as single-file `.tsx` modules (shadcn/ui style). The Angular source library at `shared-packages-from-lazar-angular-app/ui-components-library/` can be referenced for component API inspiration when building React equivalents.
+Pixler uses a **React 19 + Tailwind v4 + Radix UI + CVA** component stack with `cn()` (clsx + tailwind-merge) for class merging. Components live in `packages/ui/src/components/` as single-file `.tsx` modules (shadcn/ui style). The Angular source library at `files-from-my-angular-repo/ui/` can be referenced for component API inspiration when building React equivalents.
 
 ---
 
@@ -27,7 +27,7 @@ Classify the request before loading any spec files.
 | **story-only**    | Write or update a Storybook story                                               | Component source + `STORYBOOK.md`                                                                                               |
 | **compose**       | Compose existing components in app code                                         | Component source files as needed + `spec-ui-tokens.md`                                                                          |
 | **new-component** | Build a new primitive in `packages/ui/src/components/`                                   | `spec-ui-tokens.md` + `STORYBOOK.md`                                                                                           |
-| **page-build**    | Build a full page or view                                                       | `spec-ui-layout-patterns.md` + `spec-ui-tokens.md`. Guest/client: also `spec-ui-design-system.md` + `spec-ui-content-voice.md` + `spec-ui-layout-signatures.md` |
+| **page-build**    | Build a full page or view                                                       | `spec-ui-layout-patterns.md` + `spec-ui-tokens.md` + `spec-ui-design-system.md` + `spec-ui-content-voice.md` + `spec-ui-layout-signatures.md` |
 | **unclear**       | Cannot classify from the request                                                | Browse `packages/ui/src/components/` to understand available components, then reassess                                                    |
 
 **Component API lookup:** Read the component's `.tsx` file in `packages/ui/src/components/` for its props, variants, and usage. For stories, check the colocated `.stories.tsx`.
@@ -153,7 +153,7 @@ Spec files live in `_specs/spec-ui/` — load on-demand per the Request Classifi
 - **Design system:** `_specs/spec-ui/spec-ui-design-system.md` — palette, depth, surfaces, typography, spacing, header/footer/nav patterns. Load for any layout/design work.
 - **Content voice:** `_specs/spec-ui/spec-ui-content-voice.md` — voice, casing, units, copy rules. Load for any page-build or when writing UI strings.
 - **Layout patterns:** `_specs/spec-ui/spec-ui-layout-patterns.md` — card grouping, two-column decisions, sidebar assignment.
-- **Layout signatures:** `_specs/spec-ui/spec-ui-layout-signatures.md` — overline+rule, annotated diagram, spec chip, triple basket, header scroll, breadcrumb, megamenu.
+- **Layout signatures:** `_specs/spec-ui/spec-ui-layout-signatures.md` — overline+rule, annotated diagram, stat chip, action-group header, header scroll, breadcrumb.
 - **Responsive:** `_specs/spec-ui/spec-ui-responsive.md`
-- **Motion:** `_specs/spec-ui/spec-ui-motion.md` — Framer Motion patterns and animation guidelines.
+- **Motion:** `_specs/spec-ui/spec-ui-motion.md` — Motion (motion.dev) patterns and animation guidelines.
 - **Tailwind gotchas:** `_specs/spec-ui/spec-ui-tailwind-gotchas.md`

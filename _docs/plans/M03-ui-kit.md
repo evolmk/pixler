@@ -2,7 +2,7 @@
 
 ## Goal
 
-Port enough of Lazar's component patterns into `packages/ui` to cover Pixler v1's needs: a small, opinionated kit built on Radix + Vaul + Framer Motion + Lucide that reads everything from `@pixler/tokens` CSS variables.
+Port enough of Lazar's component patterns into `packages/ui` to cover Pixler v1's needs: a small, opinionated kit built on Radix + Vaul + Motion (motion.dev) + Lucide that reads everything from `@pixler/ui-styles` CSS variables.
 
 ## Depends on
 
@@ -11,13 +11,13 @@ Port enough of Lazar's component patterns into `packages/ui` to cover Pixler v1'
 
 ## Deliverables
 
-- [ ] `packages/ui` set up to consume `@pixler/tokens`, Tailwind v4, Radix UI, Vaul, Framer Motion, Lucide React
+- [ ] `packages/ui` set up to consume `@pixler/ui-styles`, Tailwind v4, Radix UI, Vaul, Motion (`motion`), Lucide React
 - [ ] Components (exported from `packages/ui/src/index.ts`):
   - `<Button variant size loading icon>` — primary / secondary / ghost / danger × sm/md/lg
   - `<IconButton>` — square, icon-only
   - `<Drawer side width>` — Vaul-backed, supports left/right; velocity-and-distance dismiss
   - `<Sheet>` — bottom sheet variant of Drawer
-  - `<Dialog>` — Radix dialog with Framer fade/scale
+  - `<Dialog>` — Radix dialog with Motion fade/scale
   - `<Tooltip delay side>` — Radix tooltip with sensible defaults
   - `<Toggle>` (one-off) and `<Switch>` (Radix-backed)
   - `<SegmentedControl options value onChange>` — pill-style
@@ -46,7 +46,7 @@ Port enough of Lazar's component patterns into `packages/ui` to cover Pixler v1'
 ## Files
 
 ```
-packages/ui/package.json          (depends: react, radix-ui packages, vaul, framer-motion, lucide-react)
+packages/ui/package.json          (depends: react, radix-ui packages, vaul, motion, lucide-react)
 packages/ui/src/index.ts
 packages/ui/src/components/*.tsx  (one file per component listed above)
 packages/ui/src/hooks/*.ts        (useToasts store, useReducedMotion)

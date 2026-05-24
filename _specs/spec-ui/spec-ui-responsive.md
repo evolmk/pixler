@@ -1,6 +1,6 @@
 # Mobile Responsive Rules (Detail/Edit Pages)
 
-**When to read:** When building admin detail/edit pages. Apply these responsive patterns automatically.
+**When to read:** When building detail/edit pages. Apply these responsive patterns automatically.
 
 ---
 
@@ -10,7 +10,7 @@
 | ---------------------- | ------------------------------------------- | ------------------------------------------------- |
 | **Page layout**        | `grid grid-cols-1 lg:grid-cols-[1fr_320px]` | Single column, sidebar below main                 |
 | **Sidebar**            | Fixed right column                          | Collapsible via Radix `Collapsible` + toggle header |
-| **Form grids**         | `ui-grid [cols]="2"`                        | `grid-cols-1` — all fields stack                  |
+| **Form grids**         | `grid grid-cols-2`                          | `grid-cols-1` — all fields stack                  |
 | **Card actions**       | Inline buttons                              | Stack or `flex-wrap`                              |
 | **Subcollection rows** | Horizontal with badges + actions            | Badge wraps below name                            |
 

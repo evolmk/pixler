@@ -1,0 +1,23 @@
+{
+  "name": "pixler",
+  "version": "0.0.1",
+  "description": "Local agentic SDLC orchestrator. Your stack, your team, zero LLM API cost.",
+  "type": "module",
+  "bin": {
+    "pixler": "./bin/pixler.js"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20"
+  }
+}

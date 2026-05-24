@@ -1,0 +1,37 @@
+import type { ThemeDefinition } from '../types';
+
+export const forest: ThemeDefinition = {
+  name: 'forest',
+  label: 'Forest',
+  cssScheme: undefined,
+  light: {
+    background: 'oklch(0.995 0.005 145)',
+    foreground: 'oklch(0.2 0.04 145)',
+    primary: 'oklch(0.602 0.138 149.882)',
+    primaryForeground: 'oklch(0.98 0.01 145)',
+    secondary: 'oklch(0.95 0.02 145)',
+    secondaryForeground: 'oklch(0.3 0.04 145)',
+    muted: 'oklch(0.95 0.015 145)',
+    mutedForeground: 'oklch(0.56 0.03 145)',
+    accent: 'oklch(0.92 0.04 145)',
+    accentForeground: 'oklch(0.3 0.04 145)',
+    border: 'oklch(0.914 0.02 145)',
+    input: 'oklch(0.9 0.02 145)',
+    ring: 'oklch(0.602 0.138 149.882)',
+  },
+  dark: {
+    background: 'oklch(0.15 0.02 145)',
+    foreground: 'oklch(0.95 0.01 145)',
+    primary: 'oklch(0.602 0.138 149.882)',
+    primaryForeground: 'oklch(0.15 0.02 145)',
+    secondary: 'oklch(0.28 0.03 145)',
+    secondaryForeground: 'oklch(0.95 0.01 145)',
+    muted: 'oklch(0.28 0.025 145)',
+    mutedForeground: 'oklch(0.59 0.04 145)',
+    accent: 'oklch(0.35 0.04 145)',
+    accentForeground: 'oklch(0.95 0.01 145)',
+    border: 'oklch(0.32 0.03 145)',
+    input: 'oklch(0.35 0.03 145)',
+    ring: 'oklch(0.602 0.138 149.882)',
+  },
+};

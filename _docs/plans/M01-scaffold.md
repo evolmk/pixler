@@ -16,7 +16,7 @@ Nothing. This is the root of the dependency tree.
 - [ ] `apps/api/` — NestJS 11 skeleton with a single `GET /api/health` returning `{ ok: true, version }`
 - [ ] `apps/web/` — React 19 + Vite + TypeScript skeleton, dev proxy to the api, shows a `Pixler is alive` page that calls `/api/health` and renders the version
 - [ ] `packages/ui/` — empty package, only `package.json` + `tsconfig.json` (real components land in M03)
-- [ ] `packages/tokens/` — empty package skeleton (real tokens land in M02)
+- [ ] `packages/ui-styles/` — empty package skeleton (real tokens land in M02)
 - [ ] `packages/shared-types/` — exports an empty `index.ts` placeholder + `package.json`
 - [ ] `packages/orchestrator/` — empty package skeleton
 - [ ] `packages/linear-cli/` — empty package skeleton with a `bin` entry stub that prints `"pixler linear cli — not yet implemented"`
@@ -47,9 +47,13 @@ tsconfig.base.json
 bin/pixler.js
 apps/api/{package.json,tsconfig.json,src/main.ts,src/app.module.ts,src/health.controller.ts}
 apps/web/{package.json,tsconfig.json,index.html,vite.config.ts,src/main.tsx,src/App.tsx}
-packages/{ui,tokens,shared-types,orchestrator,linear-cli}/{package.json,tsconfig.json,src/index.ts}
+packages/{ui,ui-styles,shared-types,orchestrator,linear-cli}/{package.json,tsconfig.json,src/index.ts}
 .gitignore
 ```
+
+## Dependency policy
+
+All packages must be installed at their **latest stable/LTS versions** — no alpha, beta, RC, canary, or `@next` tags. When a package offers an LTS track (e.g. NestJS), prefer the current LTS. Pin with `^` ranges so patches flow in but major bumps are intentional.
 
 ## Out of scope
 

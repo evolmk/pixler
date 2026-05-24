@@ -86,31 +86,22 @@ Static tokens — **not affected by color schemes or dark mode**.
 | `--status-success` | `#10b981` | `text-status-success` | Success  |
 | `--status-info`    | `#3b82f6` | `text-status-info`    | Info     |
 
-## Color Schemes
+## Themes
 
-Set via `data-color-scheme` attribute on `<html>`. All schemes provide light + dark variants.
+Pixler ships 8 named themes (see SPEC §9.1), each with light + dark variants. Set via `data-theme` attribute on `<html>`. Dark mode via `.dark` class on `<html>`.
 
-| Scheme      | Selector                         | Character                  |
-| ----------- | -------------------------------- | -------------------------- |
-| **Default** | `:root` (no attribute)           | Green primary (hue 145)    |
-| Slate       | `[data-color-scheme='slate']`    | Cool blue-gray             |
-| Zinc        | `[data-color-scheme='zinc']`     | Warm purple-gray           |
-| Stone       | `[data-color-scheme='stone']`    | Warm yellow-gray           |
-| Gray        | `[data-color-scheme='gray']`     | Blue-tinted gray           |
-| Rose        | `[data-color-scheme='rose']`     | Pink/rose primary (hue 12) |
-| Blue        | `[data-color-scheme='blue']`     | Blue primary (hue 250)     |
-| Green       | `[data-color-scheme='green']`    | Green primary (hue 145)    |
-| Orange      | `[data-color-scheme='orange']`   | Orange primary (hue 55)    |
-| Violet      | `[data-color-scheme='violet']`   | Violet primary (hue 290)   |
-| Nord Ice    | `[data-color-scheme='nord-ice']` | Nord-inspired arctic blues |
+| Theme          | Selector                      | Character                     |
+| -------------- | ----------------------------- | ----------------------------- |
+| **Forest**     | `[data-theme='forest']`       | Green primary (default)       |
+| **Graphite**   | `[data-theme='graphite']`     | Neutral grays, blue accent    |
+| **Catppuccin** | `[data-theme='catppuccin']`   | Frappé (dark) / Latte (light) |
+| **Tokyo Night**| `[data-theme='tokyo-night']`  | Deep blues + magenta accent   |
+| **Nord**       | `[data-theme='nord']`         | Cool blue-gray, minimal       |
+| **Rosé Pine**  | `[data-theme='rose-pine']`    | Warm muted                    |
+| **Solarized**  | `[data-theme='solarized']`    | Classic high-readability      |
+| **Mono**       | `[data-theme='mono']`         | Pure grayscale, accent-free   |
 
-## Per-App Theme Overrides
-
-- **Admin**: no overrides — uses default neutral
-- **Client & Guest**: brand green primary (`--primary: #16a355`)
-- **Portal**: navy sidebar (`--sidebar: oklch(0.21 0.06 255)`)
-
-Per-app overrides can be loaded via additional CSS files after `globals.css`.
+Forest and Graphite ship in M02. The remaining six ship in M20.
 
 ## Spacing Scale
 

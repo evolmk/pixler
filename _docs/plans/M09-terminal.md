@@ -25,7 +25,7 @@ Implement the Terminal mode UI from SPEC §4.5 + §8.6: spawn a real PTY in the 
 - [ ] Multiple terminals per workspace supported (dropdown in the right pane header to switch — only show if > 1)
 - [ ] Web client:
   - `apps/web/src/components/TerminalPane.tsx` — mounts xterm.js, subscribes to the workspace's terminal events
-  - Theme: pull terminal palette from the active `@pixler/tokens` theme (CSS vars consumed via xterm theme object); re-apply on theme change
+  - Theme: pull terminal palette from the active `@pixler/ui-styles` theme (CSS vars consumed via xterm theme object); re-apply on theme change
   - Font + size + cursor style from `terminal.*` settings keys (defined in M05 registry, extended here with `font`, `fontSize`, `cursorStyle`, `scrollback`, `copyOnSelect`, `pasteWarning`)
   - Resize observer keeps the PTY in sync with the visible cols/rows
   - **Big Terminal mode** (full-bleed) is just the M06 toggle — TerminalPane already renders fluidly

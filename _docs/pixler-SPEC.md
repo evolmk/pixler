@@ -43,10 +43,10 @@ Pixler is working when:
 |Layer                   |Choice                                            |Rationale                                                                                                                                           |
 |------------------------|--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 |Backend                 |NestJS (Node)                                     |Matches Lazar muscle memory; clean DI for orchestrator modules                                                                                      |
-|Frontend                |React 19 + Vite + TypeScript                      |Framer Motion + assistant-ui + future React Native path                                                                                             |
+|Frontend                |React 19 + Vite + TypeScript                      |Motion (motion.dev) + assistant-ui + future React Native path                                                                                       |
 |Styling                 |Tailwind v4 + CSS variables + `@pixler/ui-styles`  |Runtime theme switching with no rebuild                                                                                                             |
-|Animation               |Framer Motion                                     |Gold standard for declarative React animation                                                                                                       |
-|Gestures                |`@use-gesture/react`                              |Multi-touch, pinch, fling, with Framer Motion integration                                                                                           |
+|Animation               |Motion (motion.dev)                               |Gold standard for declarative React animation                                                                                                       |
+|Gestures                |`@use-gesture/react`                              |Multi-touch, pinch, fling, with Motion integration                                                                                                  |
 |Drawers/sheets          |Vaul                                              |Finger-tracked dismiss with velocity-and-distance physics                                                                                           |
 |Command palette         |cmdk                                              |Vercel’s primitive; fuzzy search everything                                                                                                         |
 |Primitives              |Radix UI                                          |Accessibility + unstyled by default                                                                                                                 |
@@ -85,7 +85,7 @@ pixler/
 
 ### 2.2 Design tokens approach
 
-Tokens live in `@pixler/ui-styles` and are consumed by both web (Tailwind + CSS variables) and future mobile (NativeWind). The package is generated from Lazar’s existing Tailwind preset as the starting point (the “Forest” theme), with the other 7 themes following the same token shape. The Angular source of truth for token values is in `shared-packages-from-lazar-angular-app/ui-styles-library/src/globals.css`.
+Tokens live in `@pixler/ui-styles` and are consumed by both web (Tailwind + CSS variables) and future mobile (NativeWind). The package is generated from Lazar’s existing Tailwind preset as the starting point (the “Forest” theme), with the other 7 themes following the same token shape. The Angular source of truth for token values is in `files-from-my-angular-repo/ui-styles/src/globals.css`.
 
 -----
 
@@ -724,7 +724,7 @@ When Pixler exits beta and has a public domain, ship a JSON schema at a stable U
 
 ### 11.1 First-launch flow
 
-Designed to take under 90 seconds. Each step is a Vaul drawer panel sliding in from the right with Framer Motion. Step indicator at top. Every step has a “Skip — I’ll do this later” link.
+Designed to take under 90 seconds. Each step is a Vaul drawer panel sliding in from the right with Motion. Step indicator at top. Every step has a “Skip — I’ll do this later” link.
 
 #### Step 1 — Welcome + Appearance
 

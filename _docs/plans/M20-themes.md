@@ -14,7 +14,7 @@ Finish the theming story from SPEC §9: ship all eight themes (Forest, Graphite,
 
 ## Deliverables
 
-- [ ] `packages/tokens/src/themes/`:
+- [ ] `packages/ui-styles/src/themes/`:
   - `catppuccin.ts` — Latte (light) / Frappé (dark)
   - `tokyo-night.ts`
   - `nord.ts`
@@ -31,7 +31,7 @@ Finish the theming story from SPEC §9: ship all eight themes (Forest, Graphite,
 - [ ] **Per-project theme override** (SPEC §9.3) — Project Settings → Theme override panel reuses the same grid; project setting beats global
 - [ ] **Terminal palette + chat code-block theme** verified across all 8: ensure Shiki uses an appropriately matched grammar theme (`catppuccin-frappe`, `tokyo-night`, `nord`, etc. — Shiki ships several of these natively; for Forest/Graphite/Mono fall back to closest match)
 - [ ] **Monaco theme sync**: register custom Monaco themes generated from token values for at least each `mode` per `theme` (one Monaco theme per active selection is enough — register on theme change)
-- [ ] **Animation level** setting (`appearance.animationLevel: 'full' | 'reduced' | 'off'`) implemented — `reduced` honors OS preference; `off` strips all Framer Motion animations
+- [ ] **Animation level** setting (`appearance.animationLevel: 'full' | 'reduced' | 'off'`) implemented — `reduced` honors OS preference; `off` strips all Motion animations
 - [ ] **Density** setting (`appearance.density`) — sets a CSS-variable `--pixler-density` that components read for padding/font-size scaling
 
 ## Acceptance
@@ -45,13 +45,13 @@ Finish the theming story from SPEC §9: ship all eight themes (Forest, Graphite,
 ## Files
 
 ```
-packages/tokens/src/themes/catppuccin.ts
-packages/tokens/src/themes/tokyo-night.ts
-packages/tokens/src/themes/nord.ts
-packages/tokens/src/themes/rose-pine.ts
-packages/tokens/src/themes/solarized.ts
-packages/tokens/src/themes/mono.ts
-packages/tokens/src/index.ts                       (export all)
+packages/ui-styles/src/themes/catppuccin.ts
+packages/ui-styles/src/themes/tokyo-night.ts
+packages/ui-styles/src/themes/nord.ts
+packages/ui-styles/src/themes/rose-pine.ts
+packages/ui-styles/src/themes/solarized.ts
+packages/ui-styles/src/themes/mono.ts
+packages/ui-styles/src/index.ts                       (export all)
 apps/web/src/styles/theme.css                      (extend with new blocks)
 apps/web/src/components/SettingsDrawer/AppearancePanel.tsx   (replace with the grid)
 apps/web/src/components/ThemeSwatchGrid.tsx

@@ -14,12 +14,12 @@ Implement the gesture + motion details from SPEC §8.2/§8.4 + the deep-link sur
 
 - [ ] `apps/web/package.json` adds `@use-gesture/react`
 - [ ] **Gesture wiring**:
-  - **Swipe-to-archive** on workspace sidebar cards: drag horizontally; on `> 50%` displacement or velocity-flick, fire archive; smooth Framer Motion spring-back / spring-out animation
+  - **Swipe-to-archive** on workspace sidebar cards: drag horizontally; on `> 50%` displacement or velocity-flick, fire archive; smooth Motion spring-back / spring-out animation
   - **Pull-to-refresh** on the Linear ticket list section: drag down past threshold; triggers `POST /api/linear/sync`
   - **Long-press** workspace card → opens the context menu (already in M08; here we add the gesture path)
   - **Pinch-to-zoom** Monaco diff (M17 placeholder becomes real here): pinch scales the editor font-size with a clamp
 - [ ] **Animation pass**:
-  - Audit every modal, drawer, dropdown, tab change for Framer Motion exit + enter
+  - Audit every modal, drawer, dropdown, tab change for Motion exit + enter
   - Stagger entrance animations for the sidebar workspace list (small `delay` per item)
   - Theme switch transition: 200ms fade on `--pixler-bg` swap (use `transition: background-color`)
   - Respect `appearance.animationLevel` from M20 globally

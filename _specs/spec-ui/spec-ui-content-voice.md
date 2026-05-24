@@ -2,7 +2,7 @@
 
 **Created:** 2026-05-15
 
-**When to read:** Writing any UI string — labels, CTAs, empty states, error messages, page titles, descriptions, footer links, tooltips. This spec governs all copy in Guest and Client apps.
+**When to read:** Writing any UI string — labels, CTAs, empty states, error messages, page titles, descriptions, tooltips. This spec governs all copy in Pixler.
 
 ---
 

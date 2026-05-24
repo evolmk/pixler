@@ -1,1 +1,8 @@
+node_modules/
+dist/
+.turbo/
+*.log
+.DS_Store
 /.idea/
+.env
+.env.*

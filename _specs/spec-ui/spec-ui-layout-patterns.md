@@ -1,20 +1,20 @@
 # Layout Patterns
 
-Full-page and section layout patterns using UI components.
+Full-page and section layout patterns for the Pixler app.
 
 ---
 
-## 1. Admin Shell Layout
+## 1. App Shell Layout
 
-Use `<AdminShell>` — the canonical admin layout. Provides collapsible sidebar, topbar with section switcher + breadcrumbs + search + notifications + theme selector + user menu, and a scrollable content area with `<Outlet />`.
+Pixler uses a three-pane layout (SPEC §8.1): left workspace rail, center content area with tabs, and right chat/terminal pane. All panes are resizable.
 
-### Key Inputs
+### Key Props
 
-| Input                                   | Type                     | Purpose                         |
+| Prop                                    | Type                     | Purpose                         |
 | --------------------------------------- | ------------------------ | ------------------------------- |
-| `navItems`                              | `AdminNavItem[]`         | Sidebar navigation tree         |
+| `navItems`                              | `NavItem[]`              | Workspace list in left rail     |
 | `userName`, `userEmail`, `userInitials` | `string`                 | User menu display               |
-| `appName`                               | `string`                 | Sidebar header brand            |
+| `appName`                               | `string`                 | Header brand                    |
 | `notificationCount`                     | `number`                 | Bell badge count                |
 | `showSearch`                            | `boolean`                | Enable `Cmd+K` search           |
 | `breadcrumbLabels`                      | `Record<string, string>` | URL segment → display label map |
@@ -25,17 +25,17 @@ Callbacks: `onLogout`, `onSettings`, `onSearch`.
 ### Types
 
 ```typescript
-interface AdminNavItem {
+interface NavItem {
   label: string;
   route: string;
-  iconPaths: string[]; // heroicons SVG path d values
-  children?: AdminNavChild[];
+  icon: React.ComponentType<{ className?: string }>;
+  children?: NavChild[];
 }
-interface AdminNavChild {
+interface NavChild {
   label: string;
   route: string;
 }
-interface AdminBreadcrumb {
+interface AppBreadcrumb {
   label: string;
   url: string;
 }
@@ -51,20 +51,15 @@ interface AdminBreadcrumb {
 
 - **Sidebar collapse**: `useSidebar().toggleCollapse()`
 - **Auto breadcrumbs**: Built from URL segments, customizable via `breadcrumbLabels`
-- **Section switcher**: Topbar dropdown shows all top-level nav items
 - **Keyboard shortcut**: `Cmd+K` / `Ctrl+K` triggers `onSearch`
 - **Active route**: prefix matching — `/projects` matches `/projects/settings`
 - **Nav expansion**: Items with `children` auto-expand when route is active
 
-## 2. Stacked Layout (Marketing / Guest)
-
-No sidebar — top `<Navbar>` + `<main class="flex-1">` with `<Outlet />` + footer. Wrap in `min-h-screen flex flex-col bg-background`.
-
-## 3. Common Page Patterns
+## 2. Common Page Patterns
 
 - **Dashboard**: `space-y-6` stack — page header row, stats grid (4 cols), two-column grid (chart + activity), full-width table card.
 - **Detail (split)**: `grid grid-cols-1 lg:grid-cols-[1fr_320px]` — main content left, metadata sidebar right. Breadcrumb above.
-- **List (CRUD)**: Header row (title + "Add" button), `<Card>` wrapping `<DataTable>`.
+- **List (CRUD)**: Header row (title + "Add" button), `<Card>` wrapping a data table.
 - **Empty state**: Centered card with icon, heading, description, CTA button.
 
 ---
@@ -75,18 +70,18 @@ Group fields into cards by priority:
 
 | Rule                  | Example                                | Card Title                             |
 | --------------------- | -------------------------------------- | -------------------------------------- |
-| **Explicit prefix**   | `billing*`, `shipping*`                | "Billing", "Shipping"                  |
-| **Semantic cluster**  | `companyName` + `abbr` + `website`     | "General Information"                  |
-| **Type cluster**      | All `Float` fields with currency hints | "Payment & Billing"                    |
+| **Explicit prefix**   | `workspace*`, `project*`               | "Workspace", "Project"                 |
+| **Semantic cluster**  | `projectName` + `repoUrl` + `branch`   | "General Information"                  |
+| **Type cluster**      | All numeric fields with metric hints   | "Stats & Metrics"                      |
 | **Remaining scalars** | Ungrouped string/text                  | "General Information" (catch-all)      |
-| **Booleans/toggles**  | `isActive`, `taxCode`                  | Sidebar — edit: "Status"; detail: omit |
-| **Embedded arrays**   | `contacts[]`, `addresses[]`            | One card per subcollection             |
+| **Booleans/toggles**  | `isActive`, `autoApprove`              | Sidebar — edit: "Status"; detail: omit |
+| **Embedded arrays**   | `workspaces[]`, `scripts[]`            | One card per subcollection             |
 
 **Within each card**: name/title first (full-width), short text in 2-col grid, longer text full-width, numbers in 2-col grid, selects after text, required before optional.
 
 ## Two-Column Layout Decision
 
-Use `grid grid-cols-1 lg:grid-cols-[1fr_320px]` when the model has **any** of: a status/state field, 3+ ObjectId refs, workflow states, or `created`/`lastChange` metadata. Single-column when <8 fields and no status/reference fields.
+Use `grid grid-cols-1 lg:grid-cols-[1fr_320px]` when the model has **any** of: a status/state field, 3+ references, workflow states, or `created`/`updated` metadata. Single-column when <8 fields and no status/reference fields.
 
 ## Sidebar Content Assignment
 
@@ -101,7 +96,7 @@ Last card in main column for entities supporting delete/archive. `border-destruc
 
 ---
 
-## Guest & Client App — Signature Patterns
+## Pixler Signature Patterns
 
 See **`spec-ui-layout-signatures.md`** for full recipes.
 
@@ -109,8 +104,7 @@ See **`spec-ui-layout-signatures.md`** for full recipes.
 | ----------------------------- | --------------------------------------------- |
 | Overline + brand-rule + hero  | Section introductions, page headers           |
 | Annotated diagram             | Detail hero — numbered callout pills          |
-| Spec chip w/ bottom underline | Spec values on detail pages                   |
+| Stat chip w/ bottom underline | Stat values on detail pages                   |
 | Action-group header           | Header — Projects / Workspaces / Terminal     |
 | Header scroll states          | White (top) → brand-green (scrolled)          |
-| Breadcrumb                    | Top of every Guest/Client detail page         |
-| Megamenu                      | Desktop hover-triggered navigation            |
+| Breadcrumb                    | Top of every detail page                      |

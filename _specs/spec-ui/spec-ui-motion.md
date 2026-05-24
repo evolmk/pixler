@@ -12,11 +12,11 @@
 | ---------------------- | ----------------------------------------------------------------------------- |
 | Header scroll collapse | White → White (blurred bg), 70px → 50px, `duration-200 ease`                  |
 | Dropdown open/close    | Fade in/out with opacity, `duration-200 ease`                                 |
-| Skeleton → content     | `ui-skeleton` with `animate-pulse`, swap on load                              |
-| Toast slide-in         | `ToastService` default — slides from bottom                                   |
-| Card entrance (admin)  | `animate-in fade-in slide-in-from-bottom-2 duration-300` with staggered delay |
+| Skeleton → content     | `<Skeleton>` with `animate-pulse`, swap on load                               |
+| Toast slide-in         | Radix Toast — slides from bottom-right                                        |
+| Card entrance          | `animate-in fade-in slide-in-from-bottom-2 duration-300` with staggered delay |
 | Collapsible sections   | Radix `Collapsible` with `duration-200 ease-out`                              |
-| Tab switch (admin)     | `animate-in fade-in duration-150`                                             |
+| Tab switch             | `animate-in fade-in duration-150`                                             |
 
 ## Forbidden
 
