@@ -1,6 +1,7 @@
 # Pixler v1 — Milestone Plans
 
-This directory contains the milestone plans for shipping Pixler v1 (per `pixler-SPEC.md`). Each `MXX-*.md` is **self-contained** and **agent-runnable**: a single agent can pick it up, finish it, and move on.
+This directory contains the milestone plans for shipping Pixler v1 (per `pixler-SPEC.md`). Each `MXX-*.md` is *
+*self-contained** and **agent-runnable**: a single agent can pick it up, finish it, and move on.
 
 ## How to read a plan
 
@@ -27,7 +28,7 @@ Every plan has the same shape:
             └────────► M06 app-shell ◄────────────┘
                                │
                           M07 projects
-                               │
+      R                         │
                           M08 workspaces ──► M09 terminal
                                │                  │
             ┌──────────────────┼──────────────────┴───────────┐
@@ -53,25 +54,28 @@ Every plan has the same shape:
 
 ## Suggested execution order with /goal
 
-Sequential bottleneck path is `M01 → M02/M03/M04/M05 → M06 → M07 → M08 → M09 → M13 → M14 → M15 → M25`. Everything else fans out from there.
+Sequential bottleneck path is
+`M01 → M02/M03/M04/M05 → M06 → M07 → M08 → M09 → M13 → M14 → M15 → M26`. Everything else fans out from there.
 
 For maximum parallelism:
 
-| Wave | Milestones (run in parallel)                                          |
-|------|-----------------------------------------------------------------------|
-| 1    | M01                                                                    |
-| 2    | M02, M04, M05                                                          |
-| 3    | M03                                                                    |
-| 4    | M06                                                                    |
-| 5    | M07                                                                    |
-| 6    | M08, M10, M11, M12                                                     |
-| 7    | M09                                                                    |
-| 8    | M13, M16, M17, M18, M19                                                |
-| 9    | M14                                                                    |
-| 10   | M15, M20, M21, M22, M23, M24                                           |
-| 11   | M25                                                                    |
+| Wave | Milestones (run in parallel) |
+|------|------------------------------|
+| 1    | M01                          |
+| 2    | M02, M04, M05                |
+| 3    | M03                          |
+| 4    | M06                          |
+| 5    | M07                          |
+| 6    | M08, M10, M11, M12           |
+| 7    | M09                          |
+| 8    | M13, M16, M17, M18, M19      |
+| 9    | M14                          |
+| 10   | M15, M20, M21, M22, M23, M24 |
+| 11   | M25                          |
+| 12   | M26                          | 
 
-After wave 7 you have a **walking skeleton**: create a project, open a workspace, run `claude` in a terminal pane. Subsequent waves stack on top without breaking it.
+After wave 7 you have a **walking skeleton**: create a project, open a workspace, run
+`claude` in a terminal pane. Subsequent waves stack on top without breaking it.
 
 ## Definition of done for v1
 
