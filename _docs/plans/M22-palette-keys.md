@@ -1,9 +1,15 @@
 # M22 — Command palette (`cmdk`) + keyboard shortcuts
 
+**Status:** ⏳ IN_PROGRESS
+**Modified:** 2026-05-24
+**Current Status:** Not started — runnable after M03 + M06 + all M07–M21 feature work.
+
+---
+
 ## Goal
 
-Implement SPEC §8.9 + §10.2 Keyboard: a
-`cmdk`-based fuzzy search palette over every action / setting / workspace / ticket / file, plus a full keyboard-shortcut editor with conflict detection.
+Implement SPEC §8.9 + §10.2 Keyboard: a `cmdk`-based fuzzy search palette over every action /
+setting / workspace / ticket / file, plus a full keyboard-shortcut editor with conflict detection.
 
 ## Depends on
 
@@ -11,44 +17,22 @@ Implement SPEC §8.9 + §10.2 Keyboard: a
 - M06 (the `⌘K` stub gets replaced with the real palette)
 - All feature milestones whose actions appear in the palette (everything ≤ M21)
 
-## Deliverables
-
-- [ ] **Palette infra**:
-    - `apps/web/src/lib/palette/registry.ts` — a typed `registerAction({ id, title, group, keywords?, perform, when? })`
-    - Modules across the app register their actions at mount or lazily (settings, workspace ops, theme switches, IDE openers, run/stop, etc.)
-    - Recent-actions store (last 10) for surface-first ranking
-- [ ] **Palette UI**:
-    - Opens on `⌘K` / `Ctrl+K` and from the top-bar button
-    - `cmdk` `Command` primitive
-    - Sections: Recent · Actions · Settings · Workspaces · Tickets · Files
-    - Files section searches the active workspace's tracked files via `git ls-files`
-    - Settings section is searchable across the entire registry from M05 (every setting becomes an action like "Toggle auto-approve plan")
-    - Tickets section pulls from Linear cache (M10)
-    - Workspaces section lists everything (including archived if you type `:archived`)
-- [ ] **Keyboard shortcut system**:
-    - Shortcut registry keyed off the action registry
-    - Default bindings table covering everything in SPEC mentions: `⌘K` palette, `⌘+E` open IDE,
-      `⌘+Shift+D` diff full-bleed, Esc close drawer/dialog, `⌘+T` new workspace,
-      `⌘+W` close workspace tab, arrows in palette, etc.
-    - **Settings → Keyboard panel
-      ** filled in: searchable list of all shortcuts, click-to-rebind with conflict detection (warns "X already binds to Foo — replace?")
-    - Presets: Default / Vim / Emacs-ish — each preset is a JSON file applied to overrides
-    - Persists per-shortcut overrides in `settings.keyboard.bindings`
-- [ ] **Hotkey engine**: a single root listener (
-  `react-hotkeys-hook` or hand-rolled) that dispatches to the action registry; disabled when an input is focused unless the binding is
-  `global`
-- [ ] **Help → "Keyboard shortcuts"** modal listing every binding grouped by section
-
 ## Acceptance
 
 - `⌘K` opens the palette anywhere; typing surfaces matches across all groups.
 - Selecting "Toggle auto-approve plan" flips the setting and the change persists.
-- Vim preset rebinds the common ones (`:` for command mode, `gd`/`gp` chord for diff/plan tabs, etc.).
+- Vim preset rebinds the common ones (`:` for command mode, `gd`/`gp` chord for diff/plan tabs,
+  etc.).
 - Conflict detection prevents accidental dupes.
 - All shortcuts respect input focus.
 - `pnpm -w typecheck` clean.
 
-## Files
+## Out of scope
+
+- AI-driven action suggestions ("you might want to") — out of v1.
+- Plug-in / extension API for third-party palette actions — out of v1.
+
+## Files (expected surface)
 
 ```
 apps/web/src/lib/palette/registry.ts
@@ -64,7 +48,91 @@ apps/web/src/hooks/usePalette.ts
 apps/web/package.json   (add cmdk, react-hotkeys-hook)
 ```
 
-## Out of scope
+---
 
-- AI-driven action suggestions ("you might want to") — out of v1.
-- Plug-in / extension API for third-party palette actions — out of v1.
+## Sprint 1 — Palette infra: registry + cmdk UI + recent store
+
+**Status:** ⏳ pending
+**Goal:** `⌘K` opens a real cmdk palette with section grouping and recent-actions ranking.
+
+**Tasks:**
+
+- [ ] Add `cmdk` (already installed via M03) + `react-hotkeys-hook` to `apps/web/package.json`.
+- [ ] `lib/palette/registry.ts` — `registerAction({ id, title, group, keywords?, perform, when? })`.
+- [ ] Recent-actions store (last 10) for surface-first ranking.
+- [ ] `CommandPalette.tsx` — cmdk `Command` primitive; sections: Recent · Actions · Settings ·
+  Workspaces · Tickets · Files.
+- [ ] `usePalette.ts`.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/web build` + manual: `⌘K` opens palette, sections render.
+
+---
+
+## Sprint 2 — Action registration across modules + section content
+
+**Status:** ⏳ pending
+**Goal:** Every existing feature registers its actions; Files searches `git ls-files`; Settings
+generates from M05 registry; Tickets pull from M10 cache; Workspaces section lists all incl.
+`:archived`.
+
+**Tasks:**
+
+- [ ] Register actions in each module (settings, workspace ops, theme switches, IDE openers,
+  run/stop, etc.).
+- [ ] Files section: `git ls-files` of active workspace.
+- [ ] Settings section: every setting in M05 registry becomes an action like "Toggle
+  auto-approve plan".
+- [ ] Tickets section: pulled from Linear cache (M10).
+- [ ] Workspaces section: live list; `:archived` modifier shows archived too.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/web build` + manual: `⌘K`, type "Auto-approve plan", select, setting flips.
+
+---
+
+## Sprint 3 — Hotkey engine + Keyboard panel + presets + Help modal
+
+**Status:** ⏳ pending
+**Goal:** Bindings system fully functional: defaults, presets, click-to-rebind with conflict
+detection, Help modal.
+
+**Tasks:**
+
+- [ ] `lib/palette/keyboard.ts` — shortcut registry keyed off action registry; default bindings
+  for everything in SPEC.
+- [ ] `useHotkey.ts` — single root listener; disabled when input focused unless `global`.
+- [ ] `presets/default.json`, `presets/vim.json`, `presets/emacs.json`.
+- [ ] `SettingsDrawer/KeyboardPanel.tsx` — searchable list, click-to-rebind, conflict warning,
+  preset switcher, persists overrides to `settings.keyboard.bindings`.
+- [ ] `ShortcutsHelpModal.tsx` — Help → "Keyboard shortcuts".
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual: rebind `⌘+E`; vim preset switches `:`; conflict warning fires.
+
+---
+
+## Prompt that created this plan
+
+_(Predates merged template; preserved as historical record. Plan re-shaped into sprints on 2026-05-24.)_

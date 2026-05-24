@@ -1,8 +1,16 @@
 # M20 — All 8 themes + theme picker grid
 
+**Status:** ⏳ IN_PROGRESS
+**Modified:** 2026-05-24
+**Current Status:** Not started — runnable after M02 + M03 + M09 + M16 + M17.
+
+---
+
 ## Goal
 
-Finish the theming story from SPEC §9: ship all eight themes (Forest, Graphite, Catppuccin, Tokyo Night, Nord, Rosé Pine, Solarized, Mono) × light/dark, build the 16-swatch grid theme picker with live hover preview, ensure terminal + chat + diff all sync from the same CSS variables.
+Finish the theming story from SPEC §9: ship all eight themes (Forest, Graphite, Catppuccin, Tokyo
+Night, Nord, Rosé Pine, Solarized, Mono) × light/dark, build the 16-swatch grid theme picker with
+live hover preview, ensure terminal + chat + diff all sync from the same CSS variables.
 
 ## Depends on
 
@@ -12,47 +20,21 @@ Finish the theming story from SPEC §9: ship all eight themes (Forest, Graphite,
 - M16 (chat surfaces pull from tokens)
 - M17 (diff editor honors theme)
 
-## Deliverables
-
-- [ ] `packages/ui-styles/src/themes/`:
-    - `catppuccin.ts` — Latte (light) / Frappé (dark)
-    - `tokyo-night.ts`
-    - `nord.ts`
-    - `rose-pine.ts`
-    - `solarized.ts`
-    - `mono.ts`
-    - Each one matches the same shape as `forest.ts`/
-      `graphite.ts` from M02 (base, surface, primary, accent, text, border, success/warning/danger, terminal palette, syntax palette)
-- [ ] Update `apps/web/src/styles/theme.css` with the additional
-  `[data-theme="…"][data-mode="…"]` selectors (8 themes × 2 modes = 16 blocks)
-- [ ] **Theme picker grid** in Settings → Appearance:
-    - 16 swatches in a 4×4 grid (theme × mode)
-    - Each swatch is a small preview: shows base + elevated + primary + accent + a typography sample
-    - Hover preview: applies the theme to the entire app temporarily; on click, persists via
-      `useSetting('appearance.theme', …)` + `appearance.mode`
-    - Star indicator on the currently active swatch
-- [ ] **Per-project theme override
-  ** (SPEC §9.3) — Project Settings → Theme override panel reuses the same grid; project setting beats global
-- [ ] **Terminal palette + chat code-block theme
-  ** verified across all 8: ensure Shiki uses an appropriately matched grammar theme (`catppuccin-frappe`,
-  `tokyo-night`,
-  `nord`, etc. — Shiki ships several of these natively; for Forest/Graphite/Mono fall back to closest match)
-- [ ] **Monaco theme sync**: register custom Monaco themes generated from token values for at least each `mode` per
-  `theme` (one Monaco theme per active selection is enough — register on theme change)
-- [ ] **Animation level** setting (`appearance.animationLevel: 'full' | 'reduced' | 'off'`) implemented —
-  `reduced` honors OS preference; `off` strips all Motion animations
-- [ ] **Density** setting (`appearance.density`) — sets a CSS-variable
-  `--pixler-density` that components read for padding/font-size scaling
-
 ## Acceptance
 
-- All 16 variants render the entire app cleanly: top bar, sidebar, drawers, chat, terminal, diff, modals.
+- All 16 variants render the entire app cleanly: top bar, sidebar, drawers, chat, terminal, diff,
+  modals.
 - Hovering swatches in the picker previews live; clicking sets and the choice persists.
 - Per-project override beats global on the project's pages.
 - Setting animation level to "off" eliminates all motion.
 - `pnpm -w typecheck` clean.
 
-## Files
+## Out of scope
+
+- Custom user-defined themes — pick from the 8 in v1.
+- Per-workspace theme override — project-level granularity is enough.
+
+## Files (expected surface)
 
 ```
 packages/ui-styles/src/themes/catppuccin.ts
@@ -70,7 +52,91 @@ apps/web/src/lib/monaco-theme.ts
 apps/web/src/lib/shiki.ts                          (extend theme map)
 ```
 
-## Out of scope
+---
 
-- Custom user-defined themes — pick from the 8 in v1.
-- Per-workspace theme override — project-level granularity is enough.
+## Sprint 1 — Add 6 new themes + theme.css blocks
+
+**Status:** ⏳ pending
+**Goal:** Each of the 6 new themes ships as a `*.ts` matching `forest.ts`/`graphite.ts` shape;
+`theme.css` gains the 16 `[data-theme][data-mode]` blocks.
+
+**Tasks:**
+
+- [ ] `themes/catppuccin.ts` (Latte light / Frappé dark).
+- [ ] `themes/tokyo-night.ts`.
+- [ ] `themes/nord.ts`.
+- [ ] `themes/rose-pine.ts`.
+- [ ] `themes/solarized.ts`.
+- [ ] `themes/mono.ts`.
+- [ ] `packages/ui-styles/src/index.ts` exports them all.
+- [ ] Extend `apps/web/src/styles/theme.css` with the new selectors.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w build` + manual: programmatically set each `data-theme` + `data-mode`, eyeball app chrome.
+
+---
+
+## Sprint 2 — Theme picker grid + hover preview + per-project override
+
+**Status:** ⏳ pending
+**Goal:** Settings → Appearance shows the 4×4 swatch grid with hover preview and active star;
+project-level override panel reuses it.
+
+**Tasks:**
+
+- [ ] `ThemeSwatchGrid.tsx` — 16 swatches with base/elevated/primary/accent/typography preview.
+- [ ] Hover preview applies theme temporarily; click persists via `useSetting('appearance.theme', …)`
+  + `appearance.mode`.
+- [ ] Star indicator on active swatch.
+- [ ] Replace `SettingsDrawer/AppearancePanel.tsx` with the grid (replaces M06 stub).
+- [ ] `ProjectSettingsDrawer/ThemePanel.tsx` reuses the grid; project setting beats global.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/web build` + manual: every swatch retints app on hover; click persists.
+
+---
+
+## Sprint 3 — Terminal/Shiki/Monaco sync + density + animation level
+
+**Status:** ⏳ pending
+**Goal:** Terminal palette + chat code-block theme + Monaco editor theme + density + animation
+level all driven by the active theme.
+
+**Tasks:**
+
+- [ ] Extend `lib/shiki.ts` theme map (catppuccin-frappe, tokyo-night, nord, etc.; fallback for
+  Forest/Graphite/Mono).
+- [ ] `lib/monaco-theme.ts` — register custom Monaco theme per active selection.
+- [ ] `appearance.animationLevel: 'full' | 'reduced' | 'off'` honored globally (Motion variants
+  read it).
+- [ ] `appearance.density` sets `--pixler-density` consumed by components.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w typecheck` + manual: theme switch retints terminal, chat code blocks, diff; off-animation strips Motion.
+
+---
+
+## Prompt that created this plan
+
+_(Predates merged template; preserved as historical record. Plan re-shaped into sprints on 2026-05-24.)_

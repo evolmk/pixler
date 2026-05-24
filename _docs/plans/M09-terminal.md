@@ -1,58 +1,42 @@
 # M09 — Terminal mode (node-pty + xterm.js + multiplex)
 
+**Status:** ⏳ IN_PROGRESS
+**Modified:** 2026-05-24
+**Current Status:** Not started — runnable after M06 + M08.
+
+---
+
 ## Goal
 
-Implement the Terminal mode UI from SPEC §4.5 + §8.6: spawn a real PTY in the workspace's worktree using the user's default shell (and the user's version manager — mise/asdf/nvm/rbenv — gets picked up automatically), stream stdout/stdin over Socket.io to xterm.js in the right pane, support Big Terminal full-bleed, multiplex across workspaces.
+Implement the Terminal mode UI from SPEC §4.5 + §8.6: spawn a real PTY in the workspace's
+worktree using the user's default shell (and the user's version manager — mise/asdf/nvm/rbenv —
+gets picked up automatically), stream stdout/stdin over Socket.io to xterm.js in the right pane,
+support Big Terminal full-bleed, multiplex across workspaces.
 
 ## Depends on
 
 - M06 (right pane + Big Terminal toggle)
 - M08 (workspaces + worktree path to use as PTY cwd)
 
-## Deliverables
-
-- [ ] api: `apps/api/src/terminals/`:
-    - `TerminalsModule`, `TerminalsService`
-    - `POST /api/workspaces/:id/terminal` — create a PTY in the workspace's cwd; returns `{ terminalId }`. Args: `cols`,
-      `rows`, optional `cmd` (defaults to user's shell)
-    - `DELETE /api/terminals/:terminalId` — kill PTY
-    - `POST /api/terminals/:terminalId/resize` — body `{ cols, rows }`
-    - Socket.io events on namespace `/terminals`:
-        - Server → client: `terminal.data` `{ terminalId, data }`, `terminal.exit` `{ terminalId, exitCode }`
-        - Client → server: `terminal.input` `{ terminalId, data }`
-    - PTY shell selection: respect `$SHELL`, then user setting `terminal.shell`
-    - **Spawn via login shell** (
-      `-l` flag for bash/zsh) so mise/asdf/nvm hooks load and the right tool versions are picked up
-- [ ] One PTY per workspace, persisted across right-pane navigations (kept alive by the api until workspace is closed/archived)
-- [ ] Multiple terminals per workspace supported (dropdown in the right pane header to switch — only show if > 1)
-- [ ] Web client:
-    - `apps/web/src/components/TerminalPane.tsx` — mounts xterm.js, subscribes to the workspace's terminal events
-    - Theme: pull terminal palette from the active
-      `@pixler/ui-styles` theme (CSS vars consumed via xterm theme object); re-apply on theme change
-    - Font + size + cursor style from `terminal.*` settings keys (defined in M05 registry, extended here with `font`,
-      `fontSize`, `cursorStyle`, `scrollback`, `copyOnSelect`, `pasteWarning`)
-    - Resize observer keeps the PTY in sync with the visible cols/rows
-    - **Big Terminal mode** (full-bleed) is just the M06 toggle — TerminalPane already renders fluidly
-- [ ] **Shadow mode / Interrupt
-  ** (SPEC §8.6): "Interrupt" button in the right-pane header. When pressed while an agent owns the PTY (later milestones run agents through the same PTY), it sends
-  `SIGINT` and surfaces a banner "You're in control." For M09 the agent isn't running yet, so this just sends
-  `SIGINT` to whatever's in the PTY.
-- [ ] **Multiplexed switching
-  **: when the user clicks a different workspace, the right pane switches PTY views without killing the old one (it stays alive on the server)
-- [ ] **Settings → Terminal panel
-  ** filled in (font, font size, cursor style, scrollback, copy-on-select, paste-warning, shell override)
-
 ## Acceptance
 
-- Selecting a workspace + Terminal mode shows a working bash/zsh prompt in the worktree's cwd within ~200ms.
-- Typing
-  `node -v` (or any tool managed by mise/asdf/nvm) returns the workspace's expected version, not the system default.
+- Selecting a workspace + Terminal mode shows a working bash/zsh prompt in the worktree's cwd
+  within ~200ms.
+- Typing `node -v` (or any tool managed by mise/asdf/nvm) returns the workspace's expected
+  version, not the system default.
 - Resizing the right pane resizes the PTY (verified via `stty size` matching xterm cols/rows).
 - Switching workspaces preserves the previous workspace's shell state on return.
 - Changing the theme retints the terminal palette.
 - `pnpm -w typecheck` clean.
 
-## Files
+## Out of scope
+
+- Running `claude` automatically inside the PTY — M13 orchestrator does that; for M09 the user
+  can just type `claude` themselves and verify it works.
+- Pixler status bar above the terminal (SPEC §8.6 mentions v2).
+- Custom slash-command overlays — chat-only, M16.
+
+## Files (expected surface)
 
 ```
 apps/api/src/terminals/terminals.module.ts
@@ -67,9 +51,92 @@ apps/web/src/hooks/useTerminal.ts
 apps/web/src/components/SettingsDrawer/TerminalPanel.tsx
 ```
 
-## Out of scope
+---
 
-- Running `claude` automatically inside the PTY — M13 orchestrator does that; for M09 the user can just type
-  `claude` themselves and verify it works.
-- Pixler status bar above the terminal (SPEC §8.6 mentions v2).
-- Custom slash-command overlays — chat-only, M16.
+## Sprint 1 — api: TerminalsModule + PTY infra + Socket.io gateway
+
+**Status:** ⏳ pending
+**Goal:** Server can spawn/kill/resize PTYs and stream I/O over Socket.io. One PTY per workspace,
+persisted across navigations.
+
+**Tasks:**
+
+- [ ] `TerminalsModule` + `TerminalsService` + `TerminalsController` + `TerminalsGateway`.
+- [ ] `POST /api/workspaces/:id/terminal` (returns `{ terminalId }`), `DELETE /api/terminals/:id`,
+  `POST /api/terminals/:id/resize`.
+- [ ] Socket.io `/terminals` namespace: `terminal.data` / `terminal.exit` server→client,
+  `terminal.input` client→server.
+- [ ] PTY shell selection: respect `$SHELL`, then `terminal.shell` setting; spawn as login shell
+  (`-l`) so mise/asdf/nvm hooks load.
+- [ ] Keep PTY alive across right-pane navigations (closed only on workspace archive/delete).
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/api test terminals` — spawn + echo + kill round-trip; manual `node -v` in a worktree managed by mise.
+
+---
+
+## Sprint 2 — Web TerminalPane with xterm.js + theme sync
+
+**Status:** ⏳ pending
+**Goal:** Right pane in Terminal mode renders a live xterm session, themed from the active Pixler
+palette, with PTY resize tracking the visible cols/rows.
+
+**Tasks:**
+
+- [ ] `TerminalPane.tsx` mounts xterm.js, subscribes to the workspace's terminal events.
+- [ ] `lib/terminal-theme.ts` — pull palette from CSS vars; re-apply on theme change.
+- [ ] Font + size + cursor style + scrollback + copy-on-select + paste-warning settings read from
+  `terminal.*` keys.
+- [ ] ResizeObserver keeps PTY cols/rows in sync with the visible pane.
+- [ ] `hooks/useTerminal.ts`.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/web build` + manual: prompt visible in <200ms, theme switch retints palette, `stty size` matches xterm.
+
+---
+
+## Sprint 3 — Multiplex + Interrupt + Settings panel
+
+**Status:** ⏳ pending
+**Goal:** Multiple terminals per workspace; switching workspaces preserves prior shell state;
+Settings → Terminal panel fully functional; Interrupt button sends SIGINT.
+
+**Tasks:**
+
+- [ ] `TerminalSwitcher.tsx` dropdown in right-pane header — only visible when > 1 terminal per
+  workspace.
+- [ ] Workspace switch shows the right workspace's PTY without killing prior ones.
+- [ ] Interrupt button in right-pane header sends `SIGINT` to active PTY; surfaces "You're in
+  control." banner.
+- [ ] `SettingsDrawer/TerminalPanel.tsx` — font, font size, cursor style, scrollback,
+  copy-on-select, paste-warning, shell override.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w typecheck` + manual: open 2 workspaces, switch back-and-forth, scrollback intact.
+
+---
+
+## Prompt that created this plan
+
+_(Predates merged template; preserved as historical record. Plan re-shaped into sprints on 2026-05-24.)_

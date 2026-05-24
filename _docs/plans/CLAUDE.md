@@ -32,7 +32,14 @@ Critical path: `M01 → M02/M04/M05 → M03 → M06 → M07 → M08 → M09 → 
    `Current Status` line.
 2. Move the file into `_docs/plans/completed/` and append `-COMPLETE` to the filename:
    `M<N>-<slug>-COMPLETE.md`.
-3. Update `MILESTONE-TRACKER.md`: tick the milestone, set `Last Plan Completed`, set `Next Plan`.
+3. Update `MILESTONE-TRACKER.md` — three fields, each with a precise rule (do not skip any):
+   - **Tick** the just-completed milestone in the list (`- [ ]` → `- [x] **M<N>** — …`).
+   - `**Last Plan Completed:** M<N>-<slug>` — **the plan you just finished, every time.** This is
+     a chronological marker (what just happened), NOT a "furthest-numbered completed plan"
+     marker. If you complete M03 after M05 is already done, this field becomes `M03-<slug>`, not
+     `M05-<slug>`. Always overwrite it on every completion.
+   - `**Next Plan:** M<X>-<slug>` — the first still-unticked milestone in the list (independent
+     of which plan you just finished; uses the natural list order).
 4. Append a one-line entry to `_docs/plans/completed/INDEX.md`:
    `| M<N> | YYYY-MM-DD | <short description> |`
 5. Commit the rename + tracker + index update together:

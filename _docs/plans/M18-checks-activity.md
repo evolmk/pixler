@@ -1,8 +1,16 @@
 # M18 — Checks tab + Activity feed (toasts + tab)
 
+**Status:** ⏳ IN_PROGRESS
+**Modified:** 2026-05-24
+**Current Status:** Not started — runnable after M07 + M08 + M12 + M13 + M14.
+
+---
+
 ## Goal
 
-Implement SPEC §8.8 (Checks tab) and §8.10 (Activity feed). The Checks tab consolidates per-workspace status across git, CI, deploy previews, PR review comments, and todos. The Activity feed surfaces ephemeral toasts and a persistent history.
+Implement SPEC §8.8 (Checks tab) and §8.10 (Activity feed). The Checks tab consolidates
+per-workspace status across git, CI, deploy previews, PR review comments, and todos. The Activity
+feed surfaces ephemeral toasts and a persistent history.
 
 ## Depends on
 
@@ -11,49 +19,21 @@ Implement SPEC §8.8 (Checks tab) and §8.10 (Activity feed). The Checks tab con
 - M13 (orchestrator events)
 - M14 (plan todos)
 
-## Deliverables
-
-- [ ] api `ActivityModule`:
-    - `activities` table (migration `0008_activity.sql`):
-      `id PK, scope ('app'|'project'|'workspace'), scope_id, kind, title, body, severity ('info'|'success'|'warning'|'error'), seen BOOLEAN, ts`
-    - `ActivityService.record({ scope, scopeId?, kind, title, body, severity })` — writes a row, emits
-      `activity.appended` event
-    - Listeners that translate domain events into activities:
-        - `plan.ready`, `approval.needed`, `agent.stuck` / `agent.error`, `pr.opened`, `pr.checks.failed` /
-          `pr.checks.passed`, `pr.merged`, `workspace.archived`
-    - `GET /api/activities?scope=&scopeId=&unseenOnly=` — paginated
-    - `POST /api/activities/mark-seen` body `{ ids: number[] }`
-- [ ] **Checks tab UI**:
-    - Sections (collapsible cards):
-        - **Git status** — staged/unstaged counts, ahead/behind, "Open Diff"
-        - **CI runs** — list from
-          `gh pr checks`; each row: name, conclusion icon, duration, "Open in GitHub" link; auto-refreshes via Socket.io events from M12
-        - **Deploy previews
-          ** — placeholder card; only shows if Vercel/Netlify integrations are configured (leave empty in v1, ready for extension)
-        - **PR review comments** — list of reviews and inline comments from `gh pr view --json reviews`; click to expand
-        - **Todos from plan** — pulled from M14 plan tasks with checkboxes
-        - **Tests
-          ** — placeholder "Run tests" button that opens a Run config tab (M19) — v1 doesn't auto-detect test commands
-    - Each section can be refreshed manually with a small button
-- [ ] **Activity feed**:
-    - **Toast stack** (top-right, mounted at root): uses M03 Sonner (`<Toaster />` mounted at root + `toast()` from
-      `@pixler/ui/components/sonner`); subscribes to `activity.appended` for severity ∈
-      `success|warning|error`; respects do-not-disturb (`notifications.dnd.start`/`end` setting)
-    - **Activity tab
-      ** in the left rail (separate icon, below workspaces): a scrolling list of all activities, filterable per workspace, unread count badge
-    - Click an activity → navigate to the workspace + open the relevant tab (e.g., `pr.checks.failed` → Checks tab)
-- [ ] **Notification setting panel** filled in (SPEC §10.2 Notifications): per-event on/off, sound, do-not-disturb hours
-- [ ] **Native OS notifications** when the app is not focused (electron-style via Notification API; gated by setting)
-
 ## Acceptance
 
 - Plan ready → toast appears in the top-right + activity entry recorded.
-- A CI failure on the workspace's PR pops a `warning` toast and marks the Checks tab with a red dot.
+- A CI failure on the workspace's PR pops a `warning` toast and marks the Checks tab with a red
+  dot.
 - Marking activities as seen clears the badges.
 - DnD hours suppress toasts but still record activities.
 - `pnpm -w typecheck` clean.
 
-## Files
+## Out of scope
+
+- Real GitHub webhooks — polling per M12 is enough for v1.
+- "Spotlight testing" — v2 per spec.
+
+## Files (expected surface)
 
 ```
 apps/api/src/db/migrations/0008_activity.sql
@@ -75,7 +55,92 @@ apps/web/src/hooks/useActivities.ts
 apps/web/src/hooks/useNativeNotifications.ts
 ```
 
-## Out of scope
+---
 
-- Real GitHub webhooks — polling per M12 is enough for v1.
-- "Spotlight testing" — v2 per spec.
+## Sprint 1 — ActivityModule + DB + listeners
+
+**Status:** ⏳ pending
+**Goal:** Backend records activities for every domain event and exposes a paginated read endpoint.
+
+**Tasks:**
+
+- [ ] `0008_activity.sql` migration.
+- [ ] `ActivityModule` + `ActivityService` + `ActivityController`.
+- [ ] `ActivityService.record({ scope, scopeId?, kind, title, body, severity })` → writes row +
+  emits `activity.appended`.
+- [ ] `listeners.ts` — translates `plan.ready`, `approval.needed`, `agent.stuck`, `agent.error`,
+  `pr.opened`, `pr.checks.failed`/`passed`, `pr.merged`, `workspace.archived` into activities.
+- [ ] `GET /api/activities?scope=&scopeId=&unseenOnly=` paginated.
+- [ ] `POST /api/activities/mark-seen { ids }`.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/api test activity` — trigger each event source, assert correct activity rows.
+
+---
+
+## Sprint 2 — Checks tab UI
+
+**Status:** ⏳ pending
+**Goal:** Center pane Checks tab shows live status across all sources.
+
+**Tasks:**
+
+- [ ] `ChecksTab.tsx` collapsible cards: GitStatus, CiRuns, DeployPreviews, PrReviewComments,
+  PlanTodos, Tests (placeholder).
+- [ ] `GitStatusCard.tsx` — staged/unstaged counts, ahead/behind, "Open Diff".
+- [ ] `CiRunsCard.tsx` — from `gh pr checks`; auto-refreshes via Socket.io from M12.
+- [ ] `PrReviewCommentsCard.tsx` — `gh pr view --json reviews,comments`; expand to view.
+- [ ] `PlanTodosCard.tsx` — M14 plan tasks with checkboxes.
+- [ ] `DeployPreviewsCard.tsx` — placeholder (only shows when Vercel/Netlify configured).
+- [ ] Per-card refresh buttons.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/web build` + manual: CI failure triggers red dot.
+
+---
+
+## Sprint 3 — Activity feed: toast bridge + tab + native + settings
+
+**Status:** ⏳ pending
+**Goal:** Toasts surface in top-right honoring DnD; Activity tab in left rail shows full history;
+native OS notifications when unfocused.
+
+**Tasks:**
+
+- [ ] `ToastBridge.tsx` — subscribes to `activity.appended` for severity ∈
+  `success|warning|error`; uses M03 Sonner; respects `notifications.dnd.start`/`end` setting.
+- [ ] `ActivityTab.tsx` — left rail tab below workspaces; scrolling list with per-workspace
+  filter + unread badge; click → navigate to workspace + relevant tab.
+- [ ] `SettingsDrawer/NotificationsPanel.tsx` — per-event on/off, sound, DnD hours.
+- [ ] `useNativeNotifications.ts` + `Notification` API gated by setting.
+- [ ] `useActivities.ts`.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual: simulate plan ready + CI fail; observe toasts + entries.
+
+---
+
+## Prompt that created this plan
+
+_(Predates merged template; preserved as historical record. Plan re-shaped into sprints on 2026-05-24.)_

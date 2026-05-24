@@ -1,8 +1,15 @@
 # M24 — Gestures, animations polish, deep links (`pixler://`)
 
+**Status:** ⏳ IN_PROGRESS
+**Modified:** 2026-05-24
+**Current Status:** Not started — runnable after M03 + M07 + M08 + M10.
+
+---
+
 ## Goal
 
-Implement the gesture + motion details from SPEC §8.2/§8.4 + the deep-link surface from SPEC §6.6 + §10.2 External Tools (URL scheme registration).
+Implement the gesture + motion details from SPEC §8.2/§8.4 + the deep-link surface from SPEC §6.6
++ §10.2 External Tools (URL scheme registration).
 
 ## Depends on
 
@@ -10,53 +17,23 @@ Implement the gesture + motion details from SPEC §8.2/§8.4 + the deep-link sur
 - M07/M08 (workspace context for deep links)
 - M10 (Linear comments for deep-link insertion)
 
-## Deliverables
-
-- [ ] `apps/web/package.json` adds `@use-gesture/react`
-- [ ] **Gesture wiring**:
-    - **Swipe-to-archive** on workspace sidebar cards: drag horizontally; on
-      `> 50%` displacement or velocity-flick, fire archive; smooth Motion spring-back / spring-out animation
-    - **Pull-to-refresh** on the Linear ticket list section: drag down past threshold; triggers `POST /api/linear/sync`
-    - **Long-press** workspace card → opens the context menu (already in M08; here we add the gesture path)
-    - **Pinch-to-zoom** Monaco diff (M17 placeholder becomes real here): pinch scales the editor font-size with a clamp
-- [ ] **Animation pass**:
-    - Audit every modal, drawer, dropdown, tab change for Motion exit + enter
-    - Stagger entrance animations for the sidebar workspace list (small `delay` per item)
-    - Theme switch transition: 200ms fade on `--pixler-bg` swap (use `transition: background-color`)
-    - Respect `appearance.animationLevel` from M20 globally
-- [ ] **Deep link infra**:
-    - Boot script registers `pixler://` URL scheme:
-        - macOS: install a tiny `.app` shim that posts the URL to the running api at
-          `POST /api/deeplink`; if no Pixler running, boot it then forward
-        - Windows: registry entry `HKCU\Software\Classes\pixler`
-        - Linux: `xdg-mime` + `.desktop` file
-    - `apps/api/src/deeplink/deeplink.module.ts`:
-        - `POST /api/deeplink` body `{ url }` — parses `pixler://workspace/<id>`, `pixler://project/<id>`,
-          `pixler://ticket/<identifier>`
-        - Emits `deeplink.received` event; the web app navigates accordingly and focuses the window
-    - Status displayed in **Settings → External Tools
-      ** "URL scheme registration status" — "Registered" / "Not registered (Register)"
-- [ ] **Linear deep-link comments** (SPEC §6.6):
-    - On workspace creation, post a Linear comment:
-      ```
-      🎼 Open in Pixler → pixler://workspace/<workspace-id>
-         Plan: docs/plans/<TICKET>.md (file)
-      ```
-    - Use the M11 `pixler ticket comment` CLI internally (or the M10 LinearService directly — either is fine)
-    - Toggle in Project Settings → Integrations: "Post deep-link comments to Linear" (default on)
-- [ ] **Image preview file tab
-  ** (SPEC §8.5): clicking an image in a chat message opens it in a dedicated file tab with click-to-fullscreen
-
 ## Acceptance
 
 - Swiping a workspace card 60% to the right archives it with a satisfying animation.
 - Pulling the Linear list down triggers sync with a spinner halo.
 - Pinching the diff editor scales the font-size.
-- Clicking a `pixler://workspace/<id>` link from outside the browser opens Pixler at that workspace.
+- Clicking a `pixler://workspace/<id>` link from outside the browser opens Pixler at that
+  workspace.
 - Creating a workspace posts the expected Linear comment.
 - `pnpm -w typecheck` clean.
 
-## Files
+## Out of scope
+
+- React Native gesture parity — the mobile companion is v3 per spec; v1 just ensures the
+  patterns translate cleanly.
+- Custom URL scheme on iOS/Android — v3.
+
+## Files (expected surface)
 
 ```
 apps/api/src/deeplink/deeplink.module.ts
@@ -72,7 +49,93 @@ apps/web/src/hooks/useDeepLink.ts
 apps/web/src/components/SettingsDrawer/ExternalToolsPanel.tsx (extend with URL scheme status)
 ```
 
-## Out of scope
+---
 
-- React Native gesture parity — the mobile companion is v3 per spec; v1 just ensures the patterns translate cleanly.
-- Custom URL scheme on iOS/Android — v3.
+## Sprint 1 — Gesture wiring (swipe / pull / long-press / pinch)
+
+**Status:** ⏳ pending
+**Goal:** All four gesture patterns are live on their target surfaces.
+
+**Tasks:**
+
+- [ ] Add `@use-gesture/react` to `apps/web/package.json`.
+- [ ] `WorkspaceCard.tsx` — swipe-to-archive: drag horizontally; on > 50% displacement OR
+  velocity-flick, fire archive; Motion spring-back / spring-out.
+- [ ] `LinearTicketList.tsx` — pull-to-refresh: drag down past threshold → triggers
+  `POST /api/linear/sync`.
+- [ ] Long-press on workspace card → opens context menu (M08 menu, here we add gesture path).
+- [ ] `DiffEditor.tsx` — pinch-to-zoom: pinch scales font-size with a clamp.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm --filter @pixler/web build` + manual: swipe / pull / long-press / pinch on a touch device or emulator.
+
+---
+
+## Sprint 2 — Animation pass + theme switch fade + ImageLightbox
+
+**Status:** ⏳ pending
+**Goal:** Audit Motion entrance/exit across modals/drawers/dropdowns/tabs; stagger sidebar list;
+theme switch fades cleanly.
+
+**Tasks:**
+
+- [ ] `lib/motion.ts` — shared variants used across the app.
+- [ ] Audit every modal/drawer/dropdown/tab change for Motion exit + enter.
+- [ ] Stagger entrance for sidebar workspace list (`delay` per item).
+- [ ] Theme switch: 200ms fade on `--pixler-bg` swap.
+- [ ] Respect `appearance.animationLevel` globally.
+- [ ] `ImageLightbox.tsx` — chat image click opens dedicated file tab + click-to-fullscreen.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w typecheck` + manual: animation level off → motion stripped; theme switch fades.
+
+---
+
+## Sprint 3 — Deep link infra + URL scheme + Linear deep-link comments
+
+**Status:** ⏳ pending
+**Goal:** `pixler://` URL scheme registers per-OS; clicks route into running app; workspace
+creation posts a Linear comment.
+
+**Tasks:**
+
+- [ ] `DeeplinkModule` + `DeeplinkService` + `DeeplinkController`.
+- [ ] `url-scheme.installer.ts` — macOS `.app` shim posting to local api; Windows registry entry
+  `HKCU\Software\Classes\pixler`; Linux `xdg-mime` + `.desktop`.
+- [ ] `POST /api/deeplink { url }` — parses `pixler://workspace/<id>`, `project/<id>`,
+  `ticket/<identifier>`; emits `deeplink.received`; web navigates + focuses window.
+- [ ] Extend `SettingsDrawer/ExternalToolsPanel.tsx` with URL scheme registration status +
+  Register button.
+- [ ] On workspace creation: post Linear comment with deep link + plan path (toggleable in
+  Project Settings → Integrations).
+- [ ] `useDeepLink.ts`.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual: open `pixler://workspace/<id>` from external app.
+
+---
+
+## Prompt that created this plan
+
+_(Predates merged template; preserved as historical record. Plan re-shaped into sprints on 2026-05-24.)_
