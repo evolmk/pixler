@@ -10,24 +10,24 @@ Nothing. This is the root of the dependency tree.
 
 ## Deliverables
 
-- [ ] `package.json` at repo root with `"bin": { "pixler": "./bin/pixler.js" }`, `"type": "module"`, pnpm workspace config
-- [ ] `pnpm-workspace.yaml` listing `apps/*` and `packages/*`
-- [ ] `turbo.json` with `dev`, `build`, `lint`, `typecheck` pipelines
-- [ ] `apps/api/` — NestJS 11 skeleton with a single `GET /api/health` returning `{ ok: true, version }`
-- [ ] `apps/web/` — React 19 + Vite + TypeScript skeleton, dev proxy to the api, shows a `Pixler is alive` page that calls `/api/health` and renders the version
-- [ ] `packages/ui/` — empty package, only `package.json` + `tsconfig.json` (real components land in M03)
-- [ ] `packages/ui-styles/` — empty package skeleton (real tokens land in M02)
-- [ ] `packages/shared-types/` — exports an empty `index.ts` placeholder + `package.json`
-- [ ] `packages/orchestrator/` — empty package skeleton
-- [ ] `packages/linear-cli/` — empty package skeleton with a `bin` entry stub that prints `"pixler linear cli — not yet implemented"`
-- [ ] `bin/pixler.js` — Node script that:
+- [x] `package.json` at repo root with `"bin": { "pixler": "./bin/pixler.js" }`, `"type": "module"`, pnpm workspace config
+- [x] `pnpm-workspace.yaml` listing `apps/*` and `packages/*`
+- [x] `turbo.json` with `dev`, `build`, `lint`, `typecheck` pipelines
+- [x] `apps/api/` — NestJS 11 skeleton with a single `GET /api/health` returning `{ ok: true, version }`
+- [x] `apps/web/` — React 19 + Vite + TypeScript skeleton, dev proxy to the api, shows a `Pixler is alive` page that calls `/api/health` and renders the version
+- [x] `packages/ui/` — empty package, only `package.json` + `tsconfig.json` (real components land in M03)
+- [x] `packages/ui-styles/` — empty package skeleton (real tokens land in M02)
+- [x] `packages/shared-types/` — exports an empty `index.ts` placeholder + `package.json`
+- [x] `packages/orchestrator/` — empty package skeleton
+- [x] `packages/linear-cli/` — empty package skeleton with a `bin` entry stub that prints `"pixler linear cli — not yet implemented"`
+- [x] `bin/pixler.js` — Node script that:
   - finds a free port (default 7777, fallback to next free)
   - spawns the built NestJS server from `apps/api/dist/main.js`
   - opens the user's default browser to `http://localhost:<port>` (use `open` package or platform fallback)
   - logs `Pixler running at http://localhost:<port>` to stdout
-- [ ] `tsconfig.base.json` + per-package extends
-- [ ] `.gitignore` updated (`node_modules`, `dist`, `.turbo`, `*.log`, `.DS_Store`)
-- [ ] Root README pointer left intact (the real README is updated by another agent)
+- [x] `tsconfig.base.json` + per-package extends
+- [x] `.gitignore` updated (`node_modules`, `dist`, `.turbo`, `*.log`, `.DS_Store`)
+- [x] Root README pointer left intact (the real README is updated by another agent)
 
 ## Acceptance
 

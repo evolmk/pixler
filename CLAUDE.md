@@ -70,6 +70,8 @@ pixler/
 
 Plans live in `_docs/plans/` (M01–M25). Each is self-contained and agent-runnable with: Goal, Depends on, Deliverables, Acceptance, Files, Out of scope. See `_docs/plans/README.md` for the dependency graph.
 
+When a milestone plan is completed, check off its deliverable checkboxes in the plan file (`- [ ]` → `- [x]`) and update `_docs/plans/MILESTONE-TRACKER.md` (tick the milestone, update the "Last Plan Completed" and "Next Plan" fields).
+
 Critical path: `M01 → M02/M04/M05 → M03 → M06 → M07 → M08 → M09 → M13 → M14 → M15 → M25`
 
 ## Angular reference material

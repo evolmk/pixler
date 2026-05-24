@@ -30,7 +30,7 @@ Implement SPEC §8.8 (Checks tab) and §8.10 (Activity feed). The Checks tab con
     - **Tests** — placeholder "Run tests" button that opens a Run config tab (M19) — v1 doesn't auto-detect test commands
   - Each section can be refreshed manually with a small button
 - [ ] **Activity feed**:
-  - **Toast stack** (top-right, mounted at root): uses M03 `<Toast>` + `useToasts` store; subscribes to `activity.appended` for severity ∈ `success|warning|error`; respects do-not-disturb (`notifications.dnd.start`/`end` setting)
+  - **Toast stack** (top-right, mounted at root): uses M03 Sonner (`<Toaster />` mounted at root + `toast()` from `@pixler/ui/components/sonner`); subscribes to `activity.appended` for severity ∈ `success|warning|error`; respects do-not-disturb (`notifications.dnd.start`/`end` setting)
   - **Activity tab** in the left rail (separate icon, below workspaces): a scrolling list of all activities, filterable per workspace, unread count badge
   - Click an activity → navigate to the workspace + open the relevant tab (e.g., `pr.checks.failed` → Checks tab)
 - [ ] **Notification setting panel** filled in (SPEC §10.2 Notifications): per-event on/off, sound, do-not-disturb hours
