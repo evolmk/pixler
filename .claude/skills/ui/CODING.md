@@ -34,14 +34,14 @@ const buttonVariants = cva('...base classes...', {
 
 ## New Component
 
-Follow `_specs/spec-ui/spec-ui-architecture.md` — Step by Step section exactly.
+Follow the Architecture Rules below and the Component Template.
 
 ```
-src/components/ui/{name}.tsx       (single file: component + CVA variants + types)
-src/components/ui/{name}.stories.tsx (colocated story)
+packages/ui/src/components/{name}.tsx       (single file: component + CVA variants + types)
+packages/ui/src/components/{name}.stories.tsx (colocated story)
 ```
 
-Export from `src/components/ui/index.ts`.
+Export from `packages/ui/src/components/index.ts`.
 
 ### Component Template
 
@@ -109,7 +109,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 ## Block / Composition
 
 A "block" is a reusable composition of existing `ui` components — not a new primitive.
-Build it in the consuming feature component or story. Do NOT add files to `src/components/ui/` unless it's a true design-system primitive.
+Build it in the consuming feature component or story. Do NOT add files to `packages/ui/src/components/` unless it's a true design-system primitive.
 
 ## Code Rules
 
@@ -149,5 +149,5 @@ import { PanelLeft, ChevronDown, Search } from 'lucide-react';
 5. **Radix UI primitives** — use `@radix-ui/*` for accessible interactive components (Dialog, Popover, DropdownMenu, etc.)
 6. **Semantic tokens only** — `bg-primary`, `text-muted-foreground`, never `bg-gray-200`
 7. **React only** — functional components, hooks, JSX; no class components, no non-React framework patterns
-8. **Tailwind v4 CSS-first** — theme tokens in `src/styles/globals.css`; no `theme()` in arbitrary values
+8. **Tailwind v4 CSS-first** — theme tokens in `globals.css`; no `theme()` in arbitrary values
 9. **Inline everything** — no separate `.css` files, no separate `.variants.ts` files

@@ -44,8 +44,8 @@
   --brand: #16a355;
   --brand-light: #22c55e;
   --brand-dark: #15803d;
-  --lazar-green: #3a9d5c;
-  --lazar-green-dark: #2e8b57;
+  --pixler-green: #3a9d5c;
+  --pixler-green-dark: #2e8b57;
   --status-error: #dc2626;
   --status-warning: #f59e0b;
   --status-success: #10b981;
@@ -949,8 +949,8 @@
   --color-brand: var(--brand);
   --color-brand-light: var(--brand-light);
   --color-brand-dark: var(--brand-dark);
-  --color-lazar-green: var(--lazar-green);
-  --color-lazar-green-dark: var(--lazar-green-dark);
+  --color-pixler-green: var(--pixler-green);
+  --color-pixler-green-dark: var(--pixler-green-dark);
   --color-footer-surface: var(--footer-surface);
 
   /* Status colors */

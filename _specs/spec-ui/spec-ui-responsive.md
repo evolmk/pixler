@@ -9,7 +9,7 @@
 | Element                | Desktop (`lg+`)                             | Mobile (`<lg`)                                    |
 | ---------------------- | ------------------------------------------- | ------------------------------------------------- |
 | **Page layout**        | `grid grid-cols-1 lg:grid-cols-[1fr_320px]` | Single column, sidebar below main                 |
-| **Sidebar**            | Fixed right column                          | Collapsible via `[lazarCollapse]` + toggle header |
+| **Sidebar**            | Fixed right column                          | Collapsible via Radix `Collapsible` + toggle header |
 | **Form grids**         | `ui-grid [cols]="2"`                        | `grid-cols-1` — all fields stack                  |
 | **Card actions**       | Inline buttons                              | Stack or `flex-wrap`                              |
 | **Subcollection rows** | Horizontal with badges + actions            | Badge wraps below name                            |

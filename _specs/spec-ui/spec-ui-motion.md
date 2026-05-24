@@ -15,7 +15,7 @@
 | Skeleton → content     | `ui-skeleton` with `animate-pulse`, swap on load                              |
 | Toast slide-in         | `ToastService` default — slides from bottom                                   |
 | Card entrance (admin)  | `animate-in fade-in slide-in-from-bottom-2 duration-300` with staggered delay |
-| Collapsible sections   | `[lazarCollapse]` with `duration-200 ease-out`                                |
+| Collapsible sections   | Radix `Collapsible` with `duration-200 ease-out`                              |
 | Tab switch (admin)     | `animate-in fade-in duration-150`                                             |
 
 ## Forbidden

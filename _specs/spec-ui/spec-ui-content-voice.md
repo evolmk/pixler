@@ -1,6 +1,6 @@
 # Content Voice & Copy Rules
 
-**Created:** 2026-05-15 (M150 — from `bundle-2026-05-15/README.md` CONTENT FUNDAMENTALS)
+**Created:** 2026-05-15
 
 **When to read:** Writing any UI string — labels, CTAs, empty states, error messages, page titles, descriptions, footer links, tooltips. This spec governs all copy in Guest and Client apps.
 
@@ -82,4 +82,4 @@ Pixler copy reads like a **developer tool** — not marketing, not a friendly as
 
 ---
 
-> **Cross-links:** `spec-ui-typography.md` → casing rules, display type, tabular figures · `spec-ui-design-system.md` → full voice summary · `bundle-2026-05-15/README.md` → authoritative CONTENT FUNDAMENTALS section
+> **Cross-links:** `spec-ui-typography.md` → casing rules, display type, tabular figures · `spec-ui-design-system.md` → full voice summary

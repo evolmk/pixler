@@ -63,10 +63,10 @@ Common patterns for tricky CSS situations using Tailwind utilities.
 **Solution**: Add `@source` for every package that contains Tailwind classes.
 
 ```css
-/* apps/frontend/guest/src/styles.css */
+/* app entry CSS */
 @import 'tailwindcss';
-@source '../../../../packages/ui/src';
-@source '../../../../packages/ui-components/src';
+@source '../path-to/shared-components/src';
+@source '../path-to/ui-library/src';
 ```
 
 **Symptoms of missing @source**: Classes appear in code but have zero effect. No build errors. Looks like CSS isn't working.
@@ -233,7 +233,7 @@ Flexbox `justify-between` shifts the center item when left/right have different 
 
 ## `class="eyebrow"` Custom Utility
 
-**What it is:** A registered `@utility` block in `packages/ui-styles/src/globals.css:1073-1079`, backed by `--text-eyebrow` typography tokens at `globals.css:965-968`.
+**What it is:** A registered `@utility` block in `globals.css`, backed by `--text-eyebrow` typography tokens.
 
 **Resolved CSS:** 11px / weight 600 / line-height 1.2 / letter-spacing 0.025em / `text-transform: uppercase`.
 
@@ -252,7 +252,7 @@ Flexbox `justify-between` shifts the center item when left/right have different 
 
 ## `@import 'tw-animate-css'` Caveat
 
-`packages/ui-styles/src/globals.css` opens with `@import 'tw-animate-css'`. This npm package is **not fetchable via CDN**, so the design system bundle's copy of `globals.css` has it commented out for use in HTML prototypes.
+`globals.css` opens with `@import 'tw-animate-css'`. This npm package is **not fetchable via CDN**.
 
 **In production code:** the import is active and required for animation utilities (`fade`, `scale`, `slide` keyframes from `tw-animate-css`). If you see missing keyframe animations in a local dev build, check that `tw-animate-css` is installed: `pnpm add -w tw-animate-css`.
 

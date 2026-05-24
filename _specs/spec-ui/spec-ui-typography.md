@@ -52,7 +52,7 @@ The overline + brand-rule pattern is the primary section-introduction signature 
 <div class="bg-brand h-[2px] w-10"></div>
 ```
 
-`class="eyebrow"` resolves to: 11px / weight 600 / uppercase / letter-spacing 0.025em. Registered at `packages/ui-styles/src/globals.css:1073-1079`. **Always pair with a color class** — the utility does not set color.
+`class="eyebrow"` resolves to: 11px / weight 600 / uppercase / letter-spacing 0.025em. Registered via `@utility` in `globals.css`. **Always pair with a color class** — the utility does not set color.
 
 ## Display Type
 

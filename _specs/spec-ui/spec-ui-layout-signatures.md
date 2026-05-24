@@ -1,6 +1,6 @@
 # Layout Signatures — Guest & Client Apps
 
-**Created:** 2026-05-15 (M150 — from `bundle-2026-05-15/README.md` Layout Signatures section)
+**Created:** 2026-05-15
 
 **When to read:** Building any app page, especially hero sections, detail pages, and navigation pages. These are THE brand-defining patterns -- use them consistently.
 
@@ -240,4 +240,4 @@ Triggered on hover (desktop) / tap (mobile). Reveals nested navigation structure
 
 ---
 
-> **Cross-links:** `spec-ui-design-system.md` → hover/press states, header signature overview · `spec-ui-component-recipes.md` → quick-reference snippets for recipes 1–4 · `spec-ui-layout-patterns.md` → where signatures plug into page-level layouts · `bundle-2026-05-15/README.md` → authoritative Layout Signatures section
+> **Cross-links:** `spec-ui-design-system.md` → hover/press states, header signature overview · `spec-ui-layout-patterns.md` → where signatures plug into page-level layouts

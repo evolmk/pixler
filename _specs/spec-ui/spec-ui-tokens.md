@@ -1,10 +1,10 @@
 # Design Tokens Reference
 
-All tokens defined in `packages/ui-styles/src/globals.css` as CSS custom properties, mapped to Tailwind via `@theme inline`.
+All tokens defined in `globals.css` as CSS custom properties, mapped to Tailwind via `@theme inline`.
 
 ## Architecture
 
-One shared token system in `packages/ui-styles/src/globals.css`. Per-app overrides in `theme-{app}.css` (loaded after). Color scheme via `data-color-scheme` on `<html>`. Dark mode via `.dark` on `<html>`.
+One shared token system in `globals.css`. Color scheme via `data-color-scheme` on `<html>`. Dark mode via `.dark` on `<html>`.
 
 ## Semantic Color Tokens
 
@@ -92,7 +92,7 @@ Set via `data-color-scheme` attribute on `<html>`. All schemes provide light + d
 
 | Scheme      | Selector                         | Character                  |
 | ----------- | -------------------------------- | -------------------------- |
-| **Default** | `:root` (no attribute)           | Neutral gray, no hue       |
+| **Default** | `:root` (no attribute)           | Green primary (hue 145)    |
 | Slate       | `[data-color-scheme='slate']`    | Cool blue-gray             |
 | Zinc        | `[data-color-scheme='zinc']`     | Warm purple-gray           |
 | Stone       | `[data-color-scheme='stone']`    | Warm yellow-gray           |
@@ -110,7 +110,7 @@ Set via `data-color-scheme` attribute on `<html>`. All schemes provide light + d
 - **Client & Guest**: brand green primary (`--primary: #16a355`)
 - **Portal**: navy sidebar (`--sidebar: oklch(0.21 0.06 255)`)
 
-Per-app overrides live in `apps/frontend/{app}/src/theme-{app}.css`.
+Per-app overrides can be loaded via additional CSS files after `globals.css`.
 
 ## Spacing Scale
 
@@ -139,11 +139,11 @@ Defined via `--radius: 0.625rem` (10px):
 
 ## Custom Utilities
 
-Registered via `@utility` in `packages/ui-styles/src/globals.css:1073-1079`.
+Registered via `@utility` in `globals.css`.
 
-| Utility           | CSS output                                                                                 | Notes                                                                                                                                                               |
-| ----------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `class="eyebrow"` | 11px / weight 600 / line-height 1.2 / letter-spacing 0.025em / `text-transform: uppercase` | Backed by `--text-eyebrow` tokens at `globals.css:965-968`. **Pair with a color class** (`text-muted-foreground`, `text-brand`, etc.) — utility does not set color. |
+| Utility           | CSS output                                                                                 | Notes                                                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `class="eyebrow"` | 11px / weight 600 / line-height 1.2 / letter-spacing 0.025em / `text-transform: uppercase` | Backed by `--text-eyebrow` tokens in `globals.css`. **Pair with a color class** (`text-muted-foreground`, `text-brand`, etc.) — utility does not set color. |
 
 Usage pattern — overline + brand-rule signature:
 

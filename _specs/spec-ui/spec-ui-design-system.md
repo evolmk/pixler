@@ -1,6 +1,6 @@
 # Design System — Guest & Client Layout
 
-> On-demand agent reference for building Guest and Client app UI. For full brand narrative and page-design session context, read `_docs/design-system/design-system.md` + `bundle-2026-05-15/README.md`.
+> On-demand agent reference for building Guest and Client app UI.
 
 **Created:** 2026-03-31 · **Updated:** 2026-05-15 (M150 bundle integration)
 
@@ -180,4 +180,4 @@ Client left nav: GitHub-settings pattern — grouped sections (Projects / Orders
 - ❌ No springs, bounces, parallax, or on-scroll reveals beyond header collapse.
 - ❌ No illustrations, hand-drawn graphics, or warm color casts.
 
-> **Spec cross-link:** `_docs/design-system/design-system.md` → full brand narrative. When updating token values, update both this file and `spec-ui-tokens.md` to stay in sync.
+> When updating token values, update both this file and `spec-ui-tokens.md` to stay in sync.

@@ -12,7 +12,7 @@ description: |
 
 # Pixler UI Design System Skill
 
-Pixler uses a **React 19 + Tailwind v4 + Radix UI + CVA** component stack with `cn()` (clsx + tailwind-merge) for class merging. Components live in `src/components/ui/` as single-file `.tsx` modules (shadcn/ui style).
+Pixler uses a **React 19 + Tailwind v4 + Radix UI + CVA** component stack with `cn()` (clsx + tailwind-merge) for class merging. Components live in `packages/ui/src/components/` as single-file `.tsx` modules (shadcn/ui style). The Angular source library at `shared-packages-from-lazar-angular-app/ui-components-library/` can be referenced for component API inspiration when building React equivalents.
 
 ---
 
@@ -26,11 +26,11 @@ Classify the request before loading any spec files.
 | **variant-add**   | Add a new CVA variant to an existing component                                  | Component source (`.tsx`) + `spec-ui-tokens.md`                                                                                 |
 | **story-only**    | Write or update a Storybook story                                               | Component source + `STORYBOOK.md`                                                                                               |
 | **compose**       | Compose existing components in app code                                         | Component source files as needed + `spec-ui-tokens.md`                                                                          |
-| **new-component** | Build a new primitive in `src/components/ui/`                                   | `spec-ui-tokens.md` + `STORYBOOK.md`                                                                                           |
+| **new-component** | Build a new primitive in `packages/ui/src/components/`                                   | `spec-ui-tokens.md` + `STORYBOOK.md`                                                                                           |
 | **page-build**    | Build a full page or view                                                       | `spec-ui-layout-patterns.md` + `spec-ui-tokens.md`. Guest/client: also `spec-ui-design-system.md` + `spec-ui-content-voice.md` + `spec-ui-layout-signatures.md` |
-| **unclear**       | Cannot classify from the request                                                | Browse `src/components/ui/` to understand available components, then reassess                                                    |
+| **unclear**       | Cannot classify from the request                                                | Browse `packages/ui/src/components/` to understand available components, then reassess                                                    |
 
-**Component API lookup:** Read the component's `.tsx` file in `src/components/ui/` for its props, variants, and usage. For stories, check the colocated `.stories.tsx`.
+**Component API lookup:** Read the component's `.tsx` file in `packages/ui/src/components/` for its props, variants, and usage. For stories, check the colocated `.stories.tsx`.
 
 **Style-tweak fast path:** Skip catalog entirely. Go directly to the component source file and `spec-ui-tokens.md`.
 
@@ -48,7 +48,7 @@ If the user provided a **screenshot** — analyze layout, components, spacing, c
 
 ### 1a. Scan available components
 
-Browse `src/components/ui/` to identify existing components that may satisfy the request.
+Browse `packages/ui/src/components/` to identify existing components that may satisfy the request.
 
 ### 1b. Cross-reference request against existing components
 
@@ -56,7 +56,7 @@ For every UI element in the request, ask:
 
 | Question                                                         | If YES                                           | If NO                                              |
 | ---------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
-| Does a component with this name already exist in `src/components/ui/`? | **Reuse it as-is**                               | Create a new component                             |
+| Does a component with this name already exist in `packages/ui/src/components/`? | **Reuse it as-is**                               | Create a new component                             |
 | Does it exist but need a different visual style (color, size, shape)?  | **Add a new CVA variant** to the component file  | Check if it's a composition of existing components |
 | Can it be composed from 2-3 existing components?                       | **Compose them** (no new files)                  | Only then create a new component                   |
 
@@ -90,7 +90,7 @@ Only proceed to coding after this mapping is confirmed (or the user says to proc
 
 1. **Reuse as-is**: Use an existing component with an existing variant — add nothing.
 2. **Extend variant**: The component exists but needs a new visual style — add to its CVA variants.
-3. **Compose**: Build from existing components in the consuming page/feature — no new `src/components/ui/` files.
+3. **Compose**: Build from existing components in the consuming page/feature — no new `packages/ui/src/components/` files.
 4. **New component**: Only when the UI pattern is genuinely absent. Requires clear justification.
 
 ### Variant vs New Component
