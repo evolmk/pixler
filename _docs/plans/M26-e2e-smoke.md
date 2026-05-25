@@ -1,8 +1,8 @@
 # M26 — Playwright E2E smoke suite
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-24
-**Current Status:** Sprint 2 complete — M01-M05 specs written. Sprint 3 in-progress.
+**Current Status:** All 3 sprints complete. M26 done.
 
 ---
 
@@ -120,18 +120,18 @@ server and runs an empty (or trivial) spec successfully.
 
 ## Sprint 3 — Smoke specs M06–M09 (shell, projects, workspaces, terminal)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Four UI-level smokes round out the suite; full suite runs in < 60s.
 
 **Tasks:**
 
-- [ ] `tests/m06-shell.spec.ts` — sidebar + topbar `data-testid`s present; no unhandled JS
+- [x] `tests/m06-shell.spec.ts` — sidebar + topbar `data-testid`s present; no unhandled JS
   errors in console.
-- [ ] `tests/m07-projects.spec.ts` — create a project via UI; appears in list;
+- [x] `tests/m07-projects.spec.ts` — create a project via UI; appears in list;
   `GET /api/projects` returns it.
-- [ ] `tests/m08-workspaces.spec.ts` — open project, create workspace; card appears;
+- [x] `tests/m08-workspaces.spec.ts` — open project, create workspace; card appears;
   `GET /api/workspaces` returns it.
-- [ ] `tests/m09-terminal.spec.ts` — switch workspace to Terminal mode; `canvas.xterm-cursor-layer`
+- [x] `tests/m09-terminal.spec.ts` — switch workspace to Terminal mode; `canvas.xterm-cursor-layer`
   present; type `echo pixler-ok` + Enter; output contains `pixler-ok`.
 
 **Files Created/Modified:**
