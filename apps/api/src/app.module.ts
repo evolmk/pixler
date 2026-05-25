@@ -14,9 +14,10 @@ import { IdeModule } from './ide/ide.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { OrchestratorModule } from './orchestrator/orchestrator.module';
 import { UsageModule } from './usage/usage.module';
+import { PlansModule } from './plans/plans.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule],
   controllers: [HealthController],
 })
 export class AppModule {}

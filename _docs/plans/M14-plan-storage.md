@@ -1,8 +1,8 @@
 # M14 — Plan storage (file / inline / attachment + auto)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M10 + M13.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 in progress — DB migration, shared types, PlansModule, storage writers.
 
 ---
 
@@ -58,29 +58,38 @@ apps/web/src/hooks/usePlan.ts
 
 ## Sprint 1 — DB + types + PlansModule + three storage writers
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Migration + module + reader/writer for each storage mode work in isolation.
 
 **Tasks:**
 
-- [ ] `0005_plans.sql` per SPEC §5.5 columns.
-- [ ] `packages/shared-types/src/plans.ts` — `PlanStorageMode`, `PlanFrontmatter`, `Plan`.
-- [ ] `PlansModule` + `PlansService` + `PlansController`.
-- [ ] `storage/file-storage.ts` — write to `<repo>/docs/plans/<TICKET>.md`; commit if on a branch.
-- [ ] `storage/inline-storage.ts` — find/create `<!-- pixler-plan:start revision=N -->...<!-- pixler-plan:end -->`
+- [x] `0005_plans.sql` per SPEC §5.5 columns.
+- [x] `packages/shared-types/src/plans.ts` — `PlanStorageMode`, `PlanFrontmatter`, `Plan`.
+- [x] `PlansModule` + `PlansService` + `PlansController`.
+- [x] `storage/file-storage.ts` — write to `<repo>/docs/plans/<TICKET>.md`; commit if on a branch.
+- [x] `storage/inline-storage.ts` — find/create `<!-- pixler-plan:start revision=N -->...<!-- pixler-plan:end -->`
   block in Linear ticket description; never touch text outside.
-- [ ] `storage/attachment-storage.ts` — upload via Linear; maintain rolling pair (delete old
+- [x] `storage/attachment-storage.ts` — upload via Linear; maintain rolling pair (delete old
   AFTER new one uploads).
-- [ ] `POST /api/workspaces/:id/plan`, `GET /api/workspaces/:id/plan`,
+- [x] `POST /api/workspaces/:id/plan`, `GET /api/workspaces/:id/plan`,
   `GET /api/workspaces/:id/plan/history`, `POST /api/workspaces/:id/plan/revise`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/db/migrations/0006_plans.sql`
+- `packages/shared-types/src/plans.ts`
+- `packages/shared-types/src/index.ts`
+- `apps/api/src/plans/plans.module.ts`
+- `apps/api/src/plans/plans.service.ts`
+- `apps/api/src/plans/plans.controller.ts`
+- `apps/api/src/plans/storage/file-storage.ts`
+- `apps/api/src/plans/storage/inline-storage.ts`
+- `apps/api/src/plans/storage/attachment-storage.ts`
+- `apps/api/src/app.module.ts`
 
 **Issues Encountered:**
 
-- _none yet_
+- Migration renumbered to 0006 (0005 already used by usage). Plan file said 0005_plans.sql.
 
 **Verify:** `pnpm --filter @pixler/api test plans-storage` — round-trip each storage mode + rolling-pair test.
 
