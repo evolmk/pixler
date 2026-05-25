@@ -7,7 +7,7 @@ import { load, dump } from 'js-yaml';
 import type { WorkflowDefDto } from '@pixler/shared-types';
 import type { WorkflowDef } from '@pixler/orchestrator';
 
-const BUILTINS_DIR = join(__dirname, '..', '..', '..', 'workflows', 'defaults');
+const BUILTINS_DIR = join(__dirname, '..', '..', 'workflows', 'defaults');
 const USER_DIR = join(homedir(), '.config', 'pixler', 'workflows');
 
 @Injectable()
