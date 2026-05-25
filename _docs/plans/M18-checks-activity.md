@@ -1,8 +1,8 @@
 # M18 — Checks tab + Activity feed (toasts + tab)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 done by evolmk; Sprint 2 in progress (Checks tab UI).
+**Current Status:** All 3 sprints complete by evolmk.
 
 ---
 
@@ -127,27 +127,35 @@ apps/web/src/hooks/useNativeNotifications.ts
 
 ## Sprint 3 — Activity feed: toast bridge + tab + native + settings
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Toasts surface in top-right honoring DnD; Activity tab in left rail shows full history;
 native OS notifications when unfocused.
 
 **Tasks:**
 
-- [ ] `ToastBridge.tsx` — subscribes to `activity.appended` for severity ∈
+- [x] `ToastBridge.tsx` — subscribes to `activity.appended` for severity ∈
   `success|warning|error`; uses M03 Sonner; respects `notifications.dnd.start`/`end` setting.
-- [ ] `ActivityTab.tsx` — left rail tab below workspaces; scrolling list with per-workspace
-  filter + unread badge; click → navigate to workspace + relevant tab.
-- [ ] `SettingsDrawer/NotificationsPanel.tsx` — per-event on/off, sound, DnD hours.
-- [ ] `useNativeNotifications.ts` + `Notification` API gated by setting.
-- [ ] `useActivities.ts`.
+- [x] `ActivityFeed.tsx` — collapsible section in left rail below workspaces; scrolling list with
+  unread badge; click → navigate to workspace.
+- [x] `SettingsDrawer/NotificationsPanel.tsx` — per-event on/off, DnD hours.
+- [x] `useNativeNotifications.ts` + `Notification` API gated by setting.
+- [x] `useActivities.ts`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/ToastBridge.tsx`
+- `apps/web/src/components/ActivityFeed.tsx`
+- `apps/web/src/components/SettingsDrawer/NotificationsPanel.tsx`
+- `apps/web/src/hooks/useNativeNotifications.ts`
+- `apps/web/src/hooks/useActivities.ts`
+- `apps/web/src/components/WorkspacesSidebar.tsx`
+- `apps/web/src/components/TopBar.tsx`
+- `apps/web/src/routes/project.tsx`
 
 **Issues Encountered:**
 
-- _none yet_
+- `sonner` not a direct dep of `apps/web` — added it.
+- ActivityTab named ActivityFeed (sits inside WorkspacesSidebar as a collapsible, not a separate tab).
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual: simulate plan ready + CI fail; observe toasts + entries.
 

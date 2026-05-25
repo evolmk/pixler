@@ -42,6 +42,7 @@ import { ExternalToolsPanel } from './SettingsDrawer/ExternalToolsPanel';
 import { KeyboardPanel } from './SettingsDrawer/KeyboardPanel';
 import { UsagePanel } from './SettingsDrawer/UsagePanel';
 import { PlansPanel } from './SettingsDrawer/PlansPanel';
+import { NotificationsPanel } from './SettingsDrawer/NotificationsPanel';
 
 interface CategoryConfig {
   id: string;
@@ -61,7 +62,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'appearance', label: 'Appearance', icon: Palette },
   { id: 'usage', label: 'Usage', icon: ActivitySquare },
   { id: 'keyboard', label: 'Keyboard', icon: Keyboard, milestone: 'M22' },
-  { id: 'notifications', label: 'Notifications', icon: Bell, milestone: 'M18' },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'terminal', label: 'Terminal', icon: Terminal },
   { id: 'external-tools', label: 'External Tools', icon: Wrench, milestone: 'M19' },
   { id: 'storage', label: 'Storage', icon: HardDrive, milestone: 'M14' },
@@ -129,6 +130,8 @@ export function SettingsDrawer() {
               <UsagePanel />
             ) : activeId === 'plans' ? (
               <PlansPanel />
+            ) : activeId === 'notifications' ? (
+              <NotificationsPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState

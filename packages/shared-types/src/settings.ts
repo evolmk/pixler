@@ -50,4 +50,12 @@ export const settingsRegistry: SettingDefinition[] = [
 
   { key: 'layout.paneSizes', type: 'json', default: { outer: [22, 78], inner: [62, 38] }, scopes: ['global'], label: 'Pane Sizes', description: '3-pane split sizes: outer [sidebar, rest], inner [center, right]' },
   { key: 'layout.bigTerminal', type: 'boolean', default: false, scopes: ['global'], label: 'Big Terminal', description: 'Right pane expanded full-bleed' },
+
+  { key: 'notifications.native', type: 'boolean', default: false, scopes: ['global'], label: 'Native Notifications', description: 'Send OS notifications when Pixler is unfocused' },
+  { key: 'notifications.dnd.start', type: 'string', default: '', scopes: ['global'], label: 'DnD Start', description: 'Do-not-disturb start time (HH:MM)' },
+  { key: 'notifications.dnd.end', type: 'string', default: '', scopes: ['global'], label: 'DnD End', description: 'Do-not-disturb end time (HH:MM)' },
+  { key: 'notifications.events.agent.done', type: 'boolean', default: true, scopes: ['global'], label: 'Agent done', description: 'Notify when agent completes' },
+  { key: 'notifications.events.agent.error', type: 'boolean', default: true, scopes: ['global'], label: 'Agent error', description: 'Notify on agent errors' },
+  { key: 'notifications.events.pr.opened', type: 'boolean', default: true, scopes: ['global'], label: 'PR opened', description: 'Notify when PR is opened' },
+  { key: 'notifications.events.pr.checks', type: 'boolean', default: true, scopes: ['global'], label: 'PR checks', description: 'Notify on CI pass/fail' },
 ];
