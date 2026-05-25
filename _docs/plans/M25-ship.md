@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Not started — final milestone; runs after every prior milestone.
+**Current Status:** Sprint 1 complete — telemetry module. Sprint 2 in-progress.
 
 ---
 
@@ -56,19 +56,19 @@ LICENSE
 
 ## Sprint 1 — Telemetry module + sanitize + track helper
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Telemetry is wired end-to-end and OFF by default; web + api use `track()` consistently.
 
 **Tasks:**
 
-- [ ] `TelemetryModule` + `TelemetryService` + `sanitize.ts`.
-- [ ] Off unless `settings.telemetry.enabled`; anonymous device id in
+- [x] `TelemetryModule` + `TelemetryService` + `sanitize.ts`.
+- [x] Off unless `settings.telemetry.enabled`; anonymous device id in
   `~/.config/pixler/device-id`.
-- [ ] Buffers events; flushes every 60s to `PIXLER_TELEMETRY_URL`.
-- [ ] **What is sent** exactly matches onboarding "What gets sent?" list (feature usage counts,
+- [x] Buffers events; flushes every 60s to `PIXLER_TELEMETRY_URL`.
+- [x] **What is sent** exactly matches onboarding "What gets sent?" list (feature usage counts,
   error rates, model selection patterns — anonymized).
-- [ ] `web/src/lib/telemetry.ts` — `track(name, props?)` used sparingly across the codebase.
-- [ ] Audit M01–M24 to add tracking calls where useful (settings opened, workspace created, plan
+- [x] `web/src/lib/telemetry.ts` — `track(name, props?)` used sparingly across the codebase.
+- [x] Audit M01–M24 to add tracking calls where useful (settings opened, workspace created, plan
   written, PR opened, etc.).
 
 **Files Created/Modified:**

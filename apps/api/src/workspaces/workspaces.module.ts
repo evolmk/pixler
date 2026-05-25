@@ -8,9 +8,10 @@ import { SetupRunnerService } from './setup-runner.service';
 import { FilesToCopyService } from './files-to-copy.service';
 import { ProjectsModule } from '../projects/projects.module';
 import { DeeplinkModule } from '../deeplink/deeplink.module';
+import { TelemetryModule } from '../telemetry/telemetry.module';
 
 @Module({
-  imports: [ProjectsModule, DeeplinkModule],
+  imports: [ProjectsModule, DeeplinkModule, TelemetryModule],
   controllers: [WorkspacesController],
   providers: [
     WorkspacesService,
