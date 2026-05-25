@@ -12,3 +12,4 @@
 | M08 | 2026-05-25 | Workspaces (worktrees, naming, setup scripts, files-to-copy, web UI) |
 | M09 | 2026-05-25 | Terminal mode (node-pty, xterm.js, multiplex, interrupt, settings panel) |
 | M10 | 2026-05-25 | Linear SDK (PAT auth, sync loop, comments/attachments/subissues, Web UI) |
+| M11 | 2026-05-25 | Linear CLI (agent-facing thin CLI, all ticket/subissue/attachment commands, agent-mode picker) |
