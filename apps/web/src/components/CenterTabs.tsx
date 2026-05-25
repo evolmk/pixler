@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@pixler/ui/components/
 import { EmptyState } from '@pixler/ui/components/empty-state';
 import { Button } from '@pixler/ui/components/button';
 import { useLayoutStore } from '../stores/layout';
+import { DiffTab } from './DiffTab';
 
 interface TabConfig {
   value: string;
@@ -42,8 +43,8 @@ const TABS: TabConfig[] = [
     value: 'diff',
     label: 'Diff',
     icon: GitCompare,
-    emptyTitle: 'Diff viewer ships in M17',
-    emptyBody: 'File-level and hunk-level diffs will appear here.',
+    emptyTitle: 'Diff viewer',
+    emptyBody: '',
   },
   {
     value: 'checks',
@@ -95,15 +96,23 @@ export function CenterTabs() {
 
       {/* Tab panels */}
       {TABS.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value} className="mt-0 overflow-auto p-4">
-          <div className="flex h-full min-h-48 items-center justify-center">
-            <EmptyState
-              icon={tab.icon}
-              title={tab.emptyTitle}
-              body={tab.emptyBody}
-              className="max-w-xs border-none"
-            />
-          </div>
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          className="mt-0 h-[calc(100%-40px-53px)] overflow-hidden"
+        >
+          {tab.value === 'diff' ? (
+            <DiffTab />
+          ) : (
+            <div className="flex h-full min-h-48 items-center justify-center p-4">
+              <EmptyState
+                icon={tab.icon}
+                title={tab.emptyTitle}
+                body={tab.emptyBody}
+                className="max-w-xs border-none"
+              />
+            </div>
+          )}
         </TabsContent>
       ))}
 

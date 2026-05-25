@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — DiffModule wired, endpoints live, chokidar watcher. Sprint 2 in progress.
+**Current Status:** Sprint 2 complete — Monaco DiffTab live in CenterTabs. Sprint 3 in progress.
 
 ---
 
@@ -78,18 +78,16 @@ filesystem changes.
 
 ## Sprint 2 — Web DiffTab + Monaco DiffEditor
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Diff tab renders file tree + Monaco DiffEditor for the selected file; updates live.
 
 **Tasks:**
 
-- [ ] Add `monaco-editor` + `@monaco-editor/react` to `apps/web/package.json`.
-- [ ] `DiffTab.tsx` layout.
-- [ ] `DiffFileTree.tsx` — file tree with status badges + per-file +/-.
-- [ ] `DiffEditor.tsx` — Monaco DiffEditor, language detection by extension, side-by-side /
-  unified toggle, "Show whitespace", per-file search.
-- [ ] Re-mount efficiently on file changes using stable model identity.
-- [ ] `hooks/useDiff.ts`.
+- [x] Add `@monaco-editor/react` to `apps/web/package.json`.
+- [x] `DiffTab.tsx` layout — workspace selector + file tree + editor.
+- [x] `DiffFileTree.tsx` — file tree with status badges + per-file +/-.
+- [x] `DiffEditor.tsx` — Monaco DiffEditor, language detection by extension, side-by-side / unified toggle.
+- [x] `hooks/useDiff.ts` — socket-driven invalidation on `diff.changed` events.
 
 **Files Created/Modified:**
 
