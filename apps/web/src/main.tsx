@@ -10,6 +10,28 @@ import { RootErrorBoundary } from './components/RootErrorBoundary';
 import './stores/theme';
 import './styles/app.css';
 
+function reportFrontendError(message: string, stack: string) {
+  fetch('/api/crashes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      source: 'frontend',
+      message,
+      stack,
+      context: { url: location.href, userAgent: navigator.userAgent },
+    }),
+  }).catch(() => {/* best-effort */});
+}
+
+window.addEventListener('error', (e) => {
+  reportFrontendError(e.message, e.error?.stack ?? '');
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+  const err = e.reason instanceof Error ? e.reason : new Error(String(e.reason));
+  reportFrontendError(err.message, err.stack ?? '');
+});
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RootErrorBoundary>

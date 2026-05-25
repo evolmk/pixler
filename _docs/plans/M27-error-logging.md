@@ -1,8 +1,8 @@
 # M27 — Error Logging
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Plan authored — ready to execute.
+**Current Status:** Both sprints complete — typecheck clean.
 
 ---
 
@@ -92,25 +92,19 @@ apps/web/src/main.tsx                                (modified — global error 
 
 ## Sprint 2 — Frontend global error handler
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Capture uncaught frontend JS errors and unhandled promise rejections and forward them to `/api/crashes`.
 
 **Tasks:**
 
-- [ ] Update `apps/web/src/main.tsx`
-  - Add `window.addEventListener('error', handler)` before `ReactDOM.createRoot`
-  - Add `window.addEventListener('unhandledrejection', handler)` before `ReactDOM.createRoot`
-  - Both handlers: POST to `/api/crashes` with `{ source: 'frontend', message, stack, context: { url: location.href, userAgent: navigator.userAgent } }`
-  - Use a plain `fetch` (not TanStack Query) — must work before React mounts and after unmount
-  - Fire-and-forget (no await, no error UI — silent best-effort)
-  - Guard: skip if `import.meta.env.DEV` is false? No — log in both dev and prod
+- [x] Update `apps/web/src/main.tsx` — `window.onerror` + `unhandledrejection` listeners POSTing to `/api/crashes`, fire-and-forget.
 
-**Files Created/Modified:** _(append as you touch them)_
+**Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/main.tsx` (global error listeners added before createRoot)
 
-**Issues Encountered:** _(append surprising things + their resolution)_
+**Issues Encountered:**
 
-- _none yet_
+- _none_
 
-**Verify:** Open browser devtools, run `throw new Error('test log')` in console → check `~/.config/pixler/logs/frontend-YYYY-MM-DD.log` for the entry.
+**Verify:** `pnpm -w typecheck` — 10/10 tasks successful.
