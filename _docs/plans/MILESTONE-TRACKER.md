@@ -10,8 +10,8 @@
 
 | Instance                              | Plan              | Status         |
 |---------------------------------------|-------------------|----------------|
-| **evolmk** (default `~/.claude`)      | M22-palette-keys  | ✅ complete    |
-| **evolmikek** (`~/.claude-evolmikek`) | M13-orchestrator  | ✅ complete    |
+| **evolmk** (default `~/.claude`)      | M23-token-health  | 🔄 in-progress |
+| **evolmikek** (`~/.claude-evolmikek`) | M14-plan-storage  | 🔄 in-progress (assumed) |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
 > show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.

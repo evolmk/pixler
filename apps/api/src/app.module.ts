@@ -13,9 +13,10 @@ import { RunModule } from './run/run.module';
 import { IdeModule } from './ide/ide.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { OrchestratorModule } from './orchestrator/orchestrator.module';
+import { UsageModule } from './usage/usage.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule],
   controllers: [HealthController],
 })
 export class AppModule {}

@@ -1,8 +1,8 @@
 # M23 — Token health panel + status bar + pre-flight check
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M05 + M08 + M13.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 in progress — UsageModule, log parser, migration, API endpoints.
 
 ---
 
@@ -53,30 +53,40 @@ apps/web/src/hooks/useUsage.ts
 
 ## Sprint 1 — UsageModule + claude-log parser + usage_snapshots
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Backend reads `~/.claude/projects/` JSONL, builds a time-series, and exposes window /
 per-model / per-workspace / historical endpoints.
 
 **Tasks:**
 
-- [ ] `0009_usage.sql` migration with `usage_snapshots`.
-- [ ] `UsageModule` + `UsageService` + `UsageController`.
-- [ ] `claude-log-parser.service.ts` — walks `~/.claude/projects/`, parses JSONL transcripts;
+- [x] `0009_usage.sql` migration with `usage_snapshots` (filed as 0005_usage.sql — earlier migrations weren't 0005–0008).
+- [x] `UsageModule` + `UsageService` + `UsageController`.
+- [x] `claude-log-parser.service.ts` — walks `~/.claude/projects/`, parses JSONL transcripts;
   emits per-message tokens (input/output/cache-read/cache-write), model, ts.
-- [ ] Flush summary snapshots every N seconds.
-- [ ] `GET /api/usage/window?hours=5` (with % of cap heuristic from last 4 weeks; fallback
+- [x] Flush summary snapshots every N seconds.
+- [x] `GET /api/usage/window?hours=5` (with % of cap heuristic from last 4 weeks; fallback
   `usage.5hCap`).
-- [ ] `GET /api/usage/per-model?since=&until=`, `GET /api/usage/per-workspace?workspaceId=`
+- [x] `GET /api/usage/per-model?since=&until=`, `GET /api/usage/per-workspace?workspaceId=`
   (cwd-match), `GET /api/usage/historical?range=`.
-- [ ] `mcp-overhead-estimator.service.ts` + `GET /api/usage/mcp-overhead`.
+- [x] `mcp-overhead-estimator.service.ts` + `GET /api/usage/mcp-overhead`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/db/migrations/0005_usage.sql` — usage_snapshots table + indexes (new)
+- `apps/api/src/db/database.service.ts` — migration 5 registered
+- `apps/api/src/settings/registry.ts` — added providers.claudeProjectsPath + usage.5hCap
+- `packages/shared-types/src/usage.ts` — UsageWindow/PerModel/PerWorkspace/Historical/MCP DTOs (new)
+- `packages/shared-types/src/index.ts` — exports added
+- `apps/api/src/usage/claude-log-parser.service.ts` — JSONL transcript walker (new)
+- `apps/api/src/usage/mcp-overhead-estimator.service.ts` — MCP cost estimator (new)
+- `apps/api/src/usage/usage.service.ts` — aggregation + flush loop (new)
+- `apps/api/src/usage/usage.controller.ts` — REST endpoints (new)
+- `apps/api/src/usage/usage.module.ts` — module (new)
+- `apps/api/src/app.module.ts` — UsageModule registered
 
 **Issues Encountered:**
 
-- _none yet_
+- Plan referenced migration 0009 but only 4 prior migrations exist — used 0005 instead.
 
 **Verify:** `pnpm --filter @pixler/api test usage` + manual: parse a known transcript dir, GET /window returns coherent %.
 

@@ -13,3 +13,4 @@ export type { DiffStatus, DiffFileSummary, DiffHunk, DiffFileDetail } from './di
 export type { GithubAuthStatus, GithubRepoInfo, PullRequest, PrCheck, PrComment, CreatePrDto, MergePrDto } from './github';
 export type { RunState, RunStatus, StartRunDto } from './run';
 export type { DetectedIde, OpenInIdeDto } from './ide';
+export type { UsageWindow, UsagePerModel, UsagePerWorkspace, UsageHistoricalPoint, McpOverheadEntry, McpOverheadSummary } from './usage';

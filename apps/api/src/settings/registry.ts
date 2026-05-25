@@ -48,6 +48,8 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'diff.renderWhitespace', type: 'string', default: 'none', scopes: ['global'], label: 'Diff Whitespace', description: 'Render whitespace in diff viewer: none | boundary | all' },
   { key: 'keyboard.preset', type: 'string', default: 'default', scopes: ['global'], label: 'Keyboard Preset', description: 'Keyboard shortcut preset: default | vim | emacs' },
   { key: 'keyboard.bindings', type: 'json', default: {}, scopes: ['global'], label: 'Keyboard Bindings', description: 'User overrides for keyboard shortcuts (actionId → key string)' },
+  { key: 'providers.claudeProjectsPath', type: 'string', default: '', scopes: ['global'], label: 'Claude Projects Path', description: 'Path to ~/.claude/projects/ transcript directory (auto-detected if empty)' },
+  { key: 'usage.5hCap', type: 'number', default: 0, scopes: ['global'], label: '5h Token Cap', description: 'Manual override for 5-hour token cap (0 = auto-detect from history)' },
   { key: 'ide.default', type: 'string', default: '', scopes: ['global'], label: 'Default IDE', description: 'IDE id to use by default (vscode, cursor, zed, etc.)' },
   { key: 'onboarding.completedAt', type: 'number', default: 0, scopes: ['global'], label: 'Onboarding Completed At', description: 'Unix timestamp when onboarding was completed (0 = not complete)' },
   { key: 'onboarding.currentStep', type: 'number', default: 1, scopes: ['global'], label: 'Onboarding Current Step', description: 'Last active onboarding step (1–5)' },
