@@ -46,9 +46,6 @@ Pixler **never holds an LLM API key**. All compute is delegated to the already-a
 
 ## Quick start
 
-> [!NOTE]
-> Pixler v1 is **pre-implementation**. The commands below describe the target shape.
-
 ```bash
 # zero install, always-latest
 npx pixler
