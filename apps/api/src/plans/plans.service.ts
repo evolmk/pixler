@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../db/database.service';
 import { SettingsService } from '../settings/settings.service';
+import { EventsService } from '../events/events.service';
 import { WorkspacesService } from '../workspaces/workspaces.service';
+import { AutoRecommenderService } from './auto-recommender.service';
 import { FileStorageService } from './storage/file-storage';
 import { InlineStorageService } from './storage/inline-storage';
 import { AttachmentStorageService } from './storage/attachment-storage';
@@ -29,7 +31,9 @@ export class PlansService {
   constructor(
     private readonly db: DatabaseService,
     private readonly settings: SettingsService,
+    private readonly events: EventsService,
     private readonly workspaces: WorkspacesService,
+    private readonly recommender: AutoRecommenderService,
     private readonly fileStorage: FileStorageService,
     private readonly inlineStorage: InlineStorageService,
     private readonly attachmentStorage: AttachmentStorageService,
@@ -49,17 +53,38 @@ export class PlansService {
     return rows.map((r) => ({ revision: r.revision, updatedAt: r.updated_at, storage: r.storage as PlanStorageMode }));
   }
 
+  recommend(workspaceId: string): { mode: PlanStorageMode; reason: string } {
+    const ws = this.workspaces.findOne(workspaceId);
+    return this.recommender.recommend(ws.ticket_id ?? undefined, ws.project_id);
+  }
+
   async save(workspaceId: string, dto: SavePlanDto): Promise<Plan> {
     const ws = this.workspaces.findOne(workspaceId);
-    const resolvedMode = this.resolveMode(dto.mode, ws.project_id);
-    const now = Date.now();
+    const rec = this.recommender.recommend(ws.ticket_id ?? undefined, ws.project_id);
+    const resolvedMode: PlanStorageMode = dto.mode && dto.mode !== 'auto' ? dto.mode : rec.mode === 'auto' ? 'file' : rec.mode;
 
+    if (resolvedMode === 'inline') {
+      const { exceeded, taskCount, charCount } = this.recommender.exceedsInlineThresholds(dto.content, ws.project_id);
+      if (exceeded) {
+        this.events.emitWorkspaceEvent(workspaceId, {
+          type: 'plan.big-plan-prompt',
+          workspaceId,
+          taskCount,
+          charCount,
+          timestamp: Date.now(),
+        });
+        throw new BadRequestException({ code: 'PLAN_TOO_BIG', taskCount, charCount });
+      }
+    }
+
+    const now = Date.now();
     const existing = this.findByWorkspace(workspaceId);
 
     if (resolvedMode === 'file') {
       await this.writeFileStorage(ws, dto.content);
     } else if (resolvedMode === 'inline' && ws.ticket_id) {
-      await this.inlineStorage.write(ws.ticket_id, dto.content, 1);
+      const revision = existing ? existing.revision + 1 : 1;
+      await this.inlineStorage.write(ws.ticket_id, dto.content, revision);
     }
 
     if (existing) {
@@ -114,9 +139,12 @@ export class PlansService {
     return this.save(workspaceId, { content });
   }
 
-  private resolveMode(requested: PlanStorageMode | undefined, projectId?: string): PlanStorageMode {
-    const effective = requested ?? (this.settings.get('plans.storageMode', { projectId }) as PlanStorageMode | undefined) ?? 'auto';
-    return effective === 'auto' ? 'file' : effective;
+  resetProjectPrompts(projectId: string): void {
+    this.recommender.resetProjectPrompts(projectId);
+  }
+
+  resetAllPrompts(): void {
+    this.recommender.resetAllPrompts();
   }
 
   private async writeFileStorage(ws: { worktree_path?: string | null; ticket_id?: string | null; branch?: string | null }, content: string): Promise<void> {

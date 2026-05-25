@@ -97,26 +97,30 @@ apps/web/src/hooks/usePlan.ts
 
 ## Sprint 2 — Auto recommender + big-plan prompt + reset prompts
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** "auto" mode resolves correctly per SPEC §5.2; big-plan blocking modal appears at the
 right thresholds.
 
 **Tasks:**
 
-- [ ] `auto-recommender.service.ts` — implements SPEC §5.2 table; returns `{ mode, reason }`.
-- [ ] On plan write: if resolved mode is `inline` AND body exceeds thresholds (`> 3 tasks` OR
+- [x] `auto-recommender.service.ts` — implements SPEC §5.2 table; returns `{ mode, reason }`.
+- [x] On plan write: if resolved mode is `inline` AND body exceeds thresholds (`> 3 tasks` OR
   `> 500 chars approach`), **block** the save and emit `plan.big-plan-prompt`.
-- [ ] Reset-prompts: per-project clears `don't-ask-again` flags; global wipes across projects.
-- [ ] Inline-mode markers per SPEC §5.6 exactly.
-- [ ] Attachment versioning per SPEC §5.4 rolling-pair table.
+- [x] Reset-prompts: per-project clears `don't-ask-again` flags; global wipes across projects.
+- [x] Inline-mode markers per SPEC §5.6 exactly.
+- [x] Attachment versioning per SPEC §5.4 rolling-pair table.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/plans/auto-recommender.service.ts`
+- `apps/api/src/plans/plans.service.ts` (integrated recommender, big-plan-prompt emission)
+- `apps/api/src/plans/plans.controller.ts` (added recommend, reset-prompts endpoints)
+- `apps/api/src/plans/plans.module.ts` (added EventsModule, AutoRecommenderService)
+- `packages/shared-types/src/events.ts` (plan.big-plan-prompt event)
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/api test auto-recommender` + manual: trigger big-plan modal.
 
