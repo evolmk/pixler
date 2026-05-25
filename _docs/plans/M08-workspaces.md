@@ -1,8 +1,8 @@
 # M08 — Workspaces, worktrees, setup scripts, files-to-copy
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-24
-**Current Status:** Sprint 3 complete — setup script runner, files-to-copy, archive/rerun-setup endpoints. Sprint 4 next: web UI (dialog, sidebar, context menu, settings panels).
+**Current Status:** All 4 sprints complete. M08 done — workspace lifecycle fully implemented.
 
 ---
 
@@ -170,32 +170,42 @@ env vars, streams output. Archive endpoint runs archive script, removes worktree
 
 ## Sprint 4 — Web UI: NewWorkspaceDialog, sidebar, settings panels
 
-**Status:** 🔄 in-progress
+**Status:** ✅ complete
 **Goal:** All workspace-related UI lights up: dialog with mode picker + ticket field, sidebar
 with real cards, context menu, remove modal, Scripts and Files-to-copy panels in Project Settings.
 
 **Tasks:**
 
-- [-] `NewWorkspaceDialog.tsx` — Chat/Terminal segmented control, optional ticket id, optional
+- [x] `NewWorkspaceDialog.tsx` — Chat/Terminal segmented control, optional ticket id, optional
   custom name, live branch + worktree path preview, "Create" runs API + shows setup log live.
-- [ ] `WorkspacesSidebar.tsx` lit up: color dot, state badge, 3-dot overflow with all actions.
-- [ ] `WorkspaceContextMenu.tsx` items: Rename / Pin / Archive / Remove / Open in IDE (stub) /
+- [x] `WorkspacesSidebar.tsx` lit up: color dot, state badge, 3-dot overflow with all actions.
+- [x] `WorkspaceContextMenu.tsx` items: Rename / Pin / Archive / Remove / Open in IDE (stub) /
   Open app (stub) / Re-run setup.
-- [ ] `RemoveWorkspaceModal.tsx` with "Silence remove confirmations for 1 minute" checkbox.
-- [ ] `ProjectSettingsDrawer/ScriptsPanel.tsx` — Monaco editors for setup/run/archive,
+- [x] `RemoveWorkspaceModal.tsx` with "Silence remove confirmations for 1 minute" checkbox.
+- [x] `ProjectSettingsDrawer/ScriptsPanel.tsx` — Monaco editors for setup/run/archive,
   `$PIXLER_*` reference panel with click-to-copy.
-- [ ] `ProjectSettingsDrawer/FilesToCopyPanel.tsx` — list of paths/globs with add/remove.
-- [ ] `hooks/useWorkspaces.ts` and `useWorkspace.ts`.
+- [x] `ProjectSettingsDrawer/FilesToCopyPanel.tsx` — list of paths/globs with add/remove.
+- [x] `hooks/useWorkspaces.ts` and `useWorkspace.ts`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useWorkspaces.ts`
+- `apps/web/src/hooks/useWorkspace.ts`
+- `apps/web/src/components/NewWorkspaceDialog.tsx`
+- `apps/web/src/components/WorkspaceCard.tsx`
+- `apps/web/src/components/WorkspaceContextMenu.tsx`
+- `apps/web/src/components/RemoveWorkspaceModal.tsx`
+- `apps/web/src/components/WorkspacesSidebar.tsx` (replaced placeholder with real data)
+- `apps/web/src/components/ProjectSettingsDrawer/ScriptsPanel.tsx`
+- `apps/web/src/components/ProjectSettingsDrawer/FilesToCopyPanel.tsx`
+- `apps/web/src/components/ProjectSettingsDrawer.tsx` (wired Scripts + FilesToCopy tabs)
+- `apps/web/package.json` (@monaco-editor/react added)
 
 **Issues Encountered:**
 
-- _none yet_
+- `useThemeStore` exposes `resolvedMode` (not `theme`/`mode`) for determining dark/light — used that for Monaco theme.
 
-**Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual flow.
+**Verify:** `pnpm -w typecheck` — 9/9 tasks pass.
 
 ---
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { GitBranch, Settings, Users, Zap } from 'lucide-react';
+import { GitBranch, Settings, Users, Zap, Terminal, Files } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -18,6 +18,8 @@ import {
 import { ScrollArea } from '@pixler/ui/components/scroll-area';
 import { useLayoutStore } from '../stores/layout';
 import { GeneralPanel } from './ProjectSettingsDrawer/GeneralPanel';
+import { ScriptsPanel } from './ProjectSettingsDrawer/ScriptsPanel';
+import { FilesToCopyPanel } from './ProjectSettingsDrawer/FilesToCopyPanel';
 
 interface CategoryConfig {
   id: string;
@@ -28,7 +30,8 @@ interface CategoryConfig {
 
 const CATEGORIES: CategoryConfig[] = [
   { id: 'general', label: 'General', icon: Settings },
-  { id: 'members', label: 'Members', icon: Users, milestone: 'M08' },
+  { id: 'scripts', label: 'Scripts', icon: Terminal },
+  { id: 'files-to-copy', label: 'Files to copy', icon: Files },
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
   { id: 'integrations', label: 'Integrations', icon: Zap, milestone: 'M10' },
 ];
@@ -71,6 +74,10 @@ export function ProjectSettingsDrawer() {
             <div className="p-6">
               {activeId === 'general' ? (
                 <GeneralPanel />
+              ) : activeId === 'scripts' ? (
+                <ScriptsPanel />
+              ) : activeId === 'files-to-copy' ? (
+                <FilesToCopyPanel />
               ) : (
                 <EmptyState
                   icon={active.icon}
