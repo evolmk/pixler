@@ -16,3 +16,4 @@
 | M12 | 2026-05-25 | GitHub (gh CLI wrapper, PR lifecycle, CI checks poller, ProvidersPanel, GitPanel, PrStatusBadge) |
 | M17 | 2026-05-25 | Diff viewer (Monaco DiffEditor, HunkList staging, live file-watcher, ⌘+Shift+D) |
 | M19 | 2026-05-25 | Run + IDE (RunModule, IDEModule, RunButton, OpenAppButton, OpenInIdeMenu, ⌘+E) |
+| M20 | 2026-05-25 | Themes (8 themes, ThemeSwatchGrid, hover preview, Monaco/Shiki sync, project override) |
