@@ -29,3 +29,4 @@
 | M26 | 2026-05-25 | Playwright E2E smoke suite (9 specs across M01–M09, infra, tokens, shell, projects, workspaces, terminal) |
 | M25 | 2026-05-25 | Ship v0.1.0 — telemetry, crash reporting, distribution polish, StoragePanel, AboutPanel, AccountPanel, README, CHANGELOG, LICENSE |
 | M27 | 2026-05-25 | Error logging — FileLoggerService, dated JSON-lines log files, frontend global error handler |
+| M28 | 2026-05-25 | Auth (Linear OAuth/PAT + GitHub OAuth/PAT/CLI), YAML workflow engine, model picker with CLI probing |

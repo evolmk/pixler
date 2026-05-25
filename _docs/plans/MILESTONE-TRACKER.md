@@ -1,8 +1,8 @@
 # Milestone Tracker
 
-**Most Recent Plan ID:** M27
-**Last Plan Completed:** M27-error-logging
-**Next Plan:** — (all milestones complete)
+**Most Recent Plan ID:** M28
+**Last Plan Completed:** M28-auth-workflows-models
+**Next Plan:** —
 
 ---
 
@@ -48,6 +48,7 @@
 - [x] **M25** — Ship _(Wave 12 — serial, last)_
 - [x] **M26** — Playwright E2E smoke suite _(Wave 11 / Track B)_
 - [x] **M27** — Error logging to ~/.config/pixler/logs/
+- [x] **M28** — Auth (Linear OAuth + GitHub OAuth/PAT/CLI), workflow engine, model picker
 
 ---
 
