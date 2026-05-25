@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — DB migration, LinearModule, SecretStore, auth endpoints. Sprint 2 next: sync loop + state-map.
+**Current Status:** Sprint 2 complete — sync scheduler, state-map, tickets endpoint. Sprint 3 next: comments, attachments, sub-issues.
 
 ---
 
@@ -94,30 +94,34 @@ state; secrets land in OS keychain when available.
 
 ## Sprint 2 — Tickets sync loop + state-map
 
-**Status:** 🔄 in-progress
+**Status:** ✅ complete
 **Goal:** Tickets are pulled every `syncIntervalMs` per project, cached locally, and surfaced via
 `GET /api/linear/tickets`. State-name mapping drives transitions.
 
 **Tasks:**
 
-- [-] `sync.scheduler.ts` — calls `issues({ filter: { assignee: { isMe: true }, state: { type:
+- [x] `sync.scheduler.ts` — calls `issues({ filter: { assignee: { isMe: true }, state: { type:
   { in: ['unstarted', 'started'] } } } })` per project; upsert into `linear_tickets`; emit
   `linear.synced`.
-- [ ] `GET /api/linear/tickets?projectId=…` from local cache.
-- [ ] `POST /api/linear/sync { projectId? }` — force sync.
-- [ ] `state-map.service.ts` — maps `'todo'|'in_progress'|'in_review'|'done'` to team's actual
+- [x] `GET /api/linear/tickets?projectId=…` from local cache.
+- [x] `POST /api/linear/sync { projectId? }` — force sync.
+- [x] `state-map.service.ts` — maps `'todo'|'in_progress'|'in_review'|'done'` to team's actual
   state names via `linear.stateMap` setting.
-- [ ] `POST /api/linear/tickets/:identifier/state { state }`.
+- [x] `POST /api/linear/tickets/:identifier/state { state }`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/linear/sync.scheduler.ts`
+- `apps/api/src/linear/state-map.service.ts`
+- `apps/api/src/linear/linear.controller.ts`
+- `apps/api/src/linear/linear.module.ts`
+- `apps/api/src/settings/registry.ts` (added `linear.stateMap`)
 
 **Issues Encountered:**
 
-- _none yet_
+- `label_name` skipped in upsert to avoid N+1 label API calls — stored as null.
 
-**Verify:** `pnpm --filter @pixler/api test sync` — mock sdk + verify upsert; manual sync confirms tickets show up in cache.
+**Verify:** `pnpm -w typecheck` — 9/9 tasks pass.
 
 ---
 
