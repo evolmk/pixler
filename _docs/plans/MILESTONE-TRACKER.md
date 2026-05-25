@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M15-checkpoints
-**Next Plan:** M18-checks-activity
+**Last Plan Completed:** M18-checks-activity
+**Next Plan:** M24-gestures-deeplinks
 
 ---
 
@@ -11,7 +11,7 @@
 | Instance                              | Plan              | Status         |
 |---------------------------------------|-------------------|----------------|
 | **evolmk** (default `~/.claude`)      | M16-chat-ui       | ✅ complete    |
-| **evolmikek** (`~/.claude-evolmikek`) | M18-checks-activity | 🔄 in-progress |
+| **evolmikek** (`~/.claude-evolmikek`) | M24-gestures-deeplinks | 🔄 in-progress |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
 > show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.
@@ -38,7 +38,7 @@
 - [x] **M15** — Checkpoints _(Wave 8 / Track B)_
 - [x] **M16** — Chat UI _(Wave 7 / Track A)_
 - [x] **M17** — Diff viewer _(Wave 5 / Track B)_
-- [ ] **M18** — Checks + activity _(Wave 9 / Track B)_
+- [x] **M18** — Checks + activity _(Wave 9 / Track B)_
 - [x] **M19** — Run + IDE _(Wave 6 / Track B)_
 - [x] **M20** — Themes _(Wave 8 / Track A)_
 - [x] **M21** — Onboarding _(Wave 9 / Track A)_
