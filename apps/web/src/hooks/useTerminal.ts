@@ -3,6 +3,8 @@ import { io, Socket } from 'socket.io-client';
 
 interface UseTerminalOptions {
   workspaceId: string | null | undefined;
+  /** If set, subscribe to this existing terminal instead of findOrCreate. */
+  terminalId?: string | null;
   cols?: number;
   rows?: number;
   onData: (data: string) => void;
@@ -13,10 +15,12 @@ interface UseTerminalReturn {
   terminalId: string | null;
   write: (data: string) => void;
   resize: (cols: number, rows: number) => void;
+  interrupt: () => void;
 }
 
 export function useTerminal({
   workspaceId,
+  terminalId: explicitTerminalId,
   cols,
   rows,
   onData,
@@ -50,18 +54,22 @@ export function useTerminal({
       if (id === terminalIdRef.current) onExitRef.current?.(exitCode);
     });
 
-    fetch(`/api/workspaces/${workspaceId}/terminal`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cols: cols ?? 80, rows: rows ?? 24 }),
-    })
-      .then((r) => r.json() as Promise<{ terminalId: string }>)
-      .then(({ terminalId: id }) => {
-        if (!mounted) return;
-        terminalIdRef.current = id;
-        setTerminalId(id);
-        sock.emit('terminal.subscribe', id);
-      });
+    const resolveId = explicitTerminalId
+      ? Promise.resolve(explicitTerminalId)
+      : fetch(`/api/workspaces/${workspaceId}/terminal`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cols: cols ?? 80, rows: rows ?? 24 }),
+        })
+          .then((r) => r.json() as Promise<{ terminalId: string }>)
+          .then((d) => d.terminalId);
+
+    resolveId.then((id) => {
+      if (!mounted) return;
+      terminalIdRef.current = id;
+      setTerminalId(id);
+      sock.emit('terminal.subscribe', id);
+    });
 
     return () => {
       mounted = false;
@@ -70,7 +78,7 @@ export function useTerminal({
       terminalIdRef.current = null;
       setTerminalId(null);
     };
-  }, [workspaceId]); // cols/rows intentionally excluded — initial size only
+  }, [workspaceId, explicitTerminalId]); // cols/rows intentionally excluded — initial size only
 
   const write = useCallback((data: string) => {
     const id = terminalIdRef.current;
@@ -84,5 +92,43 @@ export function useTerminal({
     socketRef.current.emit('terminal.resize', { terminalId: id, cols: c, rows: r });
   }, []);
 
-  return { terminalId, write, resize };
+  const interrupt = useCallback(() => {
+    const id = terminalIdRef.current;
+    if (!id) return;
+    fetch(`/api/terminals/${id}/interrupt`, { method: 'POST' }).catch(() => {});
+  }, []);
+
+  return { terminalId, write, resize, interrupt };
+}
+
+export function useTerminalList(workspaceId: string | null | undefined) {
+  const [terminals, setTerminals] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!workspaceId) return;
+    let mounted = true;
+
+    const load = () =>
+      fetch(`/api/workspaces/${workspaceId}/terminals`)
+        .then((r) => r.json() as Promise<{ terminals: string[] }>)
+        .then((d) => { if (mounted) setTerminals(d.terminals); });
+
+    load();
+    return () => { mounted = false; };
+  }, [workspaceId]);
+
+  const addTerminal = useCallback(async () => {
+    if (!workspaceId) return null;
+    const res = await fetch(`/api/workspaces/${workspaceId}/terminal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // pass a sentinel to force-create a new terminal (not findOrCreate)
+      body: JSON.stringify({ forceNew: true }),
+    });
+    const { terminalId } = await res.json() as { terminalId: string };
+    setTerminals((prev) => [...prev, terminalId]);
+    return terminalId;
+  }, [workspaceId]);
+
+  return { terminals, addTerminal };
 }

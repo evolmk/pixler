@@ -34,6 +34,7 @@ import {
 import { useLayoutStore } from '../stores/layout';
 import { AppearancePanel } from './SettingsDrawer/AppearancePanel';
 import { LinearPanel } from './SettingsDrawer/LinearPanel';
+import { TerminalPanel } from './SettingsDrawer/TerminalPanel';
 
 interface CategoryConfig {
   id: string;
@@ -53,7 +54,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'appearance', label: 'Appearance', icon: Palette },
   { id: 'keyboard', label: 'Keyboard', icon: Keyboard, milestone: 'M22' },
   { id: 'notifications', label: 'Notifications', icon: Bell, milestone: 'M18' },
-  { id: 'terminal', label: 'Terminal', icon: Terminal, milestone: 'M09' },
+  { id: 'terminal', label: 'Terminal', icon: Terminal },
   { id: 'external-tools', label: 'External Tools', icon: Wrench, milestone: 'M19' },
   { id: 'storage', label: 'Storage', icon: HardDrive, milestone: 'M14' },
   { id: 'experimental', label: 'Experimental', icon: FlaskConical, milestone: 'M25' },
@@ -101,6 +102,8 @@ export function SettingsDrawer() {
               <AppearancePanel />
             ) : activeId === 'linear' ? (
               <LinearPanel />
+            ) : activeId === 'terminal' ? (
+              <TerminalPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState

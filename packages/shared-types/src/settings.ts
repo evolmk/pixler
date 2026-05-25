@@ -39,4 +39,15 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'providers.gh', type: 'string', default: 'gh', scopes: ['global'], label: 'GitHub CLI Path', description: 'Path to gh CLI' },
 
   { key: 'telemetry.enabled', type: 'boolean', default: true, scopes: ['global'], label: 'Telemetry', description: 'Enable anonymous telemetry' },
+
+  { key: 'terminal.shell', type: 'string', default: '', scopes: ['global'], label: 'Shell', description: 'Override shell path (defaults to $SHELL)' },
+  { key: 'terminal.fontFamily', type: 'string', default: '', scopes: ['global'], label: 'Font Family', description: 'Terminal font family' },
+  { key: 'terminal.fontSize', type: 'number', default: 13, scopes: ['global'], label: 'Font Size', description: 'Terminal font size in px' },
+  { key: 'terminal.cursorStyle', type: 'string', default: 'block', scopes: ['global'], label: 'Cursor Style', description: 'block | underline | bar' },
+  { key: 'terminal.scrollback', type: 'number', default: 5000, scopes: ['global'], label: 'Scrollback', description: 'Lines of scrollback history' },
+  { key: 'terminal.copyOnSelect', type: 'boolean', default: false, scopes: ['global'], label: 'Copy on Select', description: 'Copy selection to clipboard automatically' },
+  { key: 'terminal.pasteWarning', type: 'boolean', default: true, scopes: ['global'], label: 'Paste Warning', description: 'Warn when pasting multi-line content' },
+
+  { key: 'layout.paneSizes', type: 'json', default: { outer: [22, 78], inner: [62, 38] }, scopes: ['global'], label: 'Pane Sizes', description: '3-pane split sizes: outer [sidebar, rest], inner [center, right]' },
+  { key: 'layout.bigTerminal', type: 'boolean', default: false, scopes: ['global'], label: 'Big Terminal', description: 'Right pane expanded full-bleed' },
 ];

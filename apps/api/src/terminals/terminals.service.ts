@@ -98,6 +98,10 @@ export class TerminalsService {
     this.workspaceTerminals.get(t.workspaceId)?.delete(id);
   }
 
+  interrupt(id: string): void {
+    this.findOne(id).pty.write('\x03');
+  }
+
   killForWorkspace(workspaceId: string): void {
     for (const id of this.getForWorkspace(workspaceId)) {
       this.kill(id);

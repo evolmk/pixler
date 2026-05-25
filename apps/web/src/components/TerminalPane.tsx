@@ -9,9 +9,20 @@ import { useSetting } from '../hooks/useSetting';
 
 interface TerminalPaneProps {
   workspaceId?: string | null;
+  /** Subscribe to an existing terminal instead of findOrCreate. */
+  terminalId?: string | null;
+  /** Called with the resolved terminal ID once the session is ready. */
+  onTerminalReady?: (id: string) => void;
+  /** Ref that will be populated with the interrupt fn so the parent can call it. */
+  onInterruptRef?: React.MutableRefObject<(() => void) | null>;
 }
 
-export function TerminalPane({ workspaceId }: TerminalPaneProps) {
+export function TerminalPane({
+  workspaceId,
+  terminalId: explicitTerminalId,
+  onTerminalReady,
+  onInterruptRef,
+}: TerminalPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const xtermRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -29,10 +40,24 @@ export function TerminalPane({ workspaceId }: TerminalPaneProps) {
     xtermRef.current?.write(data);
   }, []);
 
-  const { write, resize } = useTerminal({ workspaceId, onData: handleData });
+  const { write, resize, interrupt, terminalId: resolvedId } = useTerminal({
+    workspaceId,
+    terminalId: explicitTerminalId,
+    onData: handleData,
+  });
 
   useEffect(() => { writeRef.current = write; }, [write]);
   useEffect(() => { resizeRef.current = resize; }, [resize]);
+
+  // Expose interrupt to parent
+  useEffect(() => {
+    if (onInterruptRef) onInterruptRef.current = interrupt;
+  }, [interrupt, onInterruptRef]);
+
+  // Notify parent once terminal id is resolved
+  useEffect(() => {
+    if (resolvedId) onTerminalReady?.(resolvedId);
+  }, [resolvedId, onTerminalReady]);
 
   // Mount xterm once
   useEffect(() => {

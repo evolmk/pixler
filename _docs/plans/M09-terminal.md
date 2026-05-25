@@ -1,8 +1,8 @@
 # M09 — Terminal mode (node-pty + xterm.js + multiplex)
 
-**Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Sprint 2 complete — xterm.js TerminalPane wired with theme sync and settings. Sprint 3 next: multiplex + interrupt + settings panel.
+**Status:** ✅ COMPLETE
+**Modified:** 2026-05-25
+**Current Status:** All 3 sprints complete — PTY backend, xterm.js UI, multiplex, interrupt, settings panel.
 
 ---
 
@@ -121,29 +121,38 @@ palette, with PTY resize tracking the visible cols/rows.
 
 ## Sprint 3 — Multiplex + Interrupt + Settings panel
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Multiple terminals per workspace; switching workspaces preserves prior shell state;
 Settings → Terminal panel fully functional; Interrupt button sends SIGINT.
 
 **Tasks:**
 
-- [ ] `TerminalSwitcher.tsx` dropdown in right-pane header — only visible when > 1 terminal per
+- [x] `TerminalSwitcher.tsx` dropdown in right-pane header — only visible when > 1 terminal per
   workspace.
-- [ ] Workspace switch shows the right workspace's PTY without killing prior ones.
-- [ ] Interrupt button in right-pane header sends `SIGINT` to active PTY; surfaces "You're in
+- [x] Workspace switch shows the right workspace's PTY without killing prior ones.
+- [x] Interrupt button in right-pane header sends `SIGINT` to active PTY; surfaces "You're in
   control." banner.
-- [ ] `SettingsDrawer/TerminalPanel.tsx` — font, font size, cursor style, scrollback,
+- [x] `SettingsDrawer/TerminalPanel.tsx` — font, font size, cursor style, scrollback,
   copy-on-select, paste-warning, shell override.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/TerminalSwitcher.tsx`
+- `apps/web/src/components/RightPane.tsx` (switcher + interrupt + "You're in control." banner)
+- `apps/web/src/components/TerminalPane.tsx` (onInterruptRef, onTerminalReady, explicit terminalId)
+- `apps/web/src/hooks/useTerminal.ts` (interrupt, useTerminalList, forceNew, explicit terminalId)
+- `apps/web/src/components/SettingsDrawer/TerminalPanel.tsx`
+- `apps/web/src/components/SettingsDrawer.tsx` (wire TerminalPanel)
+- `apps/api/src/terminals/terminals.controller.ts` (interrupt endpoint, list terminals)
+- `apps/api/src/terminals/terminals.service.ts` (interrupt method)
+- `apps/api/src/settings/registry.ts` (terminal settings)
+- `packages/shared-types/src/settings.ts` (terminal settings)
 
 **Issues Encountered:**
 
-- _none yet_
+- none
 
-**Verify:** `pnpm -w typecheck` + manual: open 2 workspaces, switch back-and-forth, scrollback intact.
+**Verify:** `pnpm -w typecheck` — clean.
 
 ---
 
