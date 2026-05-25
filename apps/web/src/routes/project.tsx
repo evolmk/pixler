@@ -9,6 +9,7 @@ import { CenterTabs } from '../components/CenterTabs';
 import { RightPane } from '../components/RightPane';
 import { SettingsDrawer } from '../components/SettingsDrawer';
 import { ProjectSettingsDrawer } from '../components/ProjectSettingsDrawer';
+import { TeamConfigDiffModal } from '../components/TeamConfigDiffModal';
 
 /**
  * 3-pane shell for `/p/$projectId` and `/p/$projectId/w/$workspaceId`.
@@ -90,6 +91,9 @@ export function ProjectShell() {
       {/* Global drawers */}
       <SettingsDrawer />
       <ProjectSettingsDrawer />
+
+      {/* Team config diff — appears when a project with pixler.json is added */}
+      <TeamConfigDiffModal />
 
       {/* Activity toast viewport — M18 populates this */}
       <Toaster position="bottom-right" />

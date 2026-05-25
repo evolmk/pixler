@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Bell, ChevronDown, Command, Monitor, Moon, Plus, Settings, Settings2, Sun } from 'lucide-react';
+import { Bell, ChevronDown, Command, FolderPlus, Monitor, Moon, Plus, Settings, Settings2, Sun } from 'lucide-react';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button } from '@pixler/ui/components/button';
 import {
   DropdownMenu,
@@ -24,6 +25,8 @@ import {
 import { useThemeStore } from '../stores/theme';
 import { useLayoutStore } from '../stores/layout';
 import { useSetting } from '../hooks/useSetting';
+import { useProjects } from '../hooks/useProjects';
+import { NewProjectDialog } from './NewProjectDialog';
 import type { ThemeMode } from '@pixler/ui-styles';
 
 const MODE_ICONS: Record<ThemeMode, typeof Sun> = {
@@ -37,12 +40,17 @@ const MODE_CYCLE: ThemeMode[] = ['light', 'dark', 'system'];
 export function TopBar() {
   const [workspaceDialogOpen, setWorkspaceDialogOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const [newProjectOpen, setNewProjectOpen] = useState(false);
 
   const { mode, resolvedMode, setMode } = useThemeStore();
   const setSettingsOpen = useLayoutStore((s) => s.setSettingsOpen);
   const setProjectSettingsOpen = useLayoutStore((s) => s.setProjectSettingsOpen);
 
   const { set: persistMode } = useSetting<ThemeMode>('appearance.mode');
+  const { data: projects = [] } = useProjects();
+  const navigate = useNavigate();
+  const params = useParams({ strict: false }) as { projectId?: string };
+  const activeProject = projects.find((p) => p.id === params.projectId);
 
   const handleModeToggle = () => {
     const next = MODE_CYCLE[(MODE_CYCLE.indexOf(mode) + 1) % MODE_CYCLE.length];
@@ -64,24 +72,53 @@ export function TopBar() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-1 text-xs">
-            Select project
+            {activeProject?.name ?? 'Select project'}
             <ChevronDown className="size-3 opacity-60" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48">
-          <DropdownMenuItem disabled className="text-xs text-muted-foreground">
-            Projects load in M07
-          </DropdownMenuItem>
+        <DropdownMenuContent align="start" className="w-52">
+          {projects.length === 0 ? (
+            <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+              No projects yet
+            </DropdownMenuItem>
+          ) : (
+            projects.map((p) => (
+              <DropdownMenuItem
+                key={p.id}
+                onClick={() => navigate({ to: '/p/$projectId', params: { projectId: p.id } })}
+                className="gap-2 text-xs"
+                data-active={p.id === params.projectId}
+              >
+                {p.name}
+              </DropdownMenuItem>
+            ))
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => setProjectSettingsOpen(true)}
+            onClick={() => setNewProjectOpen(true)}
             className="gap-2 text-xs"
           >
-            <Settings2 className="size-3.5" />
-            Project settings
+            <FolderPlus className="size-3.5" />
+            Add project…
           </DropdownMenuItem>
+          {activeProject && (
+            <DropdownMenuItem
+              onClick={() => setProjectSettingsOpen(true)}
+              className="gap-2 text-xs"
+            >
+              <Settings2 className="size-3.5" />
+              Project settings
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* New Project dialog */}
+      <NewProjectDialog
+        open={newProjectOpen}
+        onOpenChange={setNewProjectOpen}
+        onProjectAdded={(id) => navigate({ to: '/p/$projectId', params: { projectId: id } })}
+      />
 
       {/* + Workspace */}
       <Button

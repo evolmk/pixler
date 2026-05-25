@@ -15,18 +15,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@pixler/ui/components/tooltip';
+import { ScrollArea } from '@pixler/ui/components/scroll-area';
 import { useLayoutStore } from '../stores/layout';
+import { GeneralPanel } from './ProjectSettingsDrawer/GeneralPanel';
 
 interface CategoryConfig {
   id: string;
   label: string;
   icon: LucideIcon;
-  milestone: string;
+  milestone?: string;
 }
 
 const CATEGORIES: CategoryConfig[] = [
-  { id: 'general', label: 'General', icon: Settings, milestone: 'M07' },
-  { id: 'members', label: 'Members', icon: Users, milestone: 'M07' },
+  { id: 'general', label: 'General', icon: Settings },
+  { id: 'members', label: 'Members', icon: Users, milestone: 'M08' },
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
   { id: 'integrations', label: 'Integrations', icon: Zap, milestone: 'M10' },
 ];
@@ -36,7 +38,7 @@ export function ProjectSettingsDrawer() {
   const open = useLayoutStore((s) => s.projectSettingsOpen);
   const setOpen = useLayoutStore((s) => s.setProjectSettingsOpen);
 
-  const active = CATEGORIES.find((c) => c.id === activeId) ?? CATEGORIES[0];
+  const active = CATEGORIES.find((c) => c.id === activeId) ?? CATEGORIES[0]!;
 
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
@@ -65,14 +67,20 @@ export function ProjectSettingsDrawer() {
           <DrawerHeader className="border-b border-border">
             <DrawerTitle>Project — {active.label}</DrawerTitle>
           </DrawerHeader>
-          <div className="flex flex-1 items-center justify-center overflow-y-auto p-6">
-            <EmptyState
-              icon={active.icon}
-              title={`${active.label} settings`}
-              body={`Ships in ${active.milestone}.`}
-              className="border-none"
-            />
-          </div>
+          <ScrollArea className="flex-1">
+            <div className="p-6">
+              {activeId === 'general' ? (
+                <GeneralPanel />
+              ) : (
+                <EmptyState
+                  icon={active.icon}
+                  title={`${active.label} settings`}
+                  body={`Ships in ${active.milestone}.`}
+                  className="border-none"
+                />
+              )}
+            </div>
+          </ScrollArea>
         </div>
       </DrawerContent>
     </Drawer>

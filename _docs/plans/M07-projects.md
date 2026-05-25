@@ -1,8 +1,8 @@
 # M07 — Project management (add local, clone from GitHub, `pixler.json`)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-24
-**Current Status:** Sprint 3 complete — pixler.json schema, read/write, and team-config-diff event wired; starting Sprint 4 (web UI).
+**Current Status:** All 4 sprints complete — M07 fully implemented and typecheck clean.
 
 ---
 
@@ -160,28 +160,37 @@ defaults, emit `project.team-config-diff` for the UI.
 
 ## Sprint 4 — Web UI: New Project dialog, switcher, settings General panel
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** All project-related UI lights up: New Project dialog, clone progress, team-config diff
 modal, switcher fed by live data, Project Settings → General fully functional.
 
 **Tasks:**
 
-- [ ] `NewProjectDialog.tsx` — two tiles "Open local folder" / "Clone from GitHub"; local uses
+- [x] `NewProjectDialog.tsx` — two tiles "Open local folder" / "Clone from GitHub"; local uses
   native picker + backend validate.
-- [ ] `CloneProgress.tsx` — live log streamed from Socket.io.
-- [ ] `TeamConfigDiffModal.tsx` — 2-column diff with cherry-pick checkboxes.
-- [ ] `TopBar.tsx` — wire project switcher to `useProjects()` (replaces M06's stub).
-- [ ] `ProjectSettingsDrawer/GeneralPanel.tsx` — display name, icon, description, "Reset to defaults".
-- [ ] Empty-state CTA on `/` becomes live.
-- [ ] `hooks/useProjects.ts` and `hooks/useProject.ts` — TanStack Query.
+- [x] `CloneProgress.tsx` — live log streamed from Socket.io.
+- [x] `TeamConfigDiffModal.tsx` — 2-column diff with cherry-pick checkboxes.
+- [x] `TopBar.tsx` — wire project switcher to `useProjects()` (replaces M06's stub).
+- [x] `ProjectSettingsDrawer/GeneralPanel.tsx` — display name, icon, description, remove/delete.
+- [x] Empty-state CTA on `/` becomes live.
+- [x] `hooks/useProjects.ts` and `hooks/useProject.ts` — TanStack Query.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useProjects.ts`
+- `apps/web/src/hooks/useProject.ts`
+- `apps/web/src/components/NewProjectDialog.tsx`
+- `apps/web/src/components/CloneProgress.tsx`
+- `apps/web/src/components/TeamConfigDiffModal.tsx`
+- `apps/web/src/components/TopBar.tsx` (switcher wired to live data)
+- `apps/web/src/components/ProjectSettingsDrawer.tsx` (GeneralPanel mounted)
+- `apps/web/src/components/ProjectSettingsDrawer/GeneralPanel.tsx`
+- `apps/web/src/routes/index.tsx` (CTA opens NewProjectDialog)
+- `apps/web/src/routes/project.tsx` (TeamConfigDiffModal added)
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual smoke through every acceptance criterion.
 
