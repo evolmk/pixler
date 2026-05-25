@@ -1,8 +1,8 @@
 # M15 — Checkpoints (snapshot + rollback)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M13.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 in progress — DB migration, CheckpointsModule, takeSnapshot/rollback.
 
 ---
 
@@ -49,27 +49,34 @@ apps/web/src/hooks/useCheckpoints.ts
 
 ## Sprint 1 — DB + CheckpointsModule + takeSnapshot/rollback
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Service can snapshot a workspace (git stash + chat/plan/todo capture) and roll it back.
 
 **Tasks:**
 
-- [ ] `0006_checkpoints.sql` per SPEC columns.
-- [ ] `CheckpointsModule` + `CheckpointsService` + `CheckpointsController`.
-- [ ] `takeSnapshot(workspaceId, { label, trigger })` — git stash + chat history snapshot (ok to
+- [x] `0006_checkpoints.sql` per SPEC columns.
+- [x] `CheckpointsModule` + `CheckpointsService` + `CheckpointsController`.
+- [x] `takeSnapshot(workspaceId, { label, trigger })` — git stash + chat history snapshot (ok to
   start empty if M16 not done) + plan revision (M14) + todo state + emit `checkpoint.taken`.
-- [ ] `rollback(checkpointId)` — restore stash, chat, plan, todo state; emit
+- [x] `rollback(checkpointId)` — restore stash, chat, plan, todo state; emit
   `checkpoint.rolled-back`.
-- [ ] `GET /api/workspaces/:id/checkpoints`, `POST /api/workspaces/:id/checkpoints { label? }`,
+- [x] `GET /api/workspaces/:id/checkpoints`, `POST /api/workspaces/:id/checkpoints { label? }`,
   `POST /api/checkpoints/:id/rollback`, `DELETE /api/checkpoints/:id`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/db/migrations/0007_checkpoints.sql`
+- `packages/shared-types/src/checkpoints.ts`
+- `packages/shared-types/src/events.ts` (checkpoint.taken, checkpoint.rolled-back)
+- `packages/shared-types/src/index.ts`
+- `apps/api/src/checkpoints/checkpoints.module.ts`
+- `apps/api/src/checkpoints/checkpoints.service.ts`
+- `apps/api/src/checkpoints/checkpoints.controller.ts`
+- `apps/api/src/app.module.ts`
 
 **Issues Encountered:**
 
-- _none yet_
+- Migration renumbered to 0007 (0006 already used by M14 plans).
 
 **Verify:** `pnpm --filter @pixler/api test checkpoints` + manual: dirty a worktree, snapshot, clean, rollback restores changes.
 

@@ -16,3 +16,4 @@ export type { DetectedIde, OpenInIdeDto } from './ide';
 export type { UsageWindow, UsagePerModel, UsagePerWorkspace, UsageHistoricalPoint, McpOverheadEntry, McpOverheadSummary } from './usage';
 export type { PlanStorageMode, PlanStatus, PlanFrontmatter, Plan, SavePlanDto, RevisePlanDto, PlanHistoryEntry } from './plans';
 export type { MessageRole, MessageContentType, Message, SendMessageDto, MessagesPage } from './messages';
+export type { CheckpointTrigger, Checkpoint, TakeCheckpointDto } from './checkpoints';

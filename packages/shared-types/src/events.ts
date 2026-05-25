@@ -16,6 +16,8 @@ export type WorkspaceEvent =
   | { type: 'agent.gate'; workspaceId: string; gate: 'plan' | 'validation' | 'pr'; timestamp: number }
   | { type: 'agent.paused'; workspaceId: string; rejectionCount: number; timestamp: number }
   | { type: 'agent.done'; workspaceId: string; prUrl: string; timestamp: number }
-  | { type: 'plan.big-plan-prompt'; workspaceId: string; taskCount: number; charCount: number; timestamp: number };
+  | { type: 'plan.big-plan-prompt'; workspaceId: string; taskCount: number; charCount: number; timestamp: number }
+  | { type: 'checkpoint.taken'; workspaceId: string; checkpointId: string; label: string; timestamp: number }
+  | { type: 'checkpoint.rolled-back'; workspaceId: string; checkpointId: string; timestamp: number };
 
 export type SettingsEvent = { type: 'settings.changed'; key: string; scope: string; timestamp: number };
