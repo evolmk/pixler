@@ -1,8 +1,8 @@
 # M13 — Orchestrator state machine + agent process spawning
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M08 + M09 + M11 + M12.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — pure state machine + 56 tests + 100% coverage.
 
 ---
 
@@ -65,26 +65,33 @@ apps/web/src/hooks/useOrchestrator.ts
 
 ## Sprint 1 — Pure orchestrator package + state machine + tests
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** `packages/orchestrator` is a standalone library with 100% test coverage. No Nest, no
 node-pty.
 
 **Tasks:**
 
-- [ ] `states.ts` — enum + transition table per SPEC §4.1.
-- [ ] `events.ts` — union of all events.
-- [ ] `machine.ts` — `createMachine(initial, transitions)` + reducer `step(state, event)`
+- [x] `states.ts` — enum + transition table per SPEC §4.1.
+- [x] `events.ts` — union of all events.
+- [x] `machine.ts` — `createMachine(initial, transitions)` + reducer `step(state, event)`
   returning new state + side-effects.
-- [ ] `loop-limit.ts` — enforces max-iteration count (default 3, 1–5 configurable).
-- [ ] Vitest suite achieving 100% coverage.
+- [x] `loop-limit.ts` — enforces max-iteration count (default 3, 1–5 configurable).
+- [x] Vitest suite achieving 100% coverage.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/orchestrator/src/states.ts` (new)
+- `packages/orchestrator/src/events.ts` (new)
+- `packages/orchestrator/src/machine.ts` (new)
+- `packages/orchestrator/src/loop-limit.ts` (new)
+- `packages/orchestrator/src/index.ts` (filled out)
+- `packages/orchestrator/test/machine.test.ts` (new, 56 tests, 100% coverage)
+- `packages/orchestrator/vitest.config.ts` (new)
+- `packages/orchestrator/package.json` (test scripts + vitest devDeps)
 
 **Issues Encountered:**
 
-- _none yet_
+- Exhaustive `never` branch excluded from coverage with `/* c8 ignore */`.
 
 **Verify:** `pnpm --filter @pixler/orchestrator test --coverage` — 100% lines/branches.
 
