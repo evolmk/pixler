@@ -23,25 +23,28 @@ bookkeeping you do after the work, it *is* part of the work.
 - `[-]` in-progress (flip to this the moment you start a task)
 - `[x]` complete (flip to this the moment it's done and verified)
 
-## Structure: phases → sprints
+## Structure: sprints
 
-A milestone is broken into **phases** (the high-level plan) which decompose into **sprints** (the
-unit of execution). Each sprint is a coherent, independently-verifiable chunk of work with its own
-goal and `[ ]` task checklist. A good sprint passes its own build/test and is worth one commit.
+A milestone decomposes into **sprints** — the unit of execution. Each sprint is a coherent,
+independently-verifiable chunk of work with its own goal and `[ ]` task checklist. A good sprint
+passes its own build/test and is worth one commit.
 
 ## Creating a plan (before any code)
 
 1. **Pick the type** — milestone (feature/refactor) or bugfix (defect). Bugfixes use the lighter
    template.
-2. **Gather scope, then confirm — don't guess.** Ask only the questions that change the plan: its
-   name, scope boundaries, and what's explicitly *out* of scope. For a bugfix also get steps to
-   reproduce, severity, and the affected area. Restate goal / scope / non-goals in a couple of
-   lines and get an explicit "yes" before writing the file.
-3. **Write the file from the template** in `_docs/plans/`. Replace every placeholder, set today's date
-   and `Status: ⏳ IN_PROGRESS`, and paste the original request under "Prompt that created this plan".
-4. **Decompose into phases, then sprints** with concrete `[ ]` tasks small enough to verify.
+2. **Run the interview protocol** in `CLAUDE.local.md` ("Interview Before Writing") before
+   writing the file. Restate goal / scope / non-goals and get an explicit "yes" before writing.
+3. **Write the file from the template** in `_docs/plans/templates/`. Replace every placeholder,
+   set today's date and `Status: ⏳ IN_PROGRESS`, and paste the original request under "Prompt
+   that created this plan".
+4. **Decompose into sprints** with concrete `[ ]` tasks small enough to verify.
 5. **Stop. Creating ≠ executing.** Confirm the plan reads right, pick an execution mode, *then*
    start Sprint 1. Don't slide straight from writing into implementing.
+
+If your repo has project-specific bookkeeping (milestone numbering, tracker files, completion
+index), document it in `_docs/plans/CLAUDE.md` — that file loads alongside this one whenever an
+agent edits a plan and is the right place for repo-specific overrides.
 
 ## Executing a plan
 
@@ -60,15 +63,17 @@ goal and `[ ]` task checklist. A good sprint passes its own build/test and is wo
 - The **Modified:** date at the top.
 
 **Verify before marking a sprint complete.** Run the project's check (build / typecheck / tests).
-Don't mark `[x]` on faith — mark it on a passing check. Note what you ran in the sprint's Current
-State.
+Don't mark `[x]` on faith — mark it on a passing check. Note what you ran in the sprint's
+`Verify:` line.
 
 **Committing (recommended for resumability).** Commit after each sprint completes, with a short
 message naming the sprint. A per-sprint commit history is a second, independent record of what's
 done — `git log` and the plan file should agree.
 
 **When the whole milestone is done:** set `Status: ✅ COMPLETE`, write the final Current Status,
-and move the file to `_docs/plans/done/` (optional).
+and follow your repo's completion protocol — default is to move the file to `_docs/plans/done/`.
+Repos with their own bookkeeping (e.g. a `MILESTONE-TRACKER.md`, a completion `INDEX.md`, or a
+suffix convention) should encode that in `_docs/plans/CLAUDE.md`.
 
 ## Resuming after a hang (the payoff)
 
@@ -95,7 +100,8 @@ steps 3–4 are quick reconciliation, not archaeology.
 ## Skills
 
 - `/agent-planning create` — author a plan into `_docs/plans/`.
-- `/agent-planning run` — execute the next sprint(s) and keep the file synced.
+- `/agent-planning run` (or `/plan-run`) — execute the next sprint(s) and keep the file synced.
 - `/plan-check` — read-only status across all plans.
 
-Templates live in `_docs/plans/templates/.TEMPLATE-milestone.md` and `_docs/plans/templates/.TEMPLATE-bugfix.md`.
+Templates live in `_docs/plans/templates/.TEMPLATE-milestone.md` and
+`_docs/plans/templates/.TEMPLATE-bugfix.md`.

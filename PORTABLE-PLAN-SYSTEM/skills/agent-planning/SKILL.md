@@ -17,7 +17,7 @@ code at all times, so an interrupted session can always be resumed from the file
 
 | Subcommand | What it does                                                                    |
 | :--------- | :------------------------------------------------------------------------------ |
-| `create`   | Gather scope, confirm, write a plan to `_docs/plans/` broken into phases → sprints.   |
+| `create`   | Gather scope, confirm, write a plan to `_docs/plans/` broken into sprints.      |
 | `run`      | Execute the next sprint(s), keeping the file synced; resume safely after a hang. |
 
 If the user's intent is ambiguous, ask which subcommand they want.
@@ -34,13 +34,16 @@ The plan file is the source of truth. Update it **as you go**, never at the end.
 
 ### 1. Determine plan type
 
-| Plan type | Template                          | Output                                |
-| :-------- | :-------------------------------- | :------------------------------------ |
-| Milestone | `_docs/plans/templates/.TEMPLATE-milestone.md` | `_docs/plans/milestone-{slug}.md` |
-| Bugfix    | `_docs/plans/templates/.TEMPLATE-bugfix.md`    | `_docs/plans/bugfix-{slug}.md`    |
+| Plan type | Template                                       | Output                         |
+| :-------- | :--------------------------------------------- | :----------------------------- |
+| Milestone | `_docs/plans/templates/.TEMPLATE-milestone.md` | `_docs/plans/<slug>.md`        |
+| Bugfix    | `_docs/plans/templates/.TEMPLATE-bugfix.md`    | `_docs/plans/bugfix-<slug>.md` |
 
 Use the bugfix template if the user mentions `bug`/`fix`/broken behavior or scopes the work to a
 defect. Use milestone otherwise.
+
+If your repo has a milestone-numbering or naming convention (e.g. `M<N>-<slug>.md`), follow what
+`_docs/plans/CLAUDE.md` says — that file loads alongside this skill when an agent edits a plan.
 
 ### 2. Gather scope
 
@@ -61,9 +64,9 @@ Restate plan type, name, goal, scope, and what's **out of scope** in a few lines
 - Write the file into `_docs/plans/` from the template.
 - Replace all placeholders; set today's date and `Status: ⏳ IN_PROGRESS`.
 - Paste the original request under "Prompt that created this plan".
-- **Milestone:** break work into phases (high-level) → sprints (executable unit) with concrete
-  `[ ]` tasks. Each sprint gets a one-line goal, is independently verifiable (its own build/test),
-  and is worth one commit.
+- **Milestone:** decompose work into **sprints** (the executable unit) with concrete `[ ]` tasks.
+  Each sprint gets a one-line goal, is independently verifiable (its own build/test), and is worth
+  one commit.
 - **Bugfix:** fill the root-cause hypothesis, fix tasks, and verification steps.
 
 ### 5. Hand off
@@ -77,8 +80,8 @@ here?"** If the user says run → route to `run`.
 
 ### 1. Find the active plan
 
-Glob `_docs/plans/*.md` (exclude `.TEMPLATE-*` and `_docs/plans/done/`). If more than one is in progress, ask
-which to work on.
+Glob `_docs/plans/*.md` (exclude `.TEMPLATE-*` and `_docs/plans/done/`). If more than one is in
+progress, ask which to work on.
 
 ### 2. Resume check (if reopening an in-progress plan)
 
@@ -114,8 +117,10 @@ Don't trust the checkboxes blindly — verify against the code:
 
 ### 5. Finish
 
-When every sprint is `[x]`: set `Status: ✅ COMPLETE`, write the final Current Status, and
-optionally move the file to `_docs/plans/done/`.
+When every sprint is `[x]`: set `Status: ✅ COMPLETE`, write the final Current Status. **For
+completion bookkeeping (folder move, tracker updates, index files, suffix conventions), follow
+the protocol in `_docs/plans/CLAUDE.md` if your repo has one; otherwise the default is to move
+the file to `_docs/plans/done/`.**
 
 ---
 

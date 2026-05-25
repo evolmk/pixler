@@ -42,7 +42,7 @@ const preview: Preview = {
     },
     backgrounds: { disable: true },
     options: {
-      storySort: (a, b) => {
+      storySort: (a: { title: string }, b: { title: string }) => {
         const DEMO_ORDER = ['Showcase', 'Style Guide', 'Design', 'Design.md', 'Shadcn-case'];
         const GROUP_ORDER = ['Demos', 'Components', 'Hooks'];
 

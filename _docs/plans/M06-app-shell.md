@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Not started — next plan up after M03/M04/M05 completion.
+**Current Status:** Sprint 1 ✅ complete — TanStack Router + 3-pane skeleton; `pnpm -w typecheck` clean (9/9) and `@pixler/web` build passing. Sprints 2–4 pending.
 
 ---
 
@@ -55,31 +55,50 @@ apps/web/src/stores/layout.ts
 
 ## Sprint 1 — Router + 3-pane layout skeleton
 
-**Status:** ⏳ pending
+**Status:** ✅ COMPLETE
 **Goal:** Site boots and routes to `/`, `/p/:projectId`, `/p/:projectId/w/:workspaceId`. The
 project route renders a hollow 3-pane shell with `<ResizableSplit>` wired to persisted pane sizes.
 
 **Tasks:**
 
-- [ ] Install + configure router (TanStack Router preferred; React Router acceptable). Wire
-  routes: `/`, `/p/:projectId`, `/p/:projectId/w/:workspaceId`.
-- [ ] `apps/web/src/main.tsx` mounts the router and the root providers (QueryClient, Settings).
-- [ ] `routes/index.tsx` renders an `<EmptyState>` with "Create your first project" CTA (stub
-  onClick).
-- [ ] `routes/project.tsx` renders the 3-pane scaffold using `<ResizableSplit>` (left / center /
-  right) with placeholder content in each pane.
-- [ ] `stores/layout.ts` Zustand slice for `paneSizes`, full-bleed mode, plus selectors.
-- [ ] Persist pane sizes through `useSetting('layout.paneSizes')`; restore on reload.
+- [x] Install + configure router (**TanStack Router**, code-based route tree). Wire routes: `/`,
+  `/p/$projectId`, `/p/$projectId/w/$workspaceId`.
+- [x] `apps/web/src/main.tsx` mounts `<RouterProvider>` under `QueryClientProvider`; side-effect
+  import of `stores/theme` preserves boot-time theme application.
+- [x] `routes/index.tsx` renders an `<EmptyState>` with "Create your first project" CTA (stub
+  onClick → logs; M07 wires it).
+- [x] `routes/project.tsx` renders the 3-pane scaffold via **two nested `<ResizableSplit>`s**
+  (the wrapper takes exactly 2 children): outer = sidebar | rest, inner = center | right.
+- [x] `stores/layout.ts` Zustand slice — `panes` (split-native `{outer,inner}` shape), `fullBleed`,
+  `bigTerminal`, plus setters/selectors and a hard `DEFAULT_PANE_LAYOUT` fallback.
+- [x] Persist pane sizes through `useSetting('layout.paneSizes')` (debounced 300ms; hydrate-once on
+  load). Added `layout.paneSizes` + `layout.bigTerminal` to the settings registry (consultant P1).
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/router.tsx` — *new*; TanStack Router tree + type register.
+- `apps/web/src/routes/index.tsx` — *new*; home/empty-state route.
+- `apps/web/src/routes/project.tsx` — *new*; nested-split 3-pane shell + persistence.
+- `apps/web/src/stores/layout.ts` — *new*; layout Zustand store.
+- `apps/web/src/main.tsx` — replaced `<App>` root with `<RouterProvider>`; theme side-effect import.
+- `apps/api/src/settings/registry.ts` — added `layout.paneSizes`, `layout.bigTerminal` keys.
+- `apps/web/package.json` — added `@tanstack/react-router`, `lucide-react`.
 
 **Issues Encountered:**
 
-- _none yet_
+- `react-resizable-panels@4` is a rewrite that **does** export `Group`/`Panel`/`Separator` with
+  `orientation`/`onLayoutChange` — the M03 `ResizableSplit` wrapper is correct (initial concern
+  about the old v2/v3 API was unfounded). `onLayoutChange` fires per pointer-move → persistence is
+  debounced.
+- `lucide-react` was not a direct `apps/web` dep (pnpm strict). Added it (icons are used app-wide).
+- **Out-of-scope pre-existing fix:** `packages/ui/.storybook/preview.tsx` had untyped `storySort`
+  params (latent M03 issue, previously cached-passing). The lockfile change invalidated turbo's
+  cache and exposed it, breaking `pnpm -w typecheck`. Applied a minimal `{ title: string }`
+  annotation to keep the workspace green.
 
-**Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build && pnpm --filter @pixler/web dev` — open `/`, `/p/test`, `/p/test/w/abc` in browser, resize dividers, reload, confirm sizes persist.
+**Verify:** ✅ `pnpm -w typecheck` clean (9/9 tasks); ✅ `pnpm --filter @pixler/web build` succeeds.
+Manual browser pass (open `/`, `/p/test`, `/p/test/w/abc`; resize dividers; reload to confirm
+persistence) still recommended before milestone close.
 
 ---
 
@@ -182,3 +201,72 @@ Appearance panel is fully real; reduced-motion is honored throughout the shell.
 
 _(Original plan predates the merged template; preserved here as historical record. Plan re-shaped
 into sprints on 2026-05-24.)_
+
+---
+
+## Consultant Review (2026-05-24)
+
+Verified against live code (`apps/web/src`, `packages/ui`, `apps/api/src/settings`) and SPEC
+§8.1 / §8.2 / §10.2. No P0 blockers — **ready to execute**. Fold the P1s into the sprints noted.
+
+### Risks & gaps
+
+- **[P1]** `layout.*` setting keys are **not in the registry** (`apps/api/src/settings/registry.ts`
+  has `appearance.*` but no `layout.paneSizes` / `layout.sidebarWidth` / `layout.bigTerminal`).
+  `SettingsService.get()` falls back to a registry default only — unset keys return `undefined` on
+  first load (`set()` does *not* validate, so writes persist fine). **Add the `layout.*` keys to the
+  registry** (an api file missing from the Files list) *and* give `stores/layout.ts` hard fallback
+  defaults so a fresh boot has sane sizes. → **Sprint 1**.
+- **[P1]** `ResizableSplit` accepts **exactly two children** (`children: [ReactNode, ReactNode]`).
+  The 3-pane layout must **nest** two splits: `left | (center | right)`. Its `sizes` prop is
+  `[number, number]` and `onResize` forwards `onLayoutChange` as `{ [id]: number }`, but the inner
+  `ResizablePanel`s pass no `id` — verify what keys actually come back before relying on them.
+  Persist as a 3-value shape (e.g. `{ sidebar, center, right }`) assembled from both splits'
+  callbacks. → **Sprint 1**.
+- **[P1]** **Theme source-of-truth duplication.** `stores/theme.ts` (Zustand: `theme/mode/
+  resolvedMode/cycleTheme/setMode`, already used by `App.tsx`) coexists with the `appearance.theme`
+  / `appearance.mode` registry keys. Sprint 2 says "toggle reads/writes via `useSetting`" and
+  Sprint 4 makes AppearancePanel "fully real" — pick one: either have `useThemeStore` hydrate
+  from / persist to `useSetting('appearance.*')`, or wrap `useSetting` inside the store. Don't ship
+  two diverging stores. → **Sprints 2 & 4**.
+- **[P1]** `useSetting` is **hardcoded to `scope=global`** (both the `GET ?scope=global` and the
+  `PATCH … scope:'global'`). Fine for M06 (layout + appearance are global), but Sprint 4's
+  `ProjectSettingsDrawer` can't read project scope through this hook. M06's project drawer is stubs
+  so it's acceptable now — just don't assume project-scope reads work yet. → **Sprint 4**.
+- **[P2]** Pane-resize persistence will `PATCH` on every drag-end, and `useSetting` invalidates the
+  whole `['settings']` query on each `settings.changed`. **Debounce** the write (~300ms). → Sprint 1.
+
+### Spec compliance
+
+- _(ok)_ Sprint 4's 15 settings categories match SPEC §10.2 exactly; top-bar controls match the
+  §8.1 diagram; the 480px-from-right Vaul drawer matches §8.2.
+- **[P2]** Density vocabulary mismatch: registry default is `'default'`, but SPEC §10.2 specifies
+  **compact / comfortable / spacious**. Align the AppearancePanel segmented-control values and the
+  registry default (e.g. `'comfortable'`). → **Sprint 4**.
+
+### Reuse opportunities
+
+- **[P1]** `@pixler/ui` has **no barrel** — `src/index.ts` is `export {}`. Import via subpaths:
+  `import { ResizableSplit } from '@pixler/ui/components/resizable-split'`,
+  `{ Drawer } from '@pixler/ui/components/drawer'`, `{ DropdownMenu } from
+  '@pixler/ui/components/dropdown-menu'` (kebab-case files, PascalCase exports). Never
+  `from '@pixler/ui'`. → all sprints.
+- **[P1]** Sonner already exists as a UI component — Sprint 4's toast viewport should mount the
+  existing `<Toaster />` from `@pixler/ui/components/sonner` rather than a fresh provider. → Sprint 4.
+- **[P2]** Keep the existing `useAppEvents` socket hook mounted at the shell root — M18 toasts will
+  subscribe to the same `app:event` stream. → Sprint 4.
+
+### Enhancements
+
+- **[P1]** Add `data-testid="sidebar"` and `data-testid="topbar"` now — **M26's
+  `m06-shell.spec.ts` asserts both selectors**. Free to add here, saves an M26 round-trip.
+  → **Sprints 2 & 3**.
+- **[P2]** Make the center tab strip and the settings category rail **data-driven** (a config
+  array), so M15 (adds a "Checkpoints" tab) and the feature milestones can register entries without
+  editing JSX. → Sprints 3 & 4.
+- **[P2]** Persist `layout.bigTerminal` and the active center tab so a reload restores the working
+  view (Acceptance already requires pane sizes to persist; extend to mode/tab). → Sprints 1 & 3.
+
+### Changelog
+
+- 2026-05-24: Initial consultant review (router = TanStack Router; sprint-based execution).

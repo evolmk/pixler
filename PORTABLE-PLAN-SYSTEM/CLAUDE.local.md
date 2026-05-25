@@ -32,6 +32,10 @@ Before writing any plan file, run this loop:
      default sort, view modes.
    - **Schema change** — soft-delete/audit fields, indexes, backfill migration, downstream impact.
    - **New UI component** — variants, story/example, theme tokens, accessibility.
+   - **New UI page** — store/state slice, server-data hook, route registration, loading/error
+     states, responsive layout.
+   - **New event / message** — typed contract location, producer-side emit, consumer-side
+     listener, optimistic update or cache invalidation.
    - **Auth work** — role requirements, public vs private routes, token claims, post-login redirect.
 
 3. **Ask using one focused round at a time** (e.g. `AskUserQuestion`). The question is the

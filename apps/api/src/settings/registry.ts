@@ -32,4 +32,6 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'providers.gemini', type: 'string', default: 'gemini', scopes: ['global'], label: 'Gemini Path', description: 'Path to gemini CLI' },
   { key: 'providers.gh', type: 'string', default: 'gh', scopes: ['global'], label: 'GitHub CLI', description: 'Path to gh CLI' },
   { key: 'telemetry.enabled', type: 'boolean', default: true, scopes: ['global'], label: 'Telemetry', description: 'Enable anonymous telemetry' },
+  { key: 'layout.paneSizes', type: 'json', default: { outer: [22, 78], inner: [62, 38] }, scopes: ['global'], label: 'Pane Sizes', description: '3-pane split sizes: outer [sidebar, rest], inner [center, right]' },
+  { key: 'layout.bigTerminal', type: 'boolean', default: false, scopes: ['global'], label: 'Big Terminal', description: 'Right pane expanded full-bleed' },
 ];

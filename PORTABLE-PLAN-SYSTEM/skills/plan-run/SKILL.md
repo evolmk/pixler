@@ -14,7 +14,8 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
 ## Instructions
 
 1. **Find the active plan:**
-   - List `_docs/plans/*.md` (exclude `.TEMPLATE-*` and `_docs/plans/done/`).
+   - List `_docs/plans/*.md` (exclude `.TEMPLATE-*` and `_docs/plans/done/` — or your repo's
+     completion folder if different; see `_docs/plans/CLAUDE.md`).
    - If multiple are in-progress, ask the user which one. If only one, use it. Read the full file.
 
 2. **Resume check (if reopening — don't trust the checkboxes blindly):**
@@ -28,8 +29,8 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
 3. **Staleness audit (before execution):**
    - Compare the `**Modified:**` date to today:
      - **Low risk** (≤ 3 days): note "likely still current" and proceed.
-     - **Medium risk** (4–14 days): warn, and offer to audit `_docs/plans/done/` for overlap with
-       recent work, skip the audit, or abandon.
+     - **Medium risk** (4–14 days): warn, and offer to audit the completion folder for overlap
+       with recent work, skip the audit, or abandon.
      - **High risk** (15+ days): strongly recommend the audit before proceeding.
 
 4. **Ask execution mode** (if not already chosen this session):
@@ -39,7 +40,8 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
 5. **Find the next pending sprint:**
    - The first sprint section with `[ ]`/`[-]` tasks.
    - If all sprints are complete: tell the user the plan is done; offer to set `Status: ✅ COMPLETE`
-     and move the file to `_docs/plans/done/` (append `YYYY-MM-DD` to the filename before `.md`).
+     and follow the completion protocol in `_docs/plans/CLAUDE.md` if your repo has one (otherwise
+     default: move the file to `_docs/plans/done/`).
 
 6. **Execute the sprint:**
    - Flip the sprint's tasks to `[-]` as you start each one, `[x]` as you finish.
