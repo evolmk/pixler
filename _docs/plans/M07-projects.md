@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 2 complete — clone service wired with Socket.io progress events; starting Sprint 3 (pixler.json).
+**Current Status:** Sprint 3 complete — pixler.json schema, read/write, and team-config-diff event wired; starting Sprint 4 (web UI).
 
 ---
 
@@ -128,26 +128,31 @@ Socket.io, and persists the project on completion.
 
 ## Sprint 3 — `pixler.json` schema, reader, writer + diff event
 
-**Status:** 🔄 in-progress
+**Status:** ✅ complete
 **Goal:** Read/write the project's `pixler.json`; on add, if the file exists and differs from
 defaults, emit `project.team-config-diff` for the UI.
 
 **Tasks:**
 
-- [ ] `packages/shared-types/src/pixler-json.ts` — schema matching SPEC §10.7 (version, scripts,
+- [x] `packages/shared-types/src/pixler-json.ts` — schema matching SPEC §10.7 (version, scripts,
   filesToCopy, plans, git, linear, models).
-- [ ] `pixler-json.service.ts`: `loadPixlerJson(projectPath)` and `savePixlerJson(projectPath, patch)`
+- [x] `pixler-json.service.ts`: `loadPixlerJson(projectPath)` and `savePixlerJson(projectPath, patch)`
   (pretty-printed, 2-space).
-- [ ] On project add: detect `pixler.json`, compute diff against defaults, emit
+- [x] On project add: detect `pixler.json`, compute diff against defaults, emit
   `project.team-config-diff` event with the workflow-keys-only diff.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/shared-types/src/pixler-json.ts`
+- `packages/shared-types/src/index.ts` (PixlerJson types exported)
+- `packages/shared-types/src/events.ts` (project.team-config-diff event added)
+- `apps/api/src/projects/pixler-json.service.ts`
+- `apps/api/src/projects/projects.module.ts` (PixlerJsonService added)
+- `apps/api/src/projects/projects.service.ts` (diff emit on addLocal)
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/api test pixler-json` — round-trip read/write, diff event payload shape correct.
 

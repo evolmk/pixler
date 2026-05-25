@@ -8,13 +8,19 @@ import { existsSync, rmSync, readdirSync } from 'fs';
 import { join, basename } from 'path';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../db/database.service';
+import { EventsService } from '../events/events.service';
+import { PixlerJsonService } from './pixler-json.service';
 import type { Project, AddLocalProjectDto, PatchProjectDto, DeleteProjectMode } from '@pixler/shared-types';
 
 type DbProject = Omit<Project, 'cloned_by_pixler'> & { cloned_by_pixler: 0 | 1 };
 
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly events: EventsService,
+    private readonly pixlerJson: PixlerJsonService,
+  ) {}
 
   findAll(): Project[] {
     const rows = this.db.connection
@@ -63,6 +69,19 @@ export class ProjectsService {
          VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)`,
       )
       .run(id, projectName, repoPath, defaultBranch, packageManager, iconPath, now, now);
+
+    const teamConfig = this.pixlerJson.load(repoPath);
+    if (teamConfig) {
+      const diff = this.pixlerJson.diff(teamConfig, this.pixlerJson.getDefaults());
+      if (diff.length > 0) {
+        this.events.emitAppEvent({
+          type: 'project.team-config-diff',
+          projectId: id,
+          diff,
+          timestamp: Date.now(),
+        });
+      }
+    }
 
     return this.findOne(id);
   }
