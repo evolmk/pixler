@@ -100,6 +100,9 @@ Don't trust the checkboxes blindly — verify against the code:
 - **Execute all sprints** (default) — run every sprint sequentially, stop at the end.
 - **Execute next sprint only** — run one sprint, then pause. Use for risky work (auth, payments,
   schema migration, cross-service changes).
+- **If more than one sprint remains, ask in the same `AskUserQuestion` round whether to commit
+  after each sprint completes.** Record the answer and apply it to the whole run — don't re-ask
+  per sprint. Skip the question when only one sprint remains (offer a single commit at the end).
 
 ### 4. Model check (before executing)
 
@@ -121,8 +124,9 @@ Don't trust the checkboxes blindly — verify against the code:
   - Each task `[-] → [x]`.
   - The sprint's **Files Created/Modified** and **Issues Encountered**.
   - The top-of-file **Current Status** (one sentence) and the **Modified** date.
-- (Recommended) Commit after the sprint with a short message naming it — a second, independent
-  record of progress that `git log` and the plan file should agree on.
+- If the user opted into per-sprint commits at step 3, commit after the sprint with a short message
+  naming it — a second, independent record of progress that `git log` and the plan file should
+  agree on. Otherwise don't commit (offer one at the end if they didn't opt in).
 - In "all sprints" mode, continue to the next sprint. In "next sprint only" mode, stop and report.
 
 ### 6. Finish
@@ -141,8 +145,8 @@ completion bookkeeping (move to `_docs/plans/completed/`, append `-COMPLETE` suf
 - The plan file is durable state — keep it honest and current, never retroactive.
 - Verify before `[x]`.
 - Creating ≠ executing — confirm and pick a mode before implementing.
-- No auto-commit, push, or PR unless the user asks (the per-sprint commit above is a recommended
-  habit, but only when the user is committing as they go).
+- No auto-commit, push, or PR unless the user asks — the per-sprint commit opt-in at step 3 counts
+  as the user asking, for the duration of that run.
 
 ## What this skill does not do
 

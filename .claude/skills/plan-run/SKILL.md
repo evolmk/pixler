@@ -32,9 +32,13 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
        with recent work, skip the audit, or abandon.
      - **High risk** (15+ days): strongly recommend the audit before proceeding.
 
-4. **Ask execution mode** (if not already chosen this session):
+4. **Ask execution mode + commit cadence** (if not already chosen this session):
    - **Execute All Sprints** — complete all remaining sprints sequentially.
    - **Execute Next Sprint Only** — complete one sprint, then pause.
+   - **If more than one sprint remains, ask in the same `AskUserQuestion` round whether to commit
+     after each sprint completes** (yes → a per-sprint commit history mirroring the plan; no →
+     don't commit). Record the answer and apply it to the whole run — do not re-ask per sprint.
+     Skip this question when only one sprint remains (offer a single commit at the end instead).
 
 5. **Find the next pending sprint:**
    - The first sprint section with `[ ]`/`[-]` tasks.
@@ -60,7 +64,8 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
 
 8. **After sprint completion:**
    - Update the sprint status, the plan's top-of-file "Current Status", and the "Modified" date.
-   - (Recommended) Commit with a short message naming the sprint.
+   - If the user opted into per-sprint commits at step 4, commit now with a short message naming
+     the sprint. Otherwise don't commit (offer one at the end if they didn't opt in).
    - In "Execute Next Sprint Only" mode, pause and report what was completed.
 
 ## Key Rules
@@ -68,4 +73,5 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
 - Keep the plan file synchronized after every task — it's the durable record if the session dies.
 - Verify before marking `[x]`; never mark complete on faith.
 - Never silently downgrade or remove dependencies — stop and ask the user.
-- No auto-commit, push, or PR unless the user asks.
+- No auto-commit, push, or PR unless the user asks — the per-sprint commit opt-in at step 4 counts
+  as the user asking, for the duration of that run.
