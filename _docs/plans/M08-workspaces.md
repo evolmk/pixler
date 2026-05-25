@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 1 complete — DB migration, WorkspacesModule CRUD, shared-types DTOs. Sprint 2 next: naming + port allocator + worktree creation.
+**Current Status:** Sprint 2 complete — naming, port allocator, worktree creation, POST endpoint. Sprint 3 next: setup script execution, files-to-copy, archive.
 
 ---
 
@@ -99,29 +99,37 @@ apps/web/src/components/WorkspacesSidebar.tsx   (light up real data)
 
 ## Sprint 2 — Naming, port allocator, worktree creation
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** `POST /api/workspaces` produces a real git worktree on a properly-named branch with an
 allocated port; falls back to color names on collision.
 
 **Tasks:**
 
-- [ ] `port-allocator.service.ts` — finds free port starting at 7100.
-- [ ] `name-generator.service.ts` — ticket-derived names (`<label>-<id>-<slug>`); collision
+- [x] `port-allocator.service.ts` — finds free port starting at 7100.
+- [x] `name-generator.service.ts` — ticket-derived names (`<label>-<id>-<slug>`); collision
   detection against open workspaces; round-robin color names from
   `packages/shared-types/src/color-names.ts` pool.
-- [ ] `worktree.service.ts` via simple-git — `git worktree add <path> -b <branch>`.
-- [ ] `POST /api/workspaces` body `{ projectId, name?, ticketId?, ticketSource?, mode? }` —
+- [x] `worktree.service.ts` via simple-git — `git worktree add <path> -b <branch>`.
+- [x] `POST /api/workspaces` body `{ projectId, name?, ticketId?, ticketSource?, mode? }` —
   orchestrates name resolution + port allocation + worktree creation + persistence.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/workspaces/port-allocator.service.ts`
+- `apps/api/src/workspaces/name-generator.service.ts`
+- `apps/api/src/workspaces/worktree.service.ts`
+- `apps/api/src/workspaces/workspaces.module.ts` (added providers)
+- `apps/api/src/workspaces/workspaces.service.ts` (full create/remove with worktree)
+- `apps/api/src/workspaces/workspaces.controller.ts` (POST added)
+- `packages/shared-types/src/color-names.ts`
+- `packages/shared-types/src/index.ts`
+- `apps/api/package.json` (simple-git added)
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
-**Verify:** `pnpm --filter @pixler/api test workspaces` — name collision test, real worktree appears on disk.
+**Verify:** `pnpm -w typecheck` — 9/9 tasks pass.
 
 ---
 

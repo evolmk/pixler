@@ -10,17 +10,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pixler/shared-types": "workspace:*",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/platform-socket.io": "^11.1.23",
     "@nestjs/websockets": "^11.1.23",
+    "@pixler/shared-types": "workspace:*",
     "better-sqlite3": "^12.10.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "simple-git": "^3.36.0",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {

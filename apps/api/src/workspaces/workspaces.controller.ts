@@ -1,6 +1,6 @@
-import { Controller, Get, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
 import { WorkspacesService } from './workspaces.service';
-import type { PatchWorkspaceDto } from '@pixler/shared-types';
+import type { CreateWorkspaceDto, PatchWorkspaceDto } from '@pixler/shared-types';
 
 @Controller('workspaces')
 export class WorkspacesController {
@@ -14,6 +14,11 @@ export class WorkspacesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.workspaces.findOne(id);
+  }
+
+  @Post()
+  create(@Body() dto: CreateWorkspaceDto) {
+    return this.workspaces.create(dto);
   }
 
   @Patch(':id')

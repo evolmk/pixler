@@ -5,3 +5,5 @@ export { settingsRegistry } from './settings';
 export type { Project, AddLocalProjectDto, PatchProjectDto, DeleteProjectMode } from './projects';
 export type { PixlerJson, PixlerJsonDiff } from './pixler-json';
 export type { Workspace, WorkspaceState, WorkspaceMode, TicketSource, CreateWorkspaceDto, PatchWorkspaceDto } from './workspaces';
+export { COLOR_NAMES } from './color-names';
+export type { ColorName } from './color-names';

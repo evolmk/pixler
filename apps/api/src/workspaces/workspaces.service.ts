@@ -1,13 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../db/database.service';
-import type { Workspace, PatchWorkspaceDto } from '@pixler/shared-types';
+import { PortAllocatorService } from './port-allocator.service';
+import { NameGeneratorService } from './name-generator.service';
+import { WorktreeService } from './worktree.service';
+import type { Workspace, CreateWorkspaceDto, PatchWorkspaceDto } from '@pixler/shared-types';
 
 type DbWorkspace = Omit<Workspace, 'pinned'> & { pinned: 0 | 1 };
 
 @Injectable()
 export class WorkspacesService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly portAllocator: PortAllocatorService,
+    private readonly nameGenerator: NameGeneratorService,
+    private readonly worktree: WorktreeService,
+  ) {}
 
   findAllByProject(projectId: string): Workspace[] {
     const rows = this.db.connection
@@ -26,15 +34,57 @@ export class WorkspacesService {
     return this.toWorkspace(row);
   }
 
-  create(projectId: string): Workspace {
+  async create(dto: CreateWorkspaceDto): Promise<Workspace> {
+    const { projectId, ticketId, ticketSource, mode = 'chat' } = dto;
+
+    const project = this.db.connection
+      .prepare('SELECT id, path FROM projects WHERE id = ?')
+      .get(projectId) as { id: string; path: string } | undefined;
+    if (!project) throw new NotFoundException(`Project ${projectId} not found`);
+
+    const name =
+      dto.name ??
+      this.nameGenerator.generate({ ticketId });
+
+    const branch = this.worktree.branchName({ workspaceName: name });
+    const worktreePath = this.worktree.worktreeDir({
+      repoPath: project.path,
+      workspaceName: name,
+    });
+    const port = await this.portAllocator.allocate();
+
     const id = randomUUID();
     const now = Math.floor(Date.now() / 1000);
+    const isColorName = !ticketId && !dto.name;
+
     this.db.connection
       .prepare(
-        `INSERT INTO workspaces (id, project_id, name, state, mode, created_at, updated_at)
-         VALUES (?, ?, ?, 'pending', 'chat', ?, ?)`,
+        `INSERT INTO workspaces
+           (id, project_id, name, state, mode, branch, worktree_path, port,
+            ticket_id, ticket_source, color_name, pinned, created_at, updated_at)
+         VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
       )
-      .run(id, projectId, id, now, now);
+      .run(
+        id,
+        projectId,
+        name,
+        mode,
+        branch,
+        worktreePath,
+        port,
+        ticketId ?? null,
+        ticketSource ?? null,
+        isColorName ? name : null,
+        now,
+        now,
+      );
+
+    await this.worktree.create({ repoPath: project.path, worktreePath, branch });
+
+    this.db.connection
+      .prepare(`UPDATE workspaces SET state = 'ready', updated_at = ? WHERE id = ?`)
+      .run(Math.floor(Date.now() / 1000), id);
+
     return this.findOne(id);
   }
 
@@ -54,8 +104,11 @@ export class WorkspacesService {
     return this.findOne(id);
   }
 
-  remove(id: string): { ok: boolean } {
-    this.findOne(id);
+  async remove(id: string): Promise<{ ok: boolean }> {
+    const workspace = this.findOne(id);
+    if (workspace.worktree_path) {
+      await this.worktree.remove(workspace.worktree_path);
+    }
     this.db.connection.prepare('DELETE FROM workspaces WHERE id = ?').run(id);
     this.db.connection
       .prepare('DELETE FROM settings_workspace WHERE workspace_id = ?')
