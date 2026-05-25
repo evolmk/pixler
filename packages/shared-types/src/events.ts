@@ -11,6 +11,10 @@ export type WorkspaceEvent =
   | { type: 'workspace.setup-log'; workspaceId: string; line: string; timestamp: number }
   | { type: 'workspace.state-changed'; workspaceId: string; from: string; to: string; timestamp: number }
   | { type: 'agent.output'; workspaceId: string; data: string; timestamp: number }
-  | { type: 'agent.state-changed'; workspaceId: string; from: string; to: string; timestamp: number };
+  | { type: 'agent.state-changed'; workspaceId: string; from: string; to: string; timestamp: number }
+  | { type: 'agent.error'; workspaceId: string; error: string; timestamp: number }
+  | { type: 'agent.gate'; workspaceId: string; gate: 'plan' | 'validation' | 'pr'; timestamp: number }
+  | { type: 'agent.paused'; workspaceId: string; rejectionCount: number; timestamp: number }
+  | { type: 'agent.done'; workspaceId: string; prUrl: string; timestamp: number };
 
 export type SettingsEvent = { type: 'settings.changed'; key: string; scope: string; timestamp: number };

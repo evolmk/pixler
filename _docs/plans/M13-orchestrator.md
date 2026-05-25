@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — pure state machine + 56 tests + 100% coverage.
+**Current Status:** Sprint 2 complete — AgentRunnerService + PromptTemplatesService wired.
 
 ---
 
