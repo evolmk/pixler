@@ -1,8 +1,8 @@
 # M17 — Diff viewer (Monaco)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M06 + M08.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — DiffModule wired, endpoints live, chokidar watcher. Sprint 2 in progress.
 
 ---
 
@@ -52,17 +52,17 @@ apps/web/package.json   (add monaco-editor, @monaco-editor/react, chokidar on ap
 
 ## Sprint 1 — DiffModule + watcher + endpoints
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Server can compute diff via git, serve file blob pairs, and emit live update events on
 filesystem changes.
 
 **Tasks:**
 
-- [ ] `DiffModule` + `DiffService` + `DiffController`.
-- [ ] `GET /api/workspaces/:id/diff` — list of `{ path, status, additions, deletions, hunks }`.
-- [ ] `GET /api/workspaces/:id/diff/file?path=&against=workdir|index|head` — blob pair for Monaco.
-- [ ] `watcher.service.ts` using chokidar — emits `diff.changed` events.
-- [ ] `packages/shared-types/src/diff.ts` DTOs.
+- [x] `DiffModule` + `DiffService` + `DiffController`.
+- [x] `GET /api/workspaces/:id/diff` — list of `{ path, status, additions, deletions, hunks }`.
+- [x] `GET /api/workspaces/:id/diff/file?path=&against=workdir|index|head` — blob pair for Monaco.
+- [x] `watcher.service.ts` using chokidar — emits `diff.changed` events.
+- [x] `packages/shared-types/src/diff.ts` DTOs.
 
 **Files Created/Modified:**
 

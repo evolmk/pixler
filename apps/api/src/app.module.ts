@@ -8,9 +8,10 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
 import { LinearModule } from './linear/linear.module';
 import { TerminalsModule } from './terminals/terminals.module';
 import { GithubModule } from './github/github.module';
+import { DiffModule } from './diff/diff.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule],
   controllers: [HealthController],
 })
 export class AppModule {}

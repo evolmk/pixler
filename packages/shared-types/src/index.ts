@@ -9,4 +9,5 @@ export { COLOR_NAMES } from './color-names';
 export type { ColorName } from './color-names';
 export type { LinearTicket, LinearStatusDto, LinearTeamDto, LinearProjectDto, ConnectLinearDto, LinearTicketDto } from './linear';
 export type { Terminal, ResizeTerminalDto } from './terminals';
+export type { DiffStatus, DiffFileSummary, DiffHunk, DiffFileDetail } from './diff';
 export type { GithubAuthStatus, GithubRepoInfo, PullRequest, PrCheck, PrComment, CreatePrDto, MergePrDto } from './github';

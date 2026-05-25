@@ -18,6 +18,7 @@
     "@nestjs/websockets": "^11.1.23",
     "@pixler/shared-types": "workspace:*",
     "better-sqlite3": "^12.10.0",
+    "chokidar": "^5.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "fast-glob": "^3.3.3",
