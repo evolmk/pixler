@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M27
-**Last Plan Completed:** M25-ship
-**Next Plan:** M27-error-logging
+**Last Plan Completed:** M27-error-logging
+**Next Plan:** — (all milestones complete)
 
 ---
 
@@ -11,7 +11,7 @@
 | Instance                              | Plan              | Status         |
 |---------------------------------------|-------------------|----------------|
 | **evolmk** (default `~/.claude`)      | M25-ship          | ✅ complete    |
-| **evolmikek** (`~/.claude-evolmikek`) | M25-ship          | ✅ complete    |
+| **evolmikek** (`~/.claude-evolmikek`) | M27-error-logging | ✅ complete    |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
 > show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.
@@ -47,7 +47,7 @@
 - [x] **M24** — Gestures + deep links _(Wave 11 / Track A)_
 - [x] **M25** — Ship _(Wave 12 — serial, last)_
 - [x] **M26** — Playwright E2E smoke suite _(Wave 11 / Track B)_
-- [-] **M27** — Error logging to ~/.config/pixler/logs/
+- [x] **M27** — Error logging to ~/.config/pixler/logs/
 
 ---
 
