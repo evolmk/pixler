@@ -99,11 +99,19 @@ telemetry enabled) flush sanitized payloads; users can inspect what would be sen
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/crashes/crashes.module.ts`
+- `apps/api/src/crashes/crashes.service.ts`
+- `apps/api/src/crashes/crashes.controller.ts`
+- `apps/api/src/db/migrations/0010_crashes.sql`
+- `apps/api/src/db/database.service.ts`
+- `apps/api/src/app.module.ts`
+- `apps/web/src/components/RootErrorBoundary.tsx`
+- `apps/web/src/components/SettingsDrawer/AccountPanel.tsx`
+- `apps/web/src/main.tsx`
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/api test crashes` + manual: throw in dev, see toast + crash row recorded.
 
@@ -111,7 +119,7 @@ telemetry enabled) flush sanitized payloads; users can inspect what would be sen
 
 ## Sprint 3 — Distribution polish + Storage + About panels
 
-**Status:** ⏳ pending
+**Status:** ⏳ in-progress
 **Goal:** Final `package.json` ships only what's needed; `npm pack` → `npx pixler` round-trip
 works from any directory; final settings panels filled in.
 
