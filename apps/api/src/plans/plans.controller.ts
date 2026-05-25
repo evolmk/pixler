@@ -1,10 +1,14 @@
 import { Controller, Get, Post, Delete, Body, Param, NotFoundException } from '@nestjs/common';
 import { PlansService } from './plans.service';
+import { SubIssuesBridgeService } from './sub-issues-bridge.service';
 import type { SavePlanDto, RevisePlanDto } from '@pixler/shared-types';
 
 @Controller('api/workspaces/:workspaceId/plan')
 export class PlansController {
-  constructor(private readonly plans: PlansService) {}
+  constructor(
+    private readonly plans: PlansService,
+    private readonly subIssues: SubIssuesBridgeService,
+  ) {}
 
   @Get()
   getPlan(@Param('workspaceId') workspaceId: string) {
@@ -37,6 +41,16 @@ export class PlansController {
     @Body() body: RevisePlanDto,
   ) {
     return this.plans.revise(workspaceId, body.content);
+  }
+
+  @Post('toggle-task')
+  async toggleTask(
+    @Param('workspaceId') workspaceId: string,
+    @Body() body: { taskIndex: number; completed: boolean },
+  ) {
+    const plan = this.plans.findByWorkspace(workspaceId);
+    if (!plan) throw new NotFoundException('No plan for this workspace');
+    return this.subIssues.toggleTask(plan.id, body.taskIndex, body.completed);
   }
 }
 

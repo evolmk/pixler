@@ -128,28 +128,37 @@ right thresholds.
 
 ## Sprint 3 — Sub-issues bridge + Plan tab UI
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Plan tab renders the current plan with editable checkboxes that drive Linear sub-issues.
 
 **Tasks:**
 
-- [ ] `sub-issues-bridge.service.ts` — on plan commit: each top-level task becomes a Linear
+- [x] `sub-issues-bridge.service.ts` — on plan commit: each top-level task becomes a Linear
   sub-issue. On checkbox toggle: close/reopen matching sub-issue.
-- [ ] `plan.frontmatter.sub_issue_map` keyed by task index.
-- [ ] `PlanTab.tsx` — sections: Acceptance Criteria, Approach, Tasks (interactive), Peer Review,
+- [x] `plan.frontmatter.sub_issue_map` keyed by task index.
+- [x] `PlanTab.tsx` — sections: Acceptance Criteria, Approach, Tasks (interactive), Peer Review,
   Execution Log.
-- [ ] `PlanEditor.tsx` — Monaco markdown editor, toggled via "Edit".
-- [ ] `PlanStorageBadge.tsx` — 📄 / 📝 / 📎 with click-to-switch (subject to big-plan thresholds).
-- [ ] "Open in Linear" link when applicable.
-- [ ] `BigPlanPromptModal.tsx` per SPEC.
+- [x] `PlanEditor.tsx` — Monaco markdown editor, toggled via "Edit".
+- [x] `PlanStorageBadge.tsx` — 📄 / 📝 / 📎 with click-to-switch (subject to big-plan thresholds).
+- [x] "Open in Linear" link when applicable.
+- [x] `BigPlanPromptModal.tsx` per SPEC.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/plans/sub-issues-bridge.service.ts`
+- `apps/api/src/plans/plans.controller.ts` (toggle-task endpoint)
+- `apps/api/src/plans/plans.module.ts` (SubIssuesBridgeService)
+- `apps/web/src/hooks/usePlan.ts`
+- `apps/web/src/components/PlanTab.tsx`
+- `apps/web/src/components/PlanEditor.tsx`
+- `apps/web/src/components/PlanStorageBadge.tsx`
+- `apps/web/src/components/BigPlanPromptModal.tsx`
+- `apps/web/src/components/CenterTabs.tsx` (wired PlanTab)
+- `apps/web/src/hooks/useOrchestrator.ts` (fixed TS2322 from other instance)
 
 **Issues Encountered:**
 
-- _none yet_
+- `useOrchestrator.ts` had a TS2322 error from the other instance's M23 work — fixed explicit type annotation.
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual: toggle a checkbox, confirm Linear sub-issue closes.
 

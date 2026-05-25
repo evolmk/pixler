@@ -17,6 +17,7 @@ import { Button } from '@pixler/ui/components/button';
 import { useLayoutStore } from '../stores/layout';
 import { DiffTab } from './DiffTab';
 import { RunLogsTab } from './RunLogsTab';
+import { PlanTab } from './PlanTab';
 
 interface TabConfig {
   value: string;
@@ -114,6 +115,8 @@ export function CenterTabs() {
             <DiffTab />
           ) : tab.value === 'run' ? (
             <RunLogsTab />
+          ) : tab.value === 'plan' ? (
+            <PlanTab />
           ) : (
             <div className="flex h-full min-h-48 items-center justify-center p-4">
               <EmptyState

@@ -23,12 +23,14 @@ async function fetchState(workspaceId: string): Promise<OrchestratorState | null
   return res.json();
 }
 
-async function postAction(workspaceId: string, action: string, body?: unknown): Promise<void> {
-  await fetch(`/api/workspaces/${workspaceId}/orchestrator/${action}`, {
+async function postAction(workspaceId: string, action: string, body?: unknown): Promise<unknown> {
+  const res = await fetch(`/api/workspaces/${workspaceId}/orchestrator/${action}`, {
     method: 'POST',
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
+  if (!res.ok) throw new Error(`Orchestrator ${action} failed`);
+  return res.json();
 }
 
 export function useOrchestratorState(workspaceId: string | undefined) {
@@ -53,10 +55,23 @@ export function useOrchestratorState(workspaceId: string | undefined) {
   });
 }
 
+export interface StartResponse {
+  started: boolean;
+  needsConfirmation?: boolean;
+  preflight?: { percent: number; parallelCount: number; threshold: number };
+}
+
+async function startOrchestrator(workspaceId: string, override = false): Promise<StartResponse> {
+  const url = `/api/workspaces/${workspaceId}/orchestrator/start${override ? '?override=true' : ''}`;
+  const res = await fetch(url, { method: 'POST' });
+  if (!res.ok) throw new Error('Failed to start orchestrator');
+  return res.json() as Promise<StartResponse>;
+}
+
 export function useOrchestratorStart(workspaceId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => postAction(workspaceId, 'start'),
+    mutationFn: (override: boolean = false) => startOrchestrator(workspaceId, override),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orchestrator', workspaceId] }),
   });
 }
