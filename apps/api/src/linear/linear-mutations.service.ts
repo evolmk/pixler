@@ -74,6 +74,27 @@ export class LinearMutationsService {
     return { id: created.id, identifier: created.identifier };
   }
 
+  async addLabel(identifier: string, labelName: string): Promise<{ labelId: string }> {
+    const { client, issue } = await this.getIssueByIdentifier(identifier);
+    const teamId = issue.teamId;
+    if (!teamId) throw new NotFoundException(`Issue ${identifier} has no team`);
+
+    const team = await client.team(teamId);
+    const labelsResult = await team.labels();
+    const label = labelsResult.nodes.find(
+      (l) => l.name.toLowerCase() === labelName.toLowerCase(),
+    );
+    if (!label) throw new NotFoundException(`Label "${labelName}" not found in team`);
+
+    const existing = await issue.labels();
+    const existingIds = existing.nodes.map((l) => l.id);
+    if (!existingIds.includes(label.id)) {
+      await issue.update({ labelIds: [...existingIds, label.id] });
+    }
+
+    return { labelId: label.id };
+  }
+
   async completeSubissue(id: string): Promise<void> {
     const client = await this.linear.getClient();
     if (!client) throw new UnauthorizedException('Linear not connected');

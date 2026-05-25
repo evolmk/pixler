@@ -37,3 +37,18 @@ export interface LinearProjectDto {
 export interface ConnectLinearDto {
   pat: string;
 }
+
+export interface LinearTicketDto {
+  id: string;
+  identifier: string;
+  title: string;
+  description: string | null;
+  state: string;
+  stateType: string;
+  priority: number;
+  url: string;
+  assignee: { id: string; name: string } | null;
+  labels: Array<{ id: string; name: string; color: string }>;
+  createdAt: string;
+  updatedAt: string;
+}

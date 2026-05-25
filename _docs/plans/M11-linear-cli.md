@@ -1,8 +1,8 @@
 # M11 — `@pixler/linear-cli` (agent-facing thin CLI)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M10.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — CLI package built with tsup, all ticket commands + API endpoints wired. Sprint 2 in progress.
 
 ---
 
@@ -58,26 +58,39 @@ package.json                                     (add `pixler-linear` to `bin`, 
 
 ## Sprint 1 — Package scaffold + transport + ticket commands
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** `packages/linear-cli` package exists, builds with tsup, ticket commands work end-to-end
 against the local api.
 
 **Tasks:**
 
-- [ ] `packages/linear-cli/package.json` + `tsup.config.ts`.
-- [ ] `src/cli.ts` (commander or citty) wires up subcommands; each has `--help` ≤80 tokens.
-- [ ] `src/api-client.ts` reads `$PIXLER_API_PORT`; errors helpfully if unset.
-- [ ] `src/commands/ticket-fetch.ts`, `ticket-comment.ts`, `ticket-state.ts`, `ticket-label.ts`.
-- [ ] Exit codes: `0` success, `1` validation, `2` network, `3` Linear-side error.
-- [ ] JSON-by-default; `--text` flag for short human output.
+- [x] `packages/linear-cli/package.json` + `tsup.config.ts`.
+- [x] `src/cli.ts` (commander or citty) wires up subcommands; each has `--help` ≤80 tokens.
+- [x] `src/api-client.ts` reads `$PIXLER_API_PORT`; errors helpfully if unset.
+- [x] `src/commands/ticket-fetch.ts`, `ticket-comment.ts`, `ticket-state.ts`, `ticket-label.ts`.
+- [x] Exit codes: `0` success, `1` validation, `2` network, `3` Linear-side error.
+- [x] JSON-by-default; `--text` flag for short human output.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/linear-cli/package.json` — tsup + commander + @types/node
+- `packages/linear-cli/tsup.config.ts`
+- `packages/linear-cli/tsconfig.json`
+- `packages/linear-cli/src/cli.ts`
+- `packages/linear-cli/src/api-client.ts`
+- `packages/linear-cli/src/commands/ticket-fetch.ts`
+- `packages/linear-cli/src/commands/ticket-comment.ts`
+- `packages/linear-cli/src/commands/ticket-state.ts`
+- `packages/linear-cli/src/commands/ticket-label.ts`
+- `apps/api/src/linear/linear.controller.ts` — added GET /linear/tickets/:identifier, POST /linear/tickets/:identifier/label
+- `apps/api/src/linear/linear.service.ts` — added fetchTicket()
+- `apps/api/src/linear/linear-mutations.service.ts` — added addLabel()
+- `packages/shared-types/src/linear.ts` — added LinearTicketDto
+- `packages/shared-types/src/index.ts` — exported LinearTicketDto
 
 **Issues Encountered:**
 
-- _none yet_
+- tsconfig needed `"types": ["node"]` + @types/node devDep; base tsconfig lib doesn't include DOM globals
 
 **Verify:** `pnpm --filter @pixler/linear-cli build && PIXLER_API_PORT=7777 ./dist/cli.js ticket fetch ENG-101 --text`.
 

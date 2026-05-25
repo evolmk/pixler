@@ -3,17 +3,20 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
   "bin": {
-    "pixler-linear": "./bin/pixler-linear.js"
+    "pixler-linear": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "lint": "tsc --noEmit",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "commander": "^13.0.0"
+  },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.4.0",
     "typescript": "^5.8.0"
   }
 }

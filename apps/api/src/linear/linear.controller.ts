@@ -44,6 +44,11 @@ export class LinearController {
     return this.sync.tickets(projectId);
   }
 
+  @Get('tickets/:identifier')
+  ticket(@Param('identifier') identifier: string) {
+    return this.linear.fetchTicket(identifier);
+  }
+
   @Post('sync')
   forceSync(@Body() body: { projectId?: string }) {
     return this.sync.syncAll(body.projectId);
@@ -99,5 +104,13 @@ export class LinearController {
   @Post('subissues/:id/complete')
   completeSubissue(@Param('id') id: string) {
     return this.mutations.completeSubissue(id);
+  }
+
+  @Post('tickets/:identifier/label')
+  addLabel(
+    @Param('identifier') identifier: string,
+    @Body() body: { label: string },
+  ) {
+    return this.mutations.addLabel(identifier, body.label);
   }
 }

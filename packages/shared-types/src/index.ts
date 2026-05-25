@@ -7,5 +7,5 @@ export type { PixlerJson, PixlerJsonDiff } from './pixler-json';
 export type { Workspace, WorkspaceState, WorkspaceMode, TicketSource, CreateWorkspaceDto, PatchWorkspaceDto } from './workspaces';
 export { COLOR_NAMES } from './color-names';
 export type { ColorName } from './color-names';
-export type { LinearTicket, LinearStatusDto, LinearTeamDto, LinearProjectDto, ConnectLinearDto } from './linear';
+export type { LinearTicket, LinearStatusDto, LinearTeamDto, LinearProjectDto, ConnectLinearDto, LinearTicketDto } from './linear';
 export type { Terminal, ResizeTerminalDto } from './terminals';
