@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +8,8 @@ import {
 import { MoreHorizontal, Pin, PinOff, Archive, Trash2, RefreshCw, MonitorPlay, Code2 } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { usePatchWorkspace, useArchiveWorkspace, useRerunSetup } from '../hooks/useWorkspaces';
+import { useRunStatus } from '../hooks/useRun';
+import { useOpenInIde } from '../hooks/useIDEs';
 import type { Workspace } from '@pixler/shared-types';
 
 interface WorkspaceContextMenuProps {
@@ -20,6 +21,10 @@ export function WorkspaceContextMenu({ workspace, onRemove }: WorkspaceContextMe
   const patch = usePatchWorkspace();
   const archive = useArchiveWorkspace();
   const rerun = useRerunSetup();
+  const { data: runStatus } = useRunStatus(workspace.id);
+  const openInIde = useOpenInIde(workspace.id);
+
+  const isRunReady = runStatus?.state === 'ready';
 
   return (
     <DropdownMenu>
@@ -50,11 +55,14 @@ export function WorkspaceContextMenu({ workspace, onRemove }: WorkspaceContextMe
           <RefreshCw className="mr-2 size-3.5" /> Re-run setup
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <Code2 className="mr-2 size-3.5" /> Open in IDE <span className="ml-auto text-xs text-muted-foreground">M19</span>
+        <DropdownMenuItem onClick={() => void openInIde.mutateAsync({})}>
+          <Code2 className="mr-2 size-3.5" /> Open in IDE
         </DropdownMenuItem>
-        <DropdownMenuItem disabled>
-          <MonitorPlay className="mr-2 size-3.5" /> Open app <span className="ml-auto text-xs text-muted-foreground">M19</span>
+        <DropdownMenuItem
+          disabled={!isRunReady || !runStatus?.port}
+          onClick={() => isRunReady && runStatus?.port && window.open(`http://localhost:${runStatus.port}`, '_blank')}
+        >
+          <MonitorPlay className="mr-2 size-3.5" /> Open app
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

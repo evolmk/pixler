@@ -46,4 +46,5 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'layout.bigTerminal', type: 'boolean', default: false, scopes: ['global'], label: 'Big Terminal', description: 'Right pane expanded full-bleed' },
   { key: 'diff.wordWrap', type: 'string', default: 'off', scopes: ['global'], label: 'Diff Word Wrap', description: 'Word wrap in diff viewer: off | on' },
   { key: 'diff.renderWhitespace', type: 'string', default: 'none', scopes: ['global'], label: 'Diff Whitespace', description: 'Render whitespace in diff viewer: none | boundary | all' },
+  { key: 'ide.default', type: 'string', default: '', scopes: ['global'], label: 'Default IDE', description: 'IDE id to use by default (vscode, cursor, zed, etc.)' },
 ];

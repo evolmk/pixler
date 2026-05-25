@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, ChevronDown, Command, FolderPlus, Monitor, Moon, Plus, Settings, Settings2, Sun } from 'lucide-react';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button } from '@pixler/ui/components/button';
@@ -28,6 +28,10 @@ import { useSetting } from '../hooks/useSetting';
 import { useProjects } from '../hooks/useProjects';
 import { NewProjectDialog } from './NewProjectDialog';
 import { LinearStatusPill } from './LinearStatusPill';
+import { RunButton } from './RunButton';
+import { OpenAppButton } from './OpenAppButton';
+import { OpenInIdeMenu } from './OpenInIdeMenu';
+import { useOpenInIde } from '../hooks/useIDEs';
 import type { ThemeMode } from '@pixler/ui-styles';
 
 const MODE_ICONS: Record<ThemeMode, typeof Sun> = {
@@ -50,8 +54,22 @@ export function TopBar() {
   const { set: persistMode } = useSetting<ThemeMode>('appearance.mode');
   const { data: projects = [] } = useProjects();
   const navigate = useNavigate();
-  const params = useParams({ strict: false }) as { projectId?: string };
+  const params = useParams({ strict: false }) as { projectId?: string; workspaceId?: string };
   const activeProject = projects.find((p) => p.id === params.projectId);
+  const workspaceId = params.workspaceId;
+  const openInIde = useOpenInIde(workspaceId ?? '');
+
+  useEffect(() => {
+    if (!workspaceId) return;
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+        e.preventDefault();
+        void openInIde.mutateAsync({});
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [workspaceId, openInIde]);
 
   const handleModeToggle = () => {
     const next = MODE_CYCLE[(MODE_CYCLE.indexOf(mode) + 1) % MODE_CYCLE.length];
@@ -134,6 +152,14 @@ export function TopBar() {
       <span className="flex-1" />
 
       <LinearStatusPill />
+
+      {workspaceId && (
+        <>
+          <RunButton workspaceId={workspaceId} />
+          <OpenAppButton workspaceId={workspaceId} />
+          <OpenInIdeMenu workspaceId={workspaceId} />
+        </>
+      )}
 
       {/* ⌘K command palette */}
       <Button

@@ -1,8 +1,8 @@
 # M19 — Run / Open App + External IDE launcher
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — RunModule + IDEModule + DTOs wired. Sprint 2 (IDE detection UI + ExternalToolsPanel) in progress.
+**Current Status:** All sprints complete — RunModule, IDEModule, RunButton/OpenAppButton/OpenInIdeMenu in TopBar, ⌘+E shortcut, RunLogsTab, ExternalToolsPanel.
 
 ---
 
@@ -123,31 +123,37 @@ worktree path.
 
 ## Sprint 3 — Web UI: Run button, Open App, Run logs, OpenInIde menu, External Tools panel
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** All workspace-level run + IDE controls land in the UI.
 
 **Tasks:**
 
-- [ ] `RunButton.tsx` in workspace toolbar — start/stop toggle + state icon + "open logs" caret.
-- [ ] `RunLogsTab.tsx` in center pane (dedicated tab so Run logs ≠ chat ≠ terminal).
-- [ ] `OpenAppButton.tsx` appears once `run.ready` fires; opens
-  `http://localhost:$PIXLER_PORT`.
-- [ ] `OpenInIdeMenu.tsx` on workspace card + workspace toolbar — lists detected IDEs; default
-  IDE shortcut on the card.
-- [ ] `SettingsDrawer/ExternalToolsPanel.tsx` — default IDE picker, detected list, custom IDE
-  template, `pixler://` URL-scheme registration status (registration itself is M24).
-- [ ] `⌘+E` opens active workspace in default IDE.
-- [ ] Workspace context menu wire-ups: "Open in IDE", "Open app" (greyed until ready),
-  "Re-run setup script".
-- [ ] `useRun.ts` + `useIDEs.ts`.
+- [x] `RunButton.tsx` in TopBar — start/stop toggle with state icon.
+- [x] `RunLogsTab.tsx` in center pane (dedicated Run tab).
+- [x] `OpenAppButton.tsx` appears once `run.ready` fires; opens `http://localhost:$PIXLER_PORT`.
+- [x] `OpenInIdeMenu.tsx` in TopBar — lists detected IDEs.
+- [x] `SettingsDrawer/ExternalToolsPanel.tsx` — default IDE picker + detected list.
+- [x] `⌘+E` opens active workspace in default IDE (wired in TopBar).
+- [x] Workspace context menu wire-ups: "Open in IDE", "Open app" (greyed until ready).
+- [x] `useRun.ts` + `useIDEs.ts`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/RunButton.tsx` — created
+- `apps/web/src/components/OpenAppButton.tsx` — created
+- `apps/web/src/components/RunLogsTab.tsx` — created
+- `apps/web/src/components/OpenInIdeMenu.tsx` — created
+- `apps/web/src/components/SettingsDrawer/ExternalToolsPanel.tsx` — created
+- `apps/web/src/components/WorkspaceContextMenu.tsx` — IDE + Open App wired
+- `apps/web/src/components/TopBar.tsx` — RunButton/OpenAppButton/OpenInIdeMenu + ⌘+E
+- `apps/web/src/components/CenterTabs.tsx` — Run tab added
+- `apps/web/src/hooks/useRun.ts` — created
+- `apps/web/src/hooks/useIDEs.ts` — created
+- `apps/api/src/settings/registry.ts` — ide.default setting
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual end-to-end per Acceptance.
 

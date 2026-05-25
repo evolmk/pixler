@@ -8,6 +8,7 @@ import {
   MessageSquare,
   Minimize2,
   SendHorizontal,
+  Terminal,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@pixler/ui/components/tabs';
@@ -15,6 +16,7 @@ import { EmptyState } from '@pixler/ui/components/empty-state';
 import { Button } from '@pixler/ui/components/button';
 import { useLayoutStore } from '../stores/layout';
 import { DiffTab } from './DiffTab';
+import { RunLogsTab } from './RunLogsTab';
 
 interface TabConfig {
   value: string;
@@ -60,6 +62,13 @@ const TABS: TabConfig[] = [
     emptyTitle: 'PR panel ships in M18',
     emptyBody: 'Pull request status, reviews, and merge controls will appear here.',
   },
+  {
+    value: 'run',
+    label: 'Run',
+    icon: Terminal,
+    emptyTitle: 'Run logs',
+    emptyBody: '',
+  },
 ];
 
 export function CenterTabs() {
@@ -103,6 +112,8 @@ export function CenterTabs() {
         >
           {tab.value === 'diff' ? (
             <DiffTab />
+          ) : tab.value === 'run' ? (
+            <RunLogsTab />
           ) : (
             <div className="flex h-full min-h-48 items-center justify-center p-4">
               <EmptyState

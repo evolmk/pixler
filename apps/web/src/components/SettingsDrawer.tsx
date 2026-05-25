@@ -36,6 +36,7 @@ import { AppearancePanel } from './SettingsDrawer/AppearancePanel';
 import { LinearPanel } from './SettingsDrawer/LinearPanel';
 import { TerminalPanel } from './SettingsDrawer/TerminalPanel';
 import { ProvidersPanel } from './SettingsDrawer/ProvidersPanel';
+import { ExternalToolsPanel } from './SettingsDrawer/ExternalToolsPanel';
 
 interface CategoryConfig {
   id: string;
@@ -107,6 +108,8 @@ export function SettingsDrawer() {
               <TerminalPanel />
             ) : activeId === 'providers' ? (
               <ProvidersPanel />
+            ) : activeId === 'external-tools' ? (
+              <ExternalToolsPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState
