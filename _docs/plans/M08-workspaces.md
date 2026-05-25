@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M05 + M07.
+**Current Status:** Sprint 1 complete — DB migration, WorkspacesModule CRUD, shared-types DTOs. Sprint 2 next: naming + port allocator + worktree creation.
 
 ---
 
@@ -65,28 +65,35 @@ apps/web/src/components/WorkspacesSidebar.tsx   (light up real data)
 
 ## Sprint 1 — DB + WorkspacesModule scaffold (CRUD only)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Migration + module + read/write endpoints exist; rows persist; sidebar pulls live data
 (still placeholder cards for now).
 
 **Tasks:**
 
-- [ ] `0003_workspaces.sql` per SPEC §3 columns including state enum and mode enum.
-- [ ] `WorkspacesModule` + `WorkspacesService` + `WorkspacesController` scaffold.
-- [ ] `GET /api/workspaces?projectId=…`, `GET /api/workspaces/:id`.
-- [ ] `PATCH /api/workspaces/:id` (rename, pin/unpin).
-- [ ] `DELETE /api/workspaces/:id` (hard delete + worktree removal).
-- [ ] `packages/shared-types/src/workspaces.ts` DTOs.
+- [x] `0003_workspaces.sql` per SPEC §3 columns including state enum and mode enum.
+- [x] `WorkspacesModule` + `WorkspacesService` + `WorkspacesController` scaffold.
+- [x] `GET /api/workspaces?projectId=…`, `GET /api/workspaces/:id`.
+- [x] `PATCH /api/workspaces/:id` (rename, pin/unpin).
+- [x] `DELETE /api/workspaces/:id` (hard delete + worktree removal).
+- [x] `packages/shared-types/src/workspaces.ts` DTOs.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/db/migrations/0003_workspaces.sql`
+- `apps/api/src/db/database.service.ts`
+- `apps/api/src/workspaces/workspaces.module.ts`
+- `apps/api/src/workspaces/workspaces.service.ts`
+- `apps/api/src/workspaces/workspaces.controller.ts`
+- `apps/api/src/app.module.ts`
+- `packages/shared-types/src/workspaces.ts`
+- `packages/shared-types/src/index.ts`
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
-**Verify:** `pnpm --filter @pixler/api test workspaces` — round-trip CRUD.
+**Verify:** `pnpm -w typecheck` — 9/9 tasks pass.
 
 ---
 

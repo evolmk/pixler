@@ -1,0 +1,28 @@
+import { Controller, Get, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { WorkspacesService } from './workspaces.service';
+import type { PatchWorkspaceDto } from '@pixler/shared-types';
+
+@Controller('workspaces')
+export class WorkspacesController {
+  constructor(private readonly workspaces: WorkspacesService) {}
+
+  @Get()
+  findAll(@Query('projectId') projectId: string) {
+    return this.workspaces.findAllByProject(projectId);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.workspaces.findOne(id);
+  }
+
+  @Patch(':id')
+  patch(@Param('id') id: string, @Body() dto: PatchWorkspaceDto) {
+    return this.workspaces.patch(id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.workspaces.remove(id);
+  }
+}
