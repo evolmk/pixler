@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import type { MarkSeenDto, ActivityScope } from '@pixler/shared-types';
 
-@Controller('api/activities')
+@Controller('activities')
 export class ActivityController {
   constructor(private readonly activity: ActivityService) {}
 

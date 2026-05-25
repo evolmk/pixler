@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body } from '@nestjs/common';
 import { OnboardingService } from './onboarding.service';
 import { ToolDetectorService } from './tool-detector.service';
 
-@Controller('api/onboarding')
+@Controller('onboarding')
 export class OnboardingController {
   constructor(
     private readonly onboarding: OnboardingService,

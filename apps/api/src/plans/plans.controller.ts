@@ -3,7 +3,7 @@ import { PlansService } from './plans.service';
 import { SubIssuesBridgeService } from './sub-issues-bridge.service';
 import type { SavePlanDto, RevisePlanDto } from '@pixler/shared-types';
 
-@Controller('api/workspaces/:workspaceId/plan')
+@Controller('workspaces/:workspaceId/plan')
 export class PlansController {
   constructor(
     private readonly plans: PlansService,
@@ -54,7 +54,7 @@ export class PlansController {
   }
 }
 
-@Controller('api/projects/:projectId/plans')
+@Controller('projects/:projectId/plans')
 export class ProjectPlansController {
   constructor(private readonly plans: PlansService) {}
 
@@ -65,7 +65,7 @@ export class ProjectPlansController {
   }
 }
 
-@Controller('api/plans')
+@Controller('plans')
 export class GlobalPlansController {
   constructor(private readonly plans: PlansService) {}
 

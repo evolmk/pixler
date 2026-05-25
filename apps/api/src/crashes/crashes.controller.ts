@@ -8,7 +8,7 @@ interface ReportCrashDto {
   context?: Record<string, unknown>;
 }
 
-@Controller('api/crashes')
+@Controller('crashes')
 export class CrashesController {
   constructor(private readonly crashes: CrashesService) {}
 

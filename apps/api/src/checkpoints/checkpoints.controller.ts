@@ -2,7 +2,7 @@ import { Controller, Get, Post, Delete, Param, Body } from '@nestjs/common';
 import { CheckpointsService } from './checkpoints.service';
 import type { TakeCheckpointDto } from '@pixler/shared-types';
 
-@Controller('api/workspaces/:workspaceId/checkpoints')
+@Controller('workspaces/:workspaceId/checkpoints')
 export class CheckpointsController {
   constructor(private readonly checkpoints: CheckpointsService) {}
 
@@ -20,7 +20,7 @@ export class CheckpointsController {
   }
 }
 
-@Controller('api/checkpoints/:checkpointId')
+@Controller('checkpoints/:checkpointId')
 export class CheckpointItemController {
   constructor(private readonly checkpoints: CheckpointsService) {}
 

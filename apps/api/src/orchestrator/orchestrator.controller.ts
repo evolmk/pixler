@@ -3,7 +3,7 @@ import { OrchestratorService } from './orchestrator.service';
 import { PreflightService } from './preflight.service';
 import { TriggersService } from '../checkpoints/triggers.service';
 
-@Controller('api/workspaces/:workspaceId/orchestrator')
+@Controller('workspaces/:workspaceId/orchestrator')
 export class OrchestratorController {
   constructor(
     private readonly orchestrator: OrchestratorService,

@@ -4,7 +4,7 @@ import { PtyBridgeService } from './pty-bridge.service';
 import { TerminalsService } from '../terminals/terminals.service';
 import type { SendMessageDto } from '@pixler/shared-types';
 
-@Controller('api/workspaces/:workspaceId')
+@Controller('workspaces/:workspaceId')
 export class MessagesController {
   constructor(
     private readonly messages: MessagesService,

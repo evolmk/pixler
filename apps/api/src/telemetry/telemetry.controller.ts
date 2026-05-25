@@ -6,7 +6,7 @@ interface TrackDto {
   props?: Record<string, unknown>;
 }
 
-@Controller('api/telemetry')
+@Controller('telemetry')
 export class TelemetryController {
   constructor(private readonly telemetry: TelemetryService) {}
 
