@@ -58,4 +58,5 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'gates.autoApprovePr', type: 'boolean', default: false, scopes: ['global', 'project'], label: 'Auto-Approve PR', description: 'Skip human PR-approval gate' },
   { key: 'gates.loopLimit', type: 'number', default: 3, scopes: ['global', 'project'], label: 'Loop Limit', description: 'Max plan-review rejections before pausing (1–5)' },
   { key: 'workspace.clearOnSwitch', type: 'boolean', default: true, scopes: ['global'], label: 'Clear on Switch', description: 'Dispatch /clear to the previous workspace terminal when switching workspaces' },
+  { key: 'logs.retentionDays', type: 'number', default: 7, scopes: ['global'], label: 'Log Retention', description: 'Days to keep error log files (0 = keep forever)' },
 ];

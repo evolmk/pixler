@@ -55,49 +55,38 @@ apps/web/src/main.tsx                                (modified — global error 
 
 ## Sprint 1 — FileLoggerService + backend wiring
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Write API and frontend errors to dated log files; wire into existing exception filter and crashes service.
 
 **Tasks:**
 
-- [ ] Create `apps/api/src/common/logger/file-logger.service.ts`
-  - `onModuleInit`: create `~/.config/pixler/logs/` dir if missing; call `pruneOldLogs(retentionDays)` using `SettingsService.get('logs.retentionDays')` (default 7 if settings not yet available)
-  - `logApiError(status: number, method: string, path: string, message: string, stack?: string)`: appends JSON line to `api-YYYY-MM-DD.log`
-  - `logFrontendError(message: string, stack: string, context: Record<string, unknown>)`: appends JSON line to `frontend-YYYY-MM-DD.log`
-  - `pruneOldLogs(retentionDays: number)`: reads `logs/` dir, deletes files whose date suffix is older than N days
-  - Private `appendLine(filename: string, data: object)`: opens file for append, writes `JSON.stringify(data) + '\n'`; uses sync fs to keep it simple
-- [ ] Create `apps/api/src/common/logger/logs.module.ts`
-  - Exports `FileLoggerService`; imports `SettingsModule` (for retention setting on init)
-- [ ] Update `apps/api/src/common/filters/all-exceptions.filter.ts`
-  - Add constructor injection of `FileLoggerService`
-  - In `catch()`: call `fileLogger.logApiError(status, method, url, message, stack)` — log both 4xx and 5xx
-  - Extract `request` from `host.switchToHttp().getRequest()` to get method + url
-- [ ] Update `apps/api/src/app.module.ts`
-  - Import `LogsModule`
-  - Register `AllExceptionsFilter` as `APP_FILTER` provider (enables DI injection)
-- [ ] Update `apps/api/src/main.ts`
-  - Remove `app.useGlobalFilters(new AllExceptionsFilter())` — now handled by `APP_FILTER`
-- [ ] Update `apps/api/src/crashes/crashes.service.ts`
-  - Inject `FileLoggerService`
-  - In `record()`: call `fileLogger.logFrontendError(message, stack, context)` after the DB insert
-- [ ] Update `apps/api/src/crashes/crashes.module.ts`
-  - Import `LogsModule`
-- [ ] Add `logs.retentionDays` to `apps/api/src/settings/registry.ts`
-  ```ts
-  { key: 'logs.retentionDays', type: 'number', default: 7, scopes: ['global'],
-    label: 'Log Retention', description: 'Days to keep error log files (0 = keep forever)' }
-  ```
-- [ ] Add `logs/` to `.gitignore` (if not already present)
+- [x] Create `apps/api/src/common/logger/file-logger.service.ts`
+- [x] Create `apps/api/src/common/logger/logs.module.ts`
+- [x] Update `apps/api/src/common/filters/all-exceptions.filter.ts`
+- [x] Update `apps/api/src/app.module.ts` — import LogsModule, register APP_FILTER
+- [x] Update `apps/api/src/main.ts` — remove useGlobalFilters
+- [x] Update `apps/api/src/crashes/crashes.service.ts` — inject FileLoggerService
+- [x] Update `apps/api/src/crashes/crashes.module.ts` — import LogsModule
+- [x] Add `logs.retentionDays` to `apps/api/src/settings/registry.ts`
+- [x] Add `logs/` to `.gitignore`
 
-**Files Created/Modified:** _(append as you touch them)_
+**Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/common/logger/file-logger.service.ts` (new)
+- `apps/api/src/common/logger/logs.module.ts` (new)
+- `apps/api/src/common/filters/all-exceptions.filter.ts` (DI injection, request extraction)
+- `apps/api/src/app.module.ts` (LogsModule import, APP_FILTER provider)
+- `apps/api/src/main.ts` (removed useGlobalFilters)
+- `apps/api/src/crashes/crashes.service.ts` (FileLoggerService injected)
+- `apps/api/src/crashes/crashes.module.ts` (LogsModule import)
+- `apps/api/src/settings/registry.ts` (logs.retentionDays added)
+- `.gitignore` (logs/ entry)
 
-**Issues Encountered:** _(append surprising things + their resolution)_
+**Issues Encountered:**
 
-- _none yet_
+- Used `@Optional()` on all FileLoggerService injections to keep the service safely decoupled from modules that may not import LogsModule.
 
-**Verify:** `pnpm -w typecheck && pnpm --filter @pixler/api build`
+**Verify:** `pnpm -w typecheck` — 10/10 tasks successful.
 
 ---
 

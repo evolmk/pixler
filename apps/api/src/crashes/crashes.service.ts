@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../db/database.service';
 import { sanitizeString } from '../telemetry/sanitize';
 import { TelemetryService } from '../telemetry/telemetry.service';
+import { FileLoggerService } from '../common/logger/file-logger.service';
 
 interface CrashRow {
   id: string;
@@ -19,6 +20,7 @@ export class CrashesService {
   constructor(
     private readonly db: DatabaseService,
     private readonly telemetry: TelemetryService,
+    @Optional() private readonly fileLogger?: FileLoggerService,
   ) {}
 
   record(source: string, message: string, stack: string, context: Record<string, unknown> = {}): string {
@@ -29,6 +31,7 @@ export class CrashesService {
       .run(id, source, sanitizeString(message), sanitizeString(stack), JSON.stringify(context), now);
 
     this.telemetry.track('crash', { source, errorType: message.split(':')[0] ?? 'unknown' });
+    this.fileLogger?.logFrontendError(message, stack, context);
     return id;
   }
 

@@ -9,3 +9,7 @@ dist/
 
 # Claude Code runtime session logs
 .claude/logs/
+
+# Pixler error logs (written to ~/.config/pixler/logs/ — not in repo)
+# Kept here as a reminder; actual path is outside the repo
+logs/

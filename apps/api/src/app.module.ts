@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { HealthController } from './health.controller';
 import { EventsModule } from './events/events.module';
 import { DatabaseModule } from './db/database.module';
@@ -21,9 +22,14 @@ import { ActivityModule } from './activity/activity.module';
 import { DeeplinkModule } from './deeplink/deeplink.module';
 import { TelemetryModule } from './telemetry/telemetry.module';
 import { CrashesModule } from './crashes/crashes.module';
+import { LogsModule } from './common/logger/logs.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule, ActivityModule, DeeplinkModule, TelemetryModule, CrashesModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule, ActivityModule, DeeplinkModule, TelemetryModule, CrashesModule, LogsModule],
   controllers: [HealthController],
+  providers: [
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+  ],
 })
 export class AppModule {}
