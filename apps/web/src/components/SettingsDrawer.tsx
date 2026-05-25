@@ -41,6 +41,7 @@ import { ProvidersPanel } from './SettingsDrawer/ProvidersPanel';
 import { ExternalToolsPanel } from './SettingsDrawer/ExternalToolsPanel';
 import { KeyboardPanel } from './SettingsDrawer/KeyboardPanel';
 import { UsagePanel } from './SettingsDrawer/UsagePanel';
+import { PlansPanel } from './SettingsDrawer/PlansPanel';
 
 interface CategoryConfig {
   id: string;
@@ -56,7 +57,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'env', label: 'Environment', icon: Key, milestone: 'M08' },
   { id: 'linear', label: 'Linear', icon: Link, milestone: 'M10' },
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
-  { id: 'plans', label: 'Plans', icon: FileText, milestone: 'M14' },
+  { id: 'plans', label: 'Plans', icon: FileText },
   { id: 'appearance', label: 'Appearance', icon: Palette },
   { id: 'usage', label: 'Usage', icon: ActivitySquare },
   { id: 'keyboard', label: 'Keyboard', icon: Keyboard, milestone: 'M22' },
@@ -126,6 +127,8 @@ export function SettingsDrawer() {
               <KeyboardPanel />
             ) : activeId === 'usage' ? (
               <UsagePanel />
+            ) : activeId === 'plans' ? (
+              <PlansPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState

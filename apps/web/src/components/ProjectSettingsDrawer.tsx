@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Bot, GitBranch, LayoutGrid, Palette, Settings, Zap, Terminal, Files } from 'lucide-react';
+import { Bot, FileText, GitBranch, LayoutGrid, Palette, Settings, Zap, Terminal, Files } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -25,6 +25,7 @@ import { IntegrationsPanel } from './ProjectSettingsDrawer/IntegrationsPanel';
 import { GitPanel } from './ProjectSettingsDrawer/GitPanel';
 import { ThemePanel } from './ProjectSettingsDrawer/ThemePanel';
 import { WorkspacesPanel } from './ProjectSettingsDrawer/WorkspacesPanel';
+import { PlansPanel } from './ProjectSettingsDrawer/PlansPanel';
 
 interface CategoryConfig {
   id: string;
@@ -40,6 +41,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'scripts', label: 'Scripts', icon: Terminal },
   { id: 'files-to-copy', label: 'Files to copy', icon: Files },
   { id: 'git', label: 'Git', icon: GitBranch },
+  { id: 'plans', label: 'Plans', icon: FileText },
   { id: 'integrations', label: 'Integrations', icon: Zap },
   { id: 'theme', label: 'Theme', icon: Palette },
 ];
@@ -94,6 +96,8 @@ export function ProjectSettingsDrawer() {
                 <GitPanel />
               ) : activeId === 'integrations' ? (
                 <IntegrationsPanel />
+              ) : activeId === 'plans' ? (
+                <PlansPanel />
               ) : activeId === 'theme' ? (
                 <ThemePanel />
               ) : (

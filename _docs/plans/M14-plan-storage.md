@@ -1,8 +1,8 @@
 # M14 — Plan storage (file / inline / attachment + auto)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 in progress — DB migration, shared types, PlansModule, storage writers.
+**Current Status:** All 4 sprints complete — DB migration, 3 storage writers, auto-recommender, big-plan prompt, sub-issues bridge, PlanTab UI, settings panels.
 
 ---
 
@@ -166,15 +166,15 @@ right thresholds.
 
 ## Sprint 4 — Settings panels (global Plans + project Plans)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Both settings panels fully functional.
 
 **Tasks:**
 
-- [ ] `ProjectSettingsDrawer/PlansPanel.tsx` — storage method default, plan directory, inline
+- [x] `ProjectSettingsDrawer/PlansPanel.tsx` — storage method default, plan directory, inline
   thresholds, "Reset prompts" button.
-- [ ] `SettingsDrawer/PlansPanel.tsx` — global storage default + "Reset all prompts".
-- [ ] `hooks/usePlan.ts`.
+- [x] `SettingsDrawer/PlansPanel.tsx` — global storage default + "Reset all prompts".
+- [x] `hooks/usePlan.ts`.
 
 **Files Created/Modified:**
 
