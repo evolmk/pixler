@@ -20,3 +20,4 @@ export type { MessageRole, MessageContentType, Message, SendMessageDto, Messages
 export type { ActivityScope, ActivitySeverity, ActivityKind, Activity, RecordActivityDto, MarkSeenDto, ActivitiesPage } from './activity';
 export type { CheckpointTrigger, Checkpoint, TakeCheckpointDto } from './checkpoints';
 export type { AuthMethod, AuthService, OAuthInitDto, ConnectGithubPATDto, DisconnectAuthDto } from './auth';
+export type { ModelVersion, ModelFamily, ProviderModels, ModelRegistryDto } from './models';

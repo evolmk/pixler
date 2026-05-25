@@ -75,6 +75,10 @@ export class DatabaseService implements OnModuleInit {
       const sql = readFileSync(join(migrationsDir, '0010_crashes.sql'), 'utf-8');
       this.db.exec(sql);
     }
+    if (currentVersion < 11) {
+      const sql = readFileSync(join(migrationsDir, '0011_model_registry.sql'), 'utf-8');
+      this.db.exec(sql);
+    }
   }
 
   private getSchemaVersion(): number {

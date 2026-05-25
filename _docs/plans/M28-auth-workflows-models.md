@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 (auth UI) complete — starting Sprint 3 (model prober backend)
+**Current Status:** Sprint 3 (model prober backend) complete — starting Sprint 4 (model picker UI)
 
 ---
 
@@ -185,25 +185,32 @@ apps/web/src/components/OnboardingDrawer.tsx  # extend steps 2 + 3
 
 ## Sprint 3 — Model prober service (backend)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Build the model prober service that discovers available models by probing installed CLIs, caches results in SQLite, and exposes a REST + Socket.io API.
 
 **Tasks:**
 
-- [ ] Create `apps/api/src/models/models.module.ts` — registers prober service and controller
-- [ ] Create `apps/api/src/models/model-prober.service.ts` — probes `claude`, `codex`, `gemini` CLIs to discover available model families and versions; parses CLI output; returns structured `ModelRegistry` with top 3 families × 2 versions per provider; caches in SQLite `model_registry` table with timestamp
-- [ ] Create `apps/api/src/models/models.controller.ts` — `GET /models` returns cached registry; `POST /models/refresh` re-probes and returns updated registry; emits `models:updated` Socket.io event on refresh
-- [ ] Add SQLite migration for `model_registry` table (provider, family, version, model_id, probed_at)
-- [ ] Add shared-types DTOs: `ModelFamily`, `ModelVersion`, `ModelRegistryDto`, `ProviderModels`
-- [ ] Wire `ModelsModule` into `AppModule`
+- [x] Create `apps/api/src/models/models.module.ts` — registers prober service and controller
+- [x] Create `apps/api/src/models/model-prober.service.ts` — probes `claude`, `codex`, `gemini` CLIs to discover available model families and versions; parses CLI output; returns structured `ModelRegistry` with top 3 families × 2 versions per provider; caches in SQLite `model_registry` table with timestamp
+- [x] Create `apps/api/src/models/models.controller.ts` — `GET /models` returns cached registry; `POST /models/refresh` re-probes and returns updated registry; emits `models:updated` Socket.io event on refresh
+- [x] Add SQLite migration for `model_registry` table (provider, family, version, model_id, probed_at)
+- [x] Add shared-types DTOs: `ModelFamily`, `ModelVersion`, `ModelRegistryDto`, `ProviderModels`
+- [x] Wire `ModelsModule` into `AppModule`
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/shared-types/src/models.ts` — new: ModelVersion, ModelFamily, ProviderModels, ModelRegistryDto
+- `packages/shared-types/src/index.ts` — exported new model types
+- `apps/api/src/db/migrations/0011_model_registry.sql` — new migration
+- `apps/api/src/db/database.service.ts` — added migration 11
+- `apps/api/src/models/models.module.ts` — new
+- `apps/api/src/models/model-prober.service.ts` — new: CLI probing, static families per provider, SQLite caching
+- `apps/api/src/models/models.controller.ts` — new: GET /models, POST /models/refresh
+- `apps/api/src/app.module.ts` — imports ModelsModule
 
 **Issues Encountered:**
 
-- _none yet_
+- CLI model listing not standardized across providers — using static model families with CLI availability detection
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/api test` — verify model prober returns structured data for at least `claude` CLI
 
