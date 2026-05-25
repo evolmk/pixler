@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M22-palette-keys
-**Next Plan:** M23-token-health
+**Last Plan Completed:** M13-orchestrator
+**Next Plan:** M14-plan-storage
 
 ---
 
@@ -11,7 +11,7 @@
 | Instance                              | Plan              | Status         |
 |---------------------------------------|-------------------|----------------|
 | **evolmk** (default `~/.claude`)      | M22-palette-keys  | ✅ complete    |
-| **evolmikek** (`~/.claude-evolmikek`) | M13-orchestrator  | 🔄 in-progress (assumed) |
+| **evolmikek** (`~/.claude-evolmikek`) | M13-orchestrator  | ✅ complete    |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
 > show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.
@@ -33,7 +33,7 @@
 - [x] **M10** — Linear SDK _(Wave 3 / Track B)_
 - [x] **M11** — Linear CLI _(Wave 5 / Track A)_
 - [x] **M12** — GitHub (gh) _(Wave 4 / Track B)_
-- [ ] **M13** — Orchestrator _(Wave 6 / Track A)_
+- [x] **M13** — Orchestrator _(Wave 6 / Track A)_
 - [ ] **M14** — Plan storage _(Wave 7 / Track B)_
 - [ ] **M15** — Checkpoints _(Wave 8 / Track B)_
 - [ ] **M16** — Chat UI _(Wave 7 / Track A)_

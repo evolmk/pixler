@@ -19,3 +19,4 @@
 | M20 | 2026-05-25 | Themes (8 themes, ThemeSwatchGrid, hover preview, Monaco/Shiki sync, project override) |
 | M21 | 2026-05-25 | Onboarding (5-step Vaul drawer, tool-detector, guided workspace CTA, Help re-run) |
 | M22 | 2026-05-25 | Command palette (cmdk, action registry, dynamic sections, hotkey engine, KeyboardPanel, presets) |
+| M13 | 2026-05-25 | Orchestrator state machine + agent process spawning (pure FSM package, NestJS service, Linear bridge, web UI controls) |
