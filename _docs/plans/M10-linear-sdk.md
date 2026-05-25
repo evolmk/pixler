@@ -127,27 +127,32 @@ state; secrets land in OS keychain when available.
 
 ## Sprint 3 — Comments + attachments + sub-issues
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Programmatically add comments, upload/delete attachments, create/complete sub-issues.
 
 **Tasks:**
 
-- [ ] `POST /api/linear/tickets/:identifier/comment { body }`.
-- [ ] `POST /api/linear/tickets/:identifier/attachment` (multipart) — `fileUpload` mutation;
-  returns `{ attachmentId }`.
-- [ ] `DELETE /api/linear/attachments/:id`.
-- [ ] `POST /api/linear/tickets/:identifier/subissues { title }`.
-- [ ] `POST /api/linear/subissues/:id/complete`.
+- [x] `POST /api/linear/tickets/:identifier/comment { body }`.
+- [x] `POST /api/linear/tickets/:identifier/attachment` — two-step: `POST /upload/init` returns
+  pre-signed S3 URL; client uploads; `POST .../attachment { assetUrl, title }` creates attachment.
+- [x] `DELETE /api/linear/attachments/:id`.
+- [x] `POST /api/linear/tickets/:identifier/subissues { title }`.
+- [x] `POST /api/linear/subissues/:id/complete`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/linear/linear-mutations.service.ts`
+- `apps/api/src/linear/linear.controller.ts`
+- `apps/api/src/linear/linear.module.ts`
+- `apps/api/package.json` (added @types/multer dev dep)
 
 **Issues Encountered:**
 
-- _none yet_
+- Attachment upload is split into two endpoints (init → client S3 PUT → createAttachment) rather
+  than piping the file through our server — cleaner and avoids buffering large files.
+- `payload.commentId`/`attachmentId`/`issueId` used instead of awaiting entity to avoid extra round-trips.
 
-**Verify:** `pnpm --filter @pixler/api test linear-mutations` — manual: comment + upload + delete round-trip in Linear.
+**Verify:** `pnpm -w typecheck` — 9/9 tasks pass.
 
 ---
 

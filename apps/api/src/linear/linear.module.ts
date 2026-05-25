@@ -4,12 +4,13 @@ import { LinearService } from './linear.service';
 import { SecretStoreService } from './secret-store.service';
 import { SyncScheduler } from './sync.scheduler';
 import { StateMapService } from './state-map.service';
+import { LinearMutationsService } from './linear-mutations.service';
 import { SettingsModule } from '../settings/settings.module';
 
 @Module({
   imports: [SettingsModule],
   controllers: [LinearController],
-  providers: [LinearService, SecretStoreService, SyncScheduler, StateMapService],
+  providers: [LinearService, SecretStoreService, SyncScheduler, StateMapService, LinearMutationsService],
   exports: [LinearService, SyncScheduler],
 })
 export class LinearModule {}

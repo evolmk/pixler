@@ -29,7 +29,7 @@
 - [x] **M07** — Projects
 - [x] **M08** — Workspaces _(Wave 3 / Track A)_
 - [ ] **M09** — Terminal _(Wave 4 / Track A)_
-- [ ] **M10** — Linear SDK _(Wave 3 / Track B)_
+- [-] **M10** — Linear SDK _(Wave 3 / Track B)_
 - [ ] **M11** — Linear CLI _(Wave 5 / Track A)_
 - [ ] **M12** — GitHub (gh) _(Wave 4 / Track B)_
 - [ ] **M13** — Orchestrator _(Wave 6 / Track A)_
