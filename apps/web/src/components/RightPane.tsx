@@ -11,6 +11,7 @@ import { TerminalSwitcher } from './TerminalSwitcher';
 import { useTerminalList } from '../hooks/useTerminal';
 import { RightPaneControls } from './RightPaneControls';
 import { useWorkspaceClearOnSwitch } from '../hooks/useWorkspaceClearOnSwitch';
+import { ChatPane } from './ChatPane';
 
 type RightPaneMode = 'chat' | 'terminal';
 
@@ -88,14 +89,18 @@ export function RightPane() {
       {/* Pane content */}
       <div className="relative flex flex-1 overflow-hidden">
         {mode === 'chat' ? (
-          <div className="flex h-full w-full items-center justify-center p-4">
-            <EmptyState
-              icon={MessageSquare}
-              title="Chat pane ships in M16"
-              body="Agent conversation will stream here during workspace runs."
-              className="max-w-xs border-none"
-            />
-          </div>
+          params.workspaceId ? (
+            <ChatPane workspaceId={params.workspaceId} />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center p-4">
+              <EmptyState
+                icon={MessageSquare}
+                title="Select a workspace"
+                body="Open a workspace to view the agent conversation."
+                className="max-w-xs border-none"
+              />
+            </div>
+          )
         ) : params.workspaceId ? (
           <TerminalPane
             workspaceId={params.workspaceId}
