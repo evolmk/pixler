@@ -19,6 +19,7 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'linear.team', type: 'string', default: '', scopes: ['global', 'project'], label: 'Linear Team', description: 'Default Linear team key' },
   { key: 'linear.syncIntervalMs', type: 'number', default: 30000, scopes: ['global'], label: 'Sync Interval', description: 'Linear sync interval in ms' },
   { key: 'linear.stateMap', type: 'json', default: {}, scopes: ['global', 'project'], label: 'Linear State Map', description: 'Maps Pixler states (todo/in_progress/in_review/done) to Linear state names' },
+  { key: 'linear.agentMode', type: 'string', default: 'cli', scopes: ['global', 'project'], label: 'Linear Agent Mode', description: 'How agents access Linear: cli | mcp | both' },
   { key: 'plans.defaultStorage', type: 'string', default: 'auto', scopes: ['global', 'project'], label: 'Plan Storage', description: 'Plan storage mode' },
   { key: 'plans.fileDir', type: 'string', default: 'docs/plans', scopes: ['global', 'project'], label: 'Plans Directory', description: 'Relative path for plan files' },
   { key: 'models.planner', type: 'string', default: 'claude', scopes: ['global', 'project'], label: 'Planner', description: 'CLI for planning' },

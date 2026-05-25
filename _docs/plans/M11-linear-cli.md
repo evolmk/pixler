@@ -1,8 +1,8 @@
 # M11 — `@pixler/linear-cli` (agent-facing thin CLI)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — all 8 commands implemented, bin wiring done, README written. Sprint 3 in progress.
+**Current Status:** All 3 sprints complete. M11 ready for completion bookkeeping.
 
 ---
 
@@ -123,15 +123,15 @@ against the local api.
 
 ## Sprint 3 — IntegrationsPanel agent-mode picker
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Project Settings → Integrations exposes the Linear agent mode picker (CLI default / MCP
 / Both) per SPEC §6.7.
 
 **Tasks:**
 
-- [ ] Extend `ProjectSettingsDrawer/IntegrationsPanel.tsx` with the picker.
-- [ ] Persist to `settings.linear.agentMode` (project scope).
-- [ ] Show a warning about token cost when MCP or Both is selected.
+- [x] Extend `ProjectSettingsDrawer/IntegrationsPanel.tsx` with the picker.
+- [x] Persist to `settings.linear.agentMode` (project scope).
+- [x] Show a warning about token cost when MCP or Both is selected.
 
 **Files Created/Modified:**
 
