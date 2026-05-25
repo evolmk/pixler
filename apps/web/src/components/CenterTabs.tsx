@@ -20,6 +20,7 @@ import { DiffTab } from './DiffTab';
 import { RunLogsTab } from './RunLogsTab';
 import { PlanTab } from './PlanTab';
 import { CheckpointsTab } from './CheckpointsTab';
+import { ChecksTab } from './ChecksTab';
 
 interface TabConfig {
   value: string;
@@ -128,6 +129,8 @@ export function CenterTabs() {
             <PlanTab />
           ) : tab.value === 'checkpoints' ? (
             <CheckpointsTab />
+          ) : tab.value === 'checks' ? (
+            <ChecksTab onOpenDiff={() => setActiveTab('diff')} />
           ) : (
             <div className="flex h-full min-h-48 items-center justify-center p-4">
               <EmptyState
