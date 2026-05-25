@@ -128,7 +128,7 @@ Socket.io, and persists the project on completion.
 
 ## Sprint 3 — `pixler.json` schema, reader, writer + diff event
 
-**Status:** ⏳ pending
+**Status:** 🔄 in-progress
 **Goal:** Read/write the project's `pixler.json`; on add, if the file exists and differs from
 defaults, emit `project.team-config-diff` for the UI.
 

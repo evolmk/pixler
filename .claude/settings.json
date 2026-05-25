@@ -27,7 +27,8 @@
       "Read(./.env)",
       "Read(./secrets.*.json)",
       "Read(./.mcp.json)",
-      "Bash(rm * * -rf*)"
+      "Bash(rm*-rf*)",
+      "Bash(rm*-fr*)"
     ],
     "ask": [
       "Bash(rm*)",

@@ -3,3 +3,4 @@ export type { ApiError, Paginated, HealthResponse } from './dtos';
 export type { SettingScope, SettingDefinition } from './settings';
 export { settingsRegistry } from './settings';
 export type { Project, AddLocalProjectDto, PatchProjectDto, DeleteProjectMode } from './projects';
+export type { PixlerJson, PixlerJsonDiff } from './pixler-json';

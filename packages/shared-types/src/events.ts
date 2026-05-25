@@ -3,7 +3,8 @@ export type AppEvent =
   | { type: 'pixler.shutdown'; timestamp: number }
   | { type: 'project.clone-progress'; projectId: string; pct: number; line: string; timestamp: number }
   | { type: 'project.clone-complete'; projectId: string; timestamp: number }
-  | { type: 'project.clone-error'; projectId: string; error: string; timestamp: number };
+  | { type: 'project.clone-error'; projectId: string; error: string; timestamp: number }
+  | { type: 'project.team-config-diff'; projectId: string; diff: { key: string; teamValue: unknown; localValue: unknown }[]; timestamp: number };
 
 export type WorkspaceEvent =
   | { type: 'workspace.created'; workspaceId: string; timestamp: number }
