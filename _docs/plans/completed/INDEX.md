@@ -26,3 +26,4 @@
 | M15 | 2026-05-25 | Checkpoints (snapshot + rollback, auto-triggers, CheckpointsTab, RollbackConfirmModal, ⌘K action) |
 | M18 | 2026-05-25 | Checks + activity (ActivityModule, ChecksTab, ActivityFeed, ToastBridge, NotificationsPanel) |
 | M24 | 2026-05-25 | Gestures + deep links (swipe-archive, pull-refresh, pinch-zoom, motion variants, ImageLightbox, DeeplinkModule, pixler:// URL scheme) |
+| M26 | 2026-05-25 | Playwright E2E smoke suite (9 specs across M01–M09, infra, tokens, shell, projects, workspaces, terminal) |
