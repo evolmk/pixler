@@ -20,6 +20,7 @@ import { useLayoutStore } from '../stores/layout';
 import { GeneralPanel } from './ProjectSettingsDrawer/GeneralPanel';
 import { ScriptsPanel } from './ProjectSettingsDrawer/ScriptsPanel';
 import { FilesToCopyPanel } from './ProjectSettingsDrawer/FilesToCopyPanel';
+import { IntegrationsPanel } from './ProjectSettingsDrawer/IntegrationsPanel';
 
 interface CategoryConfig {
   id: string;
@@ -33,7 +34,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'scripts', label: 'Scripts', icon: Terminal },
   { id: 'files-to-copy', label: 'Files to copy', icon: Files },
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
-  { id: 'integrations', label: 'Integrations', icon: Zap, milestone: 'M10' },
+  { id: 'integrations', label: 'Integrations', icon: Zap },
 ];
 
 export function ProjectSettingsDrawer() {
@@ -78,11 +79,13 @@ export function ProjectSettingsDrawer() {
                 <ScriptsPanel />
               ) : activeId === 'files-to-copy' ? (
                 <FilesToCopyPanel />
+              ) : activeId === 'integrations' ? (
+                <IntegrationsPanel />
               ) : (
                 <EmptyState
                   icon={active.icon}
                   title={`${active.label} settings`}
-                  body={`Ships in ${active.milestone}.`}
+                  body={active.milestone ? `Ships in ${active.milestone}.` : undefined}
                   className="border-none"
                 />
               )}

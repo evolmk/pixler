@@ -33,6 +33,7 @@ import {
 } from '@pixler/ui/components/tooltip';
 import { useLayoutStore } from '../stores/layout';
 import { AppearancePanel } from './SettingsDrawer/AppearancePanel';
+import { LinearPanel } from './SettingsDrawer/LinearPanel';
 
 interface CategoryConfig {
   id: string;
@@ -98,6 +99,8 @@ export function SettingsDrawer() {
           <div className="flex-1 overflow-y-auto p-6">
             {activeId === 'appearance' ? (
               <AppearancePanel />
+            ) : activeId === 'linear' ? (
+              <LinearPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState

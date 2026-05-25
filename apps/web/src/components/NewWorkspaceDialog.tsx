@@ -19,14 +19,15 @@ interface NewWorkspaceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   projectId: string;
+  prefillTicketId?: string;
 }
 
 type Step = 'form' | 'creating';
 
-export function NewWorkspaceDialog({ open, onOpenChange, projectId }: NewWorkspaceDialogProps) {
+export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicketId }: NewWorkspaceDialogProps) {
   const [step, setStep] = useState<Step>('form');
   const [mode, setMode] = useState<WorkspaceMode>('chat');
-  const [ticketId, setTicketId] = useState('');
+  const [ticketId, setTicketId] = useState(prefillTicketId ?? '');
   const [customName, setCustomName] = useState('');
   const [error, setError] = useState('');
   const [setupLog, setSetupLog] = useState<string[]>([]);

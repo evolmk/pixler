@@ -8,6 +8,7 @@ import { WorkspaceCard } from './WorkspaceCard';
 import { NewWorkspaceDialog } from './NewWorkspaceDialog';
 import { RemoveWorkspaceModal } from './RemoveWorkspaceModal';
 import { BigTerminalToggle } from './BigTerminalToggle';
+import { LinearTicketList } from './LinearTicketList';
 import type { Workspace } from '@pixler/shared-types';
 
 export function WorkspacesSidebar() {
@@ -99,6 +100,8 @@ export function WorkspacesSidebar() {
           </details>
         )}
       </div>
+
+      {projectId && <LinearTicketList projectId={projectId} />}
 
       <BigTerminalToggle />
 

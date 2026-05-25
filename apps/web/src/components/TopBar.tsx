@@ -27,6 +27,7 @@ import { useLayoutStore } from '../stores/layout';
 import { useSetting } from '../hooks/useSetting';
 import { useProjects } from '../hooks/useProjects';
 import { NewProjectDialog } from './NewProjectDialog';
+import { LinearStatusPill } from './LinearStatusPill';
 import type { ThemeMode } from '@pixler/ui-styles';
 
 const MODE_ICONS: Record<ThemeMode, typeof Sun> = {
@@ -131,6 +132,8 @@ export function TopBar() {
       </Button>
 
       <span className="flex-1" />
+
+      <LinearStatusPill />
 
       {/* ⌘K command palette */}
       <Button
