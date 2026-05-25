@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M23-token-health
-**Next Plan:** M24-gestures-deeplinks
+**Last Plan Completed:** M14-plan-storage
+**Next Plan:** M15-checkpoints
 
 ---
 
@@ -11,7 +11,7 @@
 | Instance                              | Plan              | Status         |
 |---------------------------------------|-------------------|----------------|
 | **evolmk** (default `~/.claude`)      | M23-token-health  | ✅ complete    |
-| **evolmikek** (`~/.claude-evolmikek`) | M14-plan-storage  | 🔄 in-progress (assumed) |
+| **evolmikek** (`~/.claude-evolmikek`) | M15-checkpoints   | 🔄 in-progress |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
 > show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.
@@ -34,7 +34,7 @@
 - [x] **M11** — Linear CLI _(Wave 5 / Track A)_
 - [x] **M12** — GitHub (gh) _(Wave 4 / Track B)_
 - [x] **M13** — Orchestrator _(Wave 6 / Track A)_
-- [ ] **M14** — Plan storage _(Wave 7 / Track B)_
+- [x] **M14** — Plan storage _(Wave 7 / Track B)_
 - [ ] **M15** — Checkpoints _(Wave 8 / Track B)_
 - [ ] **M16** — Chat UI _(Wave 7 / Track A)_
 - [x] **M17** — Diff viewer _(Wave 5 / Track B)_
