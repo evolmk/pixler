@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 3 (model prober backend) complete — starting Sprint 4 (model picker UI)
+**Current Status:** Sprint 4 (model picker UI) complete — starting Sprint 5 (workflow engine core)
 
 ---
 
@@ -218,23 +218,25 @@ apps/web/src/components/OnboardingDrawer.tsx  # extend steps 2 + 3
 
 ## Sprint 4 — Model picker UI (frontend)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Redesign both global and project-level ModelsPanel with two-step provider + model picker, refresh button, and workflow-step-aware role assignments.
 
 **Tasks:**
 
-- [ ] Create `useModels.ts` hook — `useModelRegistry` query (fetches `GET /models`), `useRefreshModels` mutation (`POST /models/refresh`), listens for `models:updated` Socket.io event to invalidate cache
-- [ ] Redesign global `SettingsDrawer/ModelsPanel.tsx` — provider dropdown (only shows providers with detected CLIs) + model dropdown (filtered to selected provider's families/versions, grouped by family); "Refresh models" button with spinner; warning badge if previously selected model no longer available
-- [ ] Redesign project `ProjectSettingsDrawer/ModelsPanel.tsx` — same provider+model picker pattern with "Use global default" option per role
-- [ ] Ensure both panels show per-workflow-step role assignments (planner, reviewer, executor) with the two-step picker for each
+- [x] Create `useModels.ts` hook — `useModelRegistry` query (fetches `GET /models`), `useRefreshModels` mutation (`POST /models/refresh`), listens for `models:updated` Socket.io event to invalidate cache
+- [x] Redesign global `SettingsDrawer/ModelsPanel.tsx` — provider dropdown (only shows providers with detected CLIs) + model dropdown (filtered to selected provider's families/versions, grouped by family); "Refresh models" button with spinner; warning badge if previously selected model no longer available
+- [x] Redesign project `ProjectSettingsDrawer/ModelsPanel.tsx` — same provider+model picker pattern with "Use global default" option per role
+- [x] Ensure both panels show per-workflow-step role assignments (planner, reviewer, executor) with the two-step picker for each
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useModels.ts` — new: useModelRegistry, useRefreshModels, resolveModel, firstAvailableModel
+- `apps/web/src/components/SettingsDrawer/ModelsPanel.tsx` — redesigned: provider+model picker, Refresh button, stale warning
+- `apps/web/src/components/ProjectSettingsDrawer/ModelsPanel.tsx` — redesigned: same picker + "Global default" option per role
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w typecheck && pnpm -w dev` — manually verify model picker shows detected models, refresh button works, per-role assignments persist
 
