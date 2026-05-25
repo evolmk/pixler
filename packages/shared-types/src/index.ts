@@ -6,6 +6,7 @@ export type { Project, AddLocalProjectDto, PatchProjectDto, DeleteProjectMode } 
 export type { PixlerJson, PixlerJsonDiff } from './pixler-json';
 export type { Workspace, WorkspaceState, WorkspaceMode, TicketSource, CreateWorkspaceDto, PatchWorkspaceDto } from './workspaces';
 export { COLOR_NAMES } from './color-names';
+export { slugify } from './slugify';
 export type { ColorName } from './color-names';
 export type { LinearTicket, LinearStatusDto, LinearTeamDto, LinearProjectDto, ConnectLinearDto, LinearTicketDto } from './linear';
 export type { Terminal, ResizeTerminalDto } from './terminals';
@@ -18,3 +19,4 @@ export type { PlanStorageMode, PlanStatus, PlanFrontmatter, Plan, SavePlanDto, R
 export type { MessageRole, MessageContentType, Message, SendMessageDto, MessagesPage } from './messages';
 export type { ActivityScope, ActivitySeverity, ActivityKind, Activity, RecordActivityDto, MarkSeenDto, ActivitiesPage } from './activity';
 export type { CheckpointTrigger, Checkpoint, TakeCheckpointDto } from './checkpoints';
+export type { AuthMethod, AuthService, OAuthInitDto, ConnectGithubPATDto, DisconnectAuthDto } from './auth';

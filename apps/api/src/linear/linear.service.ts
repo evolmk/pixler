@@ -4,14 +4,25 @@ import { SecretStoreService } from './secret-store.service';
 import type { LinearStatusDto, LinearTeamDto, LinearProjectDto, LinearTicketDto } from '@pixler/shared-types';
 
 const PAT_KEY = 'linear.pat';
+const OAUTH_TOKEN_KEY = 'linear.oauth.accessToken';
 
 @Injectable()
 export class LinearService {
   constructor(private readonly secrets: SecretStoreService) {}
 
   async getClient(): Promise<LinearClient | null> {
+    const method = await this.secrets.getAuthMethod('linear');
+
+    if (method === 'oauth') {
+      const token = await this.secrets.get(OAUTH_TOKEN_KEY);
+      if (!token) return null;
+      return new LinearClient({ accessToken: token });
+    }
+
+    // 'pat' or legacy (no authMethod stored yet — auto-migrate if PAT exists)
     const pat = await this.secrets.get(PAT_KEY);
     if (!pat) return null;
+    if (!method) await this.secrets.setAuthMethod('linear', 'pat');
     return new LinearClient({ apiKey: pat });
   }
 
@@ -30,34 +41,74 @@ export class LinearService {
     const org = await viewer.organization;
 
     await this.secrets.set(PAT_KEY, pat);
+    await this.secrets.setAuthMethod('linear', 'pat');
 
     return {
       connected: true,
+      authMethod: 'pat',
       viewerName: viewer.name,
       viewerEmail: viewer.email,
       organization: org?.name,
     };
   }
 
+  async connectOAuth(accessToken: string): Promise<LinearStatusDto> {
+    let client: LinearClient;
+    try {
+      client = new LinearClient({ accessToken });
+      await client.viewer;
+    } catch {
+      throw new UnauthorizedException('Invalid Linear OAuth token');
+    }
+
+    const viewer = await client.viewer;
+    if (!viewer) throw new UnauthorizedException('Invalid Linear OAuth token');
+
+    const org = await viewer.organization;
+
+    await this.secrets.set(OAUTH_TOKEN_KEY, accessToken);
+    await this.secrets.setAuthMethod('linear', 'oauth');
+
+    return {
+      connected: true,
+      authMethod: 'oauth',
+      viewerName: viewer.name,
+      viewerEmail: viewer.email,
+      organization: org?.name,
+    };
+  }
+
+  /** Soft-disconnect: deactivates current method but keeps stored credentials. */
   async disconnect(): Promise<void> {
-    await this.secrets.delete(PAT_KEY);
+    await this.secrets.softDisconnect('linear');
+  }
+
+  /** Hard-remove: deletes the stored credential for the given method. */
+  async removeCredential(method: 'pat' | 'oauth'): Promise<void> {
+    const key = method === 'oauth' ? OAUTH_TOKEN_KEY : PAT_KEY;
+    const activeMethod = await this.secrets.getAuthMethod('linear');
+    if (activeMethod === method) await this.secrets.setAuthMethod('linear', null);
+    await this.secrets.delete(key);
   }
 
   async status(): Promise<LinearStatusDto> {
+    const rawMethod = await this.secrets.getAuthMethod('linear');
+    const method = (rawMethod === 'cli' ? null : rawMethod) as 'pat' | 'oauth' | null;
     const client = await this.getClient();
-    if (!client) return { connected: false };
+    if (!client) return { connected: false, authMethod: method };
 
     try {
       const viewer = await client.viewer;
       const org = await viewer.organization;
       return {
         connected: true,
+        authMethod: method,
         viewerName: viewer.name,
         viewerEmail: viewer.email,
         organization: org?.name,
       };
     } catch {
-      return { connected: false };
+      return { connected: false, authMethod: method };
     }
   }
 

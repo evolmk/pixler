@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DatabaseService } from '../db/database.service';
+import type { AuthMethod } from '@pixler/shared-types';
 
 const SERVICE = 'pixler';
 
@@ -69,5 +70,23 @@ export class SecretStoreService implements OnModuleInit {
     this.db.connection
       .prepare('DELETE FROM settings_global WHERE key = ?')
       .run(`secret:${key}`);
+  }
+
+  async getAuthMethod(service: 'linear' | 'github'): Promise<AuthMethod | null> {
+    const val = await this.get(`${service}.authMethod`);
+    return (val as AuthMethod) ?? null;
+  }
+
+  async setAuthMethod(service: 'linear' | 'github', method: AuthMethod | null): Promise<void> {
+    if (method === null) {
+      await this.delete(`${service}.authMethod`);
+    } else {
+      await this.set(`${service}.authMethod`, method);
+    }
+  }
+
+  /** Deactivates the current auth method without deleting stored credentials. */
+  async softDisconnect(service: 'linear' | 'github'): Promise<void> {
+    await this.setAuthMethod(service, null);
   }
 }

@@ -24,9 +24,10 @@ import { TelemetryModule } from './telemetry/telemetry.module';
 import { CrashesModule } from './crashes/crashes.module';
 import { LogsModule } from './common/logger/logs.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule, ActivityModule, DeeplinkModule, TelemetryModule, CrashesModule, LogsModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule, ActivityModule, DeeplinkModule, TelemetryModule, CrashesModule, LogsModule, AuthModule],
   controllers: [HealthController],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
