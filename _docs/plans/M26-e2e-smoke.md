@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M09.
+**Current Status:** Sprint 1 complete — infra set up. Sprint 2 in-progress.
 
 ---
 
@@ -58,24 +58,24 @@ pnpm-workspace.yaml                 (confirm apps/e2e included)
 
 ## Sprint 1 — Infrastructure: workspace + Playwright config + helpers + turbo task
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** `apps/e2e` exists as a runnable Turborepo workspace; `pnpm test:e2e` boots the dev
 server and runs an empty (or trivial) spec successfully.
 
 **Tasks:**
 
-- [ ] `apps/e2e/package.json` — `@pixler/e2e`, deps `@playwright/test` + `dotenv`; scripts
+- [x] `apps/e2e/package.json` — `@pixler/e2e`, deps `@playwright/test` + `dotenv`; scripts
   `test`, `test:ui`, `report`.
-- [ ] `apps/e2e/playwright.config.ts` — `baseURL: http://localhost:7777`; `webServer`
+- [x] `apps/e2e/playwright.config.ts` — `baseURL: http://localhost:7777`; `webServer`
   `pnpm -w dev` with `reuseExistingServer: true`; chromium + firefox projects; HTML + list
   reporters; `testDir: ./tests`, `timeout: 30000`, `retries: 1`.
-- [ ] `apps/e2e/tests/helpers/socket.ts` — `waitForSocketConnected(page)` polling `page.evaluate`
+- [x] `apps/e2e/tests/helpers/socket.ts` — `waitForSocketConnected(page)` polling `page.evaluate`
   until Socket.io client reports connected.
-- [ ] `apps/e2e/.gitignore` — `playwright-report/`, `test-results/`, `.auth/`.
-- [ ] `turbo.json` add `test:e2e` task: `dependsOn ["^build"]`, `cache: false`, `env
+- [x] `apps/e2e/.gitignore` — `playwright-report/`, `test-results/`, `.auth/`.
+- [x] `turbo.json` add `test:e2e` task: `dependsOn ["^build"]`, `cache: false`, `env
   ["PIXLER_RUNNING"]`.
-- [ ] Root `package.json` add `"test:e2e": "turbo run test:e2e"`.
-- [ ] `pnpm-workspace.yaml` confirm `apps/e2e` is included.
+- [x] Root `package.json` add `"test:e2e": "turbo run test:e2e"`.
+- [x] `pnpm-workspace.yaml` confirm `apps/e2e` is included.
 
 **Files Created/Modified:**
 
