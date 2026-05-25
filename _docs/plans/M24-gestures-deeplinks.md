@@ -1,8 +1,8 @@
 # M24 — Gestures, animations polish, deep links (`pixler://`)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M03 + M07 + M08 + M10.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — gesture wiring done. Sprint 2 in-progress.
 
 ---
 
@@ -53,26 +53,28 @@ apps/web/src/components/SettingsDrawer/ExternalToolsPanel.tsx (extend with URL s
 
 ## Sprint 1 — Gesture wiring (swipe / pull / long-press / pinch)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** All four gesture patterns are live on their target surfaces.
 
 **Tasks:**
 
-- [ ] Add `@use-gesture/react` to `apps/web/package.json`.
-- [ ] `WorkspaceCard.tsx` — swipe-to-archive: drag horizontally; on > 50% displacement OR
+- [x] Add `@use-gesture/react` and `motion` to `apps/web/package.json`.
+- [x] `WorkspaceCard.tsx` — swipe-to-archive: drag horizontally; on > 50% displacement OR
   velocity-flick, fire archive; Motion spring-back / spring-out.
-- [ ] `LinearTicketList.tsx` — pull-to-refresh: drag down past threshold → triggers
+- [x] `LinearTicketList.tsx` — pull-to-refresh: drag down past threshold → triggers
   `POST /api/linear/sync`.
-- [ ] Long-press on workspace card → opens context menu (M08 menu, here we add gesture path).
-- [ ] `DiffEditor.tsx` — pinch-to-zoom: pinch scales font-size with a clamp.
+- [x] Long-press on workspace card → opens context menu (M08 menu, here we add gesture path).
+- [x] `DiffEditor.tsx` — pinch-to-zoom: pinch scales font-size with a clamp.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/WorkspaceCard.tsx` — swipe-to-archive, long-press context menu
+- `apps/web/src/components/LinearTicketList.tsx` — pull-to-refresh gesture
+- `apps/web/src/components/DiffEditor.tsx` — pinch-to-zoom font size
 
 **Issues Encountered:**
 
-- _none yet_
+- `@use-gesture/react` `onDrag` conflicts with `motion.div` `onDrag` signature. Fixed by casting `bind()` as `React.HTMLAttributes<HTMLDivElement>` and spreading onto plain `<div>` wrappers, keeping `<motion.div>` inside for animation only.
 
 **Verify:** `pnpm --filter @pixler/web build` + manual: swipe / pull / long-press / pinch on a touch device or emulator.
 

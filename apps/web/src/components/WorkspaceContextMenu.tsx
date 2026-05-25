@@ -15,9 +15,11 @@ import type { Workspace } from '@pixler/shared-types';
 interface WorkspaceContextMenuProps {
   workspace: Workspace;
   onRemove: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function WorkspaceContextMenu({ workspace, onRemove }: WorkspaceContextMenuProps) {
+export function WorkspaceContextMenu({ workspace, onRemove, open, onOpenChange }: WorkspaceContextMenuProps) {
   const patch = usePatchWorkspace();
   const archive = useArchiveWorkspace();
   const rerun = useRerunSetup();
@@ -27,7 +29,7 @@ export function WorkspaceContextMenu({ workspace, onRemove }: WorkspaceContextMe
   const isRunReady = runStatus?.state === 'ready';
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
