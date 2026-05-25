@@ -46,6 +46,8 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'layout.bigTerminal', type: 'boolean', default: false, scopes: ['global'], label: 'Big Terminal', description: 'Right pane expanded full-bleed' },
   { key: 'diff.wordWrap', type: 'string', default: 'off', scopes: ['global'], label: 'Diff Word Wrap', description: 'Word wrap in diff viewer: off | on' },
   { key: 'diff.renderWhitespace', type: 'string', default: 'none', scopes: ['global'], label: 'Diff Whitespace', description: 'Render whitespace in diff viewer: none | boundary | all' },
+  { key: 'keyboard.preset', type: 'string', default: 'default', scopes: ['global'], label: 'Keyboard Preset', description: 'Keyboard shortcut preset: default | vim | emacs' },
+  { key: 'keyboard.bindings', type: 'json', default: {}, scopes: ['global'], label: 'Keyboard Bindings', description: 'User overrides for keyboard shortcuts (actionId → key string)' },
   { key: 'ide.default', type: 'string', default: '', scopes: ['global'], label: 'Default IDE', description: 'IDE id to use by default (vscode, cursor, zed, etc.)' },
   { key: 'onboarding.completedAt', type: 'number', default: 0, scopes: ['global'], label: 'Onboarding Completed At', description: 'Unix timestamp when onboarding was completed (0 = not complete)' },
   { key: 'onboarding.currentStep', type: 'number', default: 1, scopes: ['global'], label: 'Onboarding Current Step', description: 'Last active onboarding step (1–5)' },

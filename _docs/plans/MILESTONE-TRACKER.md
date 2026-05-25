@@ -1,17 +1,17 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M21-onboarding
-**Next Plan:** M22-palette-keys
+**Last Plan Completed:** M22-palette-keys
+**Next Plan:** M23-token-health
 
 ---
 
 ## Currently Running
 
-| Instance                              | Plan           | Status         |
-|---------------------------------------|----------------|----------------|
-| **evolmk** (default `~/.claude`)      | M09-terminal    | ✅ complete    |
-| **evolmikek** (`~/.claude-evolmikek`) | M21-onboarding  | ✅ complete    |
+| Instance                              | Plan              | Status         |
+|---------------------------------------|-------------------|----------------|
+| **evolmk** (default `~/.claude`)      | M22-palette-keys  | ✅ complete    |
+| **evolmikek** (`~/.claude-evolmikek`) | M13-orchestrator  | 🔄 in-progress (assumed) |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
 > show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.
@@ -42,7 +42,7 @@
 - [x] **M19** — Run + IDE _(Wave 6 / Track B)_
 - [x] **M20** — Themes _(Wave 8 / Track A)_
 - [x] **M21** — Onboarding _(Wave 9 / Track A)_
-- [ ] **M22** — Palette + keys _(Wave 10 / Track A)_
+- [x] **M22** — Palette + keys _(Wave 10 / Track A)_
 - [ ] **M23** — Token health _(Wave 10 / Track B)_
 - [ ] **M24** — Gestures + deep links _(Wave 11 / Track A)_
 - [ ] **M25** — Ship _(Wave 12 — serial, last)_

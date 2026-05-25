@@ -36,6 +36,11 @@ export class WorkspacesController {
     return this.workspaces.rerunSetup(id);
   }
 
+  @Get(':id/files')
+  listFiles(@Param('id') id: string) {
+    return this.workspaces.listFiles(id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.workspaces.remove(id);

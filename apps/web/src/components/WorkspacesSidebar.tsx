@@ -5,7 +5,7 @@ import { useParams } from '@tanstack/react-router';
 import { useLayoutStore } from '../stores/layout';
 import { useWorkspaces } from '../hooks/useWorkspaces';
 import { WorkspaceCard } from './WorkspaceCard';
-import { NewWorkspaceDialog } from './NewWorkspaceDialog';
+import { GuidedNewWorkspaceDialog } from './GuidedNewWorkspaceDialog';
 import { RemoveWorkspaceModal } from './RemoveWorkspaceModal';
 import { BigTerminalToggle } from './BigTerminalToggle';
 import { LinearTicketList } from './LinearTicketList';
@@ -19,8 +19,9 @@ export function WorkspacesSidebar() {
   const params = useParams({ strict: false }) as { projectId?: string };
   const projectId = params.projectId;
 
+  const newOpen = useLayoutStore((s) => s.newWorkspaceOpen);
+  const setNewOpen = useLayoutStore((s) => s.setNewWorkspaceOpen);
   const { data: workspaces = [] } = useWorkspaces(projectId);
-  const [newOpen, setNewOpen] = useState(false);
   const [pendingRemove, setPendingRemove] = useState<Workspace | null>(null);
 
   const active = workspaces.filter((w) => w.state !== 'archived');
@@ -63,15 +64,15 @@ export function WorkspacesSidebar() {
           </p>
         )}
         {active.length === 0 && projectId && (
-          <p className="px-2 py-4 text-center text-xs text-muted-foreground">
-            No workspaces yet.{' '}
+          <div className="px-3 py-6 flex flex-col items-center gap-3 text-center">
+            <p className="text-xs text-muted-foreground">No workspaces yet</p>
             <button
-              className="text-primary hover:underline"
               onClick={() => setNewOpen(true)}
+              className="w-full rounded-lg border border-dashed border-primary/50 bg-primary/5 py-3 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
             >
-              Create one
+              + Create your first workspace
             </button>
-          </p>
+          </div>
         )}
         <div className="space-y-0.5">
           {active.map((ws) => (
@@ -106,7 +107,7 @@ export function WorkspacesSidebar() {
       <BigTerminalToggle />
 
       {projectId && (
-        <NewWorkspaceDialog
+        <GuidedNewWorkspaceDialog
           open={newOpen}
           onOpenChange={setNewOpen}
           projectId={projectId}

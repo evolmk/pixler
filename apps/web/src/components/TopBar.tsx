@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, ChevronDown, Command, FolderPlus, Monitor, Moon, Plus, Settings, Settings2, Sun } from 'lucide-react';
+import { Bell, BookOpen, ChevronDown, Command, FolderPlus, HelpCircle, Keyboard, Monitor, Moon, Plus, Settings, Settings2, Sun } from 'lucide-react';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { Button } from '@pixler/ui/components/button';
 import {
@@ -16,21 +16,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@pixler/ui/components/dialog';
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandInput,
-  CommandList,
-} from '@pixler/ui/components/command';
 import { useThemeStore } from '../stores/theme';
 import { useLayoutStore } from '../stores/layout';
 import { useSetting } from '../hooks/useSetting';
 import { useProjects } from '../hooks/useProjects';
+import { usePaletteStore } from '../stores/palette';
 import { NewProjectDialog } from './NewProjectDialog';
 import { LinearStatusPill } from './LinearStatusPill';
 import { RunButton } from './RunButton';
 import { OpenAppButton } from './OpenAppButton';
 import { OpenInIdeMenu } from './OpenInIdeMenu';
+import { OnboardingShell } from './Onboarding/OnboardingShell';
+import { CommandPalette } from './CommandPalette';
+import { ShortcutsHelpModal } from './ShortcutsHelpModal';
 import { useOpenInIde } from '../hooks/useIDEs';
 import type { ThemeMode } from '@pixler/ui-styles';
 
@@ -44,8 +42,10 @@ const MODE_CYCLE: ThemeMode[] = ['light', 'dark', 'system'];
 
 export function TopBar() {
   const [workspaceDialogOpen, setWorkspaceDialogOpen] = useState(false);
-  const [commandOpen, setCommandOpen] = useState(false);
   const [newProjectOpen, setNewProjectOpen] = useState(false);
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
+  const setPaletteOpen = usePaletteStore((s) => s.setOpen);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const { mode, resolvedMode, setMode } = useThemeStore();
   const setSettingsOpen = useLayoutStore((s) => s.setSettingsOpen);
@@ -165,7 +165,7 @@ export function TopBar() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setCommandOpen(true)}
+        onClick={() => setPaletteOpen(true)}
         className="gap-1 text-xs text-muted-foreground"
         aria-label="Open command palette"
       >
@@ -178,7 +178,33 @@ export function TopBar() {
         <Bell />
       </Button>
 
-      {/* Settings gear — opens drawer stub; Sprint 4 replaces with real Vaul drawer */}
+      {/* Help menu */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon-sm" aria-label="Help">
+            <HelpCircle />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem
+            onClick={() => setShortcutsHelpOpen(true)}
+            className="gap-2 text-xs"
+          >
+            <Keyboard className="size-3.5" />
+            Keyboard shortcuts
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => setOnboardingOpen(true)}
+            className="gap-2 text-xs"
+          >
+            <BookOpen className="size-3.5" />
+            Re-run onboarding
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Settings gear */}
       <Button
         variant="ghost"
         size="icon-sm"
@@ -209,13 +235,16 @@ export function TopBar() {
         </DialogContent>
       </Dialog>
 
-      {/* ⌘K command palette stub — M22 wires real commands */}
-      <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
-        <CommandInput placeholder="Type a command or search…" />
-        <CommandList>
-          <CommandEmpty>Command palette ships in M22.</CommandEmpty>
-        </CommandList>
-      </CommandDialog>
+      {/* ⌘K command palette */}
+      <CommandPalette />
+
+      {/* Keyboard shortcuts help modal */}
+      <ShortcutsHelpModal open={shortcutsHelpOpen} onOpenChange={setShortcutsHelpOpen} />
+
+      {/* Re-run onboarding from Help menu */}
+      {onboardingOpen && (
+        <OnboardingShell forceOpen onClose={() => setOnboardingOpen(false)} />
+      )}
     </header>
   );
 }

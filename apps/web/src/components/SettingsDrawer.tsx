@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
   Bell,
@@ -37,6 +37,7 @@ import { LinearPanel } from './SettingsDrawer/LinearPanel';
 import { TerminalPanel } from './SettingsDrawer/TerminalPanel';
 import { ProvidersPanel } from './SettingsDrawer/ProvidersPanel';
 import { ExternalToolsPanel } from './SettingsDrawer/ExternalToolsPanel';
+import { KeyboardPanel } from './SettingsDrawer/KeyboardPanel';
 
 interface CategoryConfig {
   id: string;
@@ -64,9 +65,14 @@ const CATEGORIES: CategoryConfig[] = [
 ];
 
 export function SettingsDrawer() {
-  const [activeId, setActiveId] = useState('appearance');
   const open = useLayoutStore((s) => s.settingsOpen);
+  const settingsTab = useLayoutStore((s) => s.settingsTab);
   const setOpen = useLayoutStore((s) => s.setSettingsOpen);
+  const [activeId, setActiveId] = useState(settingsTab);
+
+  useEffect(() => {
+    if (open) setActiveId(settingsTab);
+  }, [open, settingsTab]);
 
   const active = CATEGORIES.find((c) => c.id === activeId) ?? CATEGORIES[7];
 
@@ -110,6 +116,8 @@ export function SettingsDrawer() {
               <ProvidersPanel />
             ) : activeId === 'external-tools' ? (
               <ExternalToolsPanel />
+            ) : activeId === 'keyboard' ? (
+              <KeyboardPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState

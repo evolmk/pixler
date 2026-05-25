@@ -22,14 +22,17 @@ interface LayoutState {
   fullBleed: FullBleedPane;
   bigTerminal: boolean;
   settingsOpen: boolean;
+  settingsTab: string;
   projectSettingsOpen: boolean;
+  newWorkspaceOpen: boolean;
   setOuter: (outer: [number, number]) => void;
   setInner: (inner: [number, number]) => void;
   hydrate: (panes: Partial<PaneLayout>) => void;
   setFullBleed: (pane: FullBleedPane) => void;
   toggleBigTerminal: () => void;
-  setSettingsOpen: (open: boolean) => void;
+  setSettingsOpen: (open: boolean, tab?: string) => void;
   setProjectSettingsOpen: (open: boolean) => void;
+  setNewWorkspaceOpen: (open: boolean) => void;
 }
 
 export const useLayoutStore = create<LayoutState>((set) => ({
@@ -37,12 +40,16 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   fullBleed: null,
   bigTerminal: false,
   settingsOpen: false,
+  settingsTab: 'appearance',
   projectSettingsOpen: false,
+  newWorkspaceOpen: false,
   setOuter: (outer) => set((s) => ({ panes: { ...s.panes, outer } })),
   setInner: (inner) => set((s) => ({ panes: { ...s.panes, inner } })),
   hydrate: (panes) => set((s) => ({ panes: { ...s.panes, ...panes } })),
   setFullBleed: (fullBleed) => set({ fullBleed }),
   toggleBigTerminal: () => set((s) => ({ bigTerminal: !s.bigTerminal })),
-  setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
+  setSettingsOpen: (settingsOpen, tab) =>
+    set((s) => ({ settingsOpen, settingsTab: tab ?? s.settingsTab })),
   setProjectSettingsOpen: (projectSettingsOpen) => set({ projectSettingsOpen }),
+  setNewWorkspaceOpen: (newWorkspaceOpen) => set({ newWorkspaceOpen }),
 }));

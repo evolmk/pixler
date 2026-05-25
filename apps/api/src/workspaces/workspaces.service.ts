@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { execSync } from 'child_process';
 import { DatabaseService } from '../db/database.service';
 import { PortAllocatorService } from './port-allocator.service';
 import { NameGeneratorService } from './name-generator.service';
@@ -146,6 +147,25 @@ export class WorkspacesService {
     }
 
     return { ok: true };
+  }
+
+  listFiles(id: string): { files: string[] } {
+    const workspace = this.findOne(id);
+    const cwd = workspace.worktree_path;
+    if (!cwd) return { files: [] };
+    try {
+      const out = execSync('git ls-files --cached --others --exclude-standard', {
+        cwd,
+        timeout: 5000,
+        maxBuffer: 1024 * 1024,
+      })
+        .toString()
+        .trim();
+      const files = out ? out.split('\n') : [];
+      return { files };
+    } catch {
+      return { files: [] };
+    }
   }
 
   async remove(id: string): Promise<{ ok: boolean }> {

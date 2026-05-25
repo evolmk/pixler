@@ -18,3 +18,4 @@
 | M19 | 2026-05-25 | Run + IDE (RunModule, IDEModule, RunButton, OpenAppButton, OpenInIdeMenu, ⌘+E) |
 | M20 | 2026-05-25 | Themes (8 themes, ThemeSwatchGrid, hover preview, Monaco/Shiki sync, project override) |
 | M21 | 2026-05-25 | Onboarding (5-step Vaul drawer, tool-detector, guided workspace CTA, Help re-run) |
+| M22 | 2026-05-25 | Command palette (cmdk, action registry, dynamic sections, hotkey engine, KeyboardPanel, presets) |

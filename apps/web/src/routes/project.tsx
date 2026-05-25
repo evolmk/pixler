@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { usePaletteActions } from '../hooks/usePaletteActions';
 import { ResizableSplit } from '@pixler/ui/components/resizable-split';
 import { Toaster } from '@pixler/ui/components/sonner';
 import { useSetting } from '../hooks/useSetting';
@@ -17,6 +18,7 @@ import { TeamConfigDiffModal } from '../components/TeamConfigDiffModal';
  * expand chevrons each render only the relevant component.
  */
 export function ProjectShell() {
+  usePaletteActions();
   const panes = useLayoutStore((s) => s.panes);
   const setOuter = useLayoutStore((s) => s.setOuter);
   const setInner = useLayoutStore((s) => s.setInner);
