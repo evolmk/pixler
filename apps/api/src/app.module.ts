@@ -7,9 +7,10 @@ import { ProjectsModule } from './projects/projects.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { LinearModule } from './linear/linear.module';
 import { TerminalsModule } from './terminals/terminals.module';
+import { GithubModule } from './github/github.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule],
   controllers: [HealthController],
 })
 export class AppModule {}

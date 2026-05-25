@@ -1,8 +1,8 @@
 # M12 — GitHub integration (`gh` CLI wrapper)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M05 + M07 + M08.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — GithubModule wired, auth/repo endpoints live. Sprint 2 in progress.
 
 ---
 
@@ -55,24 +55,33 @@ apps/web/src/hooks/useGithubStatus.ts
 
 ## Sprint 1 — GithubModule + auth/repo endpoints + gh-exec wrapper
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Module + service in place; status + repo info endpoints return parsed `gh` output.
 
 **Tasks:**
 
-- [ ] `gh-exec.service.ts` — wraps `gh` via `execa`; uses path from `settings.providers.gh`.
-- [ ] `GithubModule` + `GithubService` + `GithubController`.
-- [ ] `GET /api/github/status` — parses `gh auth status --hostname github.com`.
-- [ ] `GET /api/github/repo?projectId=…` — runs `gh repo view --json …` in project cwd; cached 60s.
-- [ ] `packages/shared-types/src/github.ts` DTOs.
+- [x] `gh-exec.service.ts` — wraps `gh` via `child_process.execFile`; uses path from `settings.providers.gh`.
+- [x] `GithubModule` + `GithubService` + `GithubController`.
+- [x] `GET /api/github/status` — parses `gh auth status --hostname github.com`.
+- [x] `GET /api/github/repo?projectId=…` — runs `gh repo view --json …` in project cwd; cached 60s.
+- [x] `packages/shared-types/src/github.ts` DTOs.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/github/gh-exec.service.ts`
+- `apps/api/src/github/github.module.ts`
+- `apps/api/src/github/github.service.ts`
+- `apps/api/src/github/github.controller.ts`
+- `apps/api/src/github/github.service.spec.ts`
+- `apps/api/src/app.module.ts` — import GithubModule
+- `apps/api/tsconfig.json` — exclude spec files from typecheck
+- `packages/shared-types/src/github.ts`
+- `packages/shared-types/src/index.ts` — export github types
 
 **Issues Encountered:**
 
-- _none yet_
+- Controller had wrong prefix `api/github` (should be `github`); fixed.
+- Spec file used jest globals without @types/jest — excluded spec files from typecheck.
 
 **Verify:** `pnpm --filter @pixler/api test github` — mock execa, verify status parse.
 
