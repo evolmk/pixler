@@ -101,7 +101,17 @@ Don't trust the checkboxes blindly — verify against the code:
 - **Execute next sprint only** — run one sprint, then pause. Use for risky work (auth, payments,
   schema migration, cross-service changes).
 
-### 4. Do the work (per sprint)
+### 4. Model check (before executing)
+
+- Note which model this session is running (stated in your environment context).
+- If it is **not** a Sonnet model: sprint execution is well-specified implementation that Sonnet
+  handles well and that burns far less of the 5-hour usage window than Opus (reserve Opus for plan
+  *authoring* and hard debugging). Surface a one-line recommendation and ask whether to **(a)**
+  pause so the user can run `/model sonnet`, or **(b)** proceed on the current model.
+- You can't switch the model yourself — only the user can, via `/model` or settings. Don't claim to
+  have switched it. If already on a Sonnet model, skip silently.
+
+### 5. Do the work (per sprint)
 
 - Find the next pending sprint; flip its tasks to `[-]` as you start them.
 - Implement the sprint.
@@ -115,7 +125,7 @@ Don't trust the checkboxes blindly — verify against the code:
   record of progress that `git log` and the plan file should agree on.
 - In "all sprints" mode, continue to the next sprint. In "next sprint only" mode, stop and report.
 
-### 5. Finish
+### 6. Finish
 
 When every sprint is `[x]`: set `Status: ✅ COMPLETE`, write the final Current Status. **For
 completion bookkeeping (move to `_docs/plans/completed/`, append `-COMPLETE` suffix, update

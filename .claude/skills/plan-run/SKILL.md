@@ -42,13 +42,23 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
      and follow the Pixler completion protocol in `_docs/plans/CLAUDE.md` (move to
      `_docs/plans/completed/` with `-COMPLETE` suffix, update `INDEX.md` and `MILESTONE-TRACKER.md`).
 
-6. **Execute the sprint:**
+6. **Model check (before executing):**
+   - Note which model this session is running (stated in your environment context).
+   - If it is **not** a Sonnet model: sprint execution is well-specified implementation that Sonnet
+     handles well and that burns far less of the 5-hour usage window than Opus (reserve Opus for
+     plan *authoring* and hard debugging). Surface a one-line recommendation and ask whether to
+     **(a)** pause so the user can run `/model sonnet`, or **(b)** proceed on the current model.
+   - You can't switch the model yourself — only the user can, via `/model` or settings. Don't claim
+     to have switched it.
+   - If already on a Sonnet model, skip silently.
+
+7. **Execute the sprint:**
    - Flip the sprint's tasks to `[-]` as you start each one, `[x]` as you finish.
    - If the repo has best-practices docs relevant to the work, read them before significant code.
    - **Verify** with the project's check (build / typecheck / tests) before marking anything `[x]`.
    - Update the sprint's "Files Created/Modified" and "Issues Encountered" as you go.
 
-7. **After sprint completion:**
+8. **After sprint completion:**
    - Update the sprint status, the plan's top-of-file "Current Status", and the "Modified" date.
    - (Recommended) Commit with a short message naming the sprint.
    - In "Execute Next Sprint Only" mode, pause and report what was completed.
