@@ -1,6 +1,6 @@
 {
   "name": "pixler",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Local agentic SDLC orchestrator. Your stack, your team, zero LLM API cost.",
   "type": "module",
   "bin": {
@@ -19,6 +19,14 @@
     "typescript": "^5.8.0"
   },
   "packageManager": "pnpm@9.15.4",
+  "files": [
+    "bin/",
+    "apps/api/dist/",
+    "apps/web/dist/",
+    "packages/linear-cli/dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=20"
   }

@@ -44,6 +44,8 @@ import { UsagePanel } from './SettingsDrawer/UsagePanel';
 import { PlansPanel } from './SettingsDrawer/PlansPanel';
 import { NotificationsPanel } from './SettingsDrawer/NotificationsPanel';
 import { AccountPanel } from './SettingsDrawer/AccountPanel';
+import { StoragePanel } from './SettingsDrawer/StoragePanel';
+import { AboutPanel } from './SettingsDrawer/AboutPanel';
 
 interface CategoryConfig {
   id: string;
@@ -135,6 +137,10 @@ export function SettingsDrawer() {
               <NotificationsPanel />
             ) : activeId === 'account' ? (
               <AccountPanel />
+            ) : activeId === 'storage' ? (
+              <StoragePanel />
+            ) : activeId === 'about' ? (
+              <AboutPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState

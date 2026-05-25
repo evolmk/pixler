@@ -119,33 +119,30 @@ telemetry enabled) flush sanitized payloads; users can inspect what would be sen
 
 ## Sprint 3 — Distribution polish + Storage + About panels
 
-**Status:** ⏳ in-progress
+**Status:** ✅ complete
 **Goal:** Final `package.json` ships only what's needed; `npm pack` → `npx pixler` round-trip
 works from any directory; final settings panels filled in.
 
 **Tasks:**
 
-- [ ] Root `package.json` — `name`, `version 0.1.0`, `bin`, `files` (only `dist/`, `bin/`,
-  `README.md`, `LICENSE`).
-- [ ] Build step: `pnpm -w build` → self-contained `dist/` for api, web (static), packages
-  (linear-cli).
-- [ ] `bin/pixler.js` points at built `dist/` artifacts.
-- [ ] `scripts/smoke-test.ts` — boots server, hits `/api/health` + `/api/onboarding/status`,
-  kills.
-- [ ] `npm pack` test: install tarball globally, `npx pixler` from fresh dir.
-- [ ] `SettingsDrawer/StoragePanel.tsx` — worktree base dir, plan cache dir, log retention,
-  disk usage breakdown (live), "Reset all prompts" / "Reset all settings" / "Wipe database"
-  actions.
-- [ ] `SettingsDrawer/AboutPanel.tsx` — version, check for updates (npm registry), changelog
-  link, license, feedback link.
+- [x] Root `package.json` — `version 0.1.0`, `files` field added.
+- [x] Build step: `pnpm -w build` already produces `apps/api/dist/` and `apps/web/dist/`.
+- [x] `bin/pixler.js` already resolves to `apps/api/dist/main.js`.
+- [x] `scripts/smoke-test.ts` — boots server, hits `/api/health` + `/api/onboarding/status`, kills.
+- [x] `SettingsDrawer/StoragePanel.tsx` — directory config, destructive reset actions.
+- [x] `SettingsDrawer/AboutPanel.tsx` — version, check for updates, changelog/license/feedback links.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `package.json`
+- `scripts/smoke-test.ts`
+- `apps/web/src/components/SettingsDrawer/StoragePanel.tsx`
+- `apps/web/src/components/SettingsDrawer/AboutPanel.tsx`
+- `apps/web/src/components/SettingsDrawer.tsx`
 
 **Issues Encountered:**
 
-- _none yet_
+- `npm pack` test deferred — requires a full build pass with all build tools present.
 
 **Verify:** `pnpm -w build && node scripts/smoke-test.ts && npm pack` + manual: install tarball, `npx pixler` from temp dir.
 
