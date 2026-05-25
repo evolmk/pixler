@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 1 complete — infra set up. Sprint 2 in-progress.
+**Current Status:** Sprint 2 complete — M01-M05 specs written. Sprint 3 in-progress.
 
 ---
 
@@ -91,20 +91,20 @@ server and runs an empty (or trivial) spec successfully.
 
 ## Sprint 2 — Smoke specs M01–M05 (boot, tokens, ui-kit, api, settings)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Five infrastructure-level smokes pass against the running app.
 
 **Tasks:**
 
-- [ ] `tests/m01-boot.spec.ts` — `GET /api/health` returns `{ status: 'ok' }`;
+- [x] `tests/m01-boot.spec.ts` — `GET /api/health` returns `{ status: 'ok' }`;
   `localhost:7777` serves React app (checks `<div id="root">`).
-- [ ] `tests/m02-tokens.spec.ts` — CSS var `--color-primary` set on `<html>`; `--font-sans`
+- [x] `tests/m02-tokens.spec.ts` — CSS var `--color-primary` set on `<html>`; `--font-sans`
   contains `Inter`.
-- [ ] `tests/m03-ui-kit.spec.ts` — navigate to component catalog (Storybook port if separate);
+- [x] `tests/m03-ui-kit.spec.ts` — navigate to component catalog (Storybook port if separate);
   at least one component card visible.
-- [ ] `tests/m04-api.spec.ts` — `GET /api/version` JSON; Socket.io `/` connects within 2s via
+- [x] `tests/m04-api.spec.ts` — `GET /api/version` JSON; Socket.io `/` connects within 2s via
   helper.
-- [ ] `tests/m05-settings.spec.ts` — PUT then GET a test setting key; verifies SQLite round-trip.
+- [x] `tests/m05-settings.spec.ts` — PUT then GET a test setting key; verifies SQLite round-trip.
 
 **Files Created/Modified:**
 
