@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M08-workspaces
-**Next Plan:** M09-terminal
+**Last Plan Completed:** M09-terminal
+**Next Plan:** M11-linear-cli
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Instance                              | Plan           | Status         |
 |---------------------------------------|----------------|----------------|
-| **evolmk** (default `~/.claude`)      | M09-terminal   | 🔄 in progress |
+| **evolmk** (default `~/.claude`)      | M09-terminal   | ✅ complete |
 | **evolmikek** (`~/.claude-evolmikek`) | M10-linear-sdk | 🔄 in progress |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
@@ -29,7 +29,7 @@
 - [x] **M06** — App shell
 - [x] **M07** — Projects
 - [x] **M08** — Workspaces _(Wave 3 / Track A)_
-- [-] **M09** — Terminal _(Wave 4 / Track A)_ **(evolmk)**
+- [x] **M09** — Terminal _(Wave 4 / Track A)_
 - [-] **M10** — Linear SDK _(Wave 3 / Track B)_ **(evolmikek)**
 - [ ] **M11** — Linear CLI _(Wave 5 / Track A)_
 - [ ] **M12** — GitHub (gh) _(Wave 4 / Track B)_
