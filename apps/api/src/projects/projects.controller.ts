@@ -9,11 +9,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
+import { CloneService, type CloneDto } from './clone.service';
 import type { AddLocalProjectDto, PatchProjectDto, DeleteProjectMode } from '@pixler/shared-types';
 
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projects: ProjectsService) {}
+  constructor(
+    private readonly projects: ProjectsService,
+    private readonly clone: CloneService,
+  ) {}
 
   @Get()
   findAll() {
@@ -41,5 +45,11 @@ export class ProjectsController {
     @Query('mode') mode: DeleteProjectMode = 'remove',
   ) {
     return this.projects.remove(id, mode);
+  }
+
+  @Post('clone')
+  cloneRepo(@Body() dto: CloneDto) {
+    this.clone.validateGhAvailable();
+    return this.clone.clone(dto);
   }
 }

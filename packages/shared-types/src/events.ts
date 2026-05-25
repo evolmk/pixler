@@ -1,6 +1,9 @@
 export type AppEvent =
   | { type: 'pixler.boot'; version: string; timestamp: number }
-  | { type: 'pixler.shutdown'; timestamp: number };
+  | { type: 'pixler.shutdown'; timestamp: number }
+  | { type: 'project.clone-progress'; projectId: string; pct: number; line: string; timestamp: number }
+  | { type: 'project.clone-complete'; projectId: string; timestamp: number }
+  | { type: 'project.clone-error'; projectId: string; error: string; timestamp: number };
 
 export type WorkspaceEvent =
   | { type: 'workspace.created'; workspaceId: string; timestamp: number }

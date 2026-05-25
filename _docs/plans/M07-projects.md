@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 1 complete — DB migration + ProjectsModule fully wired; starting Sprint 2 (clone flow).
+**Current Status:** Sprint 2 complete — clone service wired with Socket.io progress events; starting Sprint 3 (pixler.json).
 
 ---
 
@@ -99,25 +99,28 @@ work end-to-end for the local-add path.
 
 ## Sprint 2 — Clone flow via gh with Socket.io progress
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** `POST /api/projects/clone` shells out to `gh repo clone`, streams progress over
 Socket.io, and persists the project on completion.
 
 **Tasks:**
 
-- [ ] `clone.service.ts` — spawns `gh repo clone`, parses progress lines, emits
+- [x] `clone.service.ts` — spawns `gh repo clone`, parses progress lines, emits
   `project.clone-progress` events `{ pct, line }`.
-- [ ] Clone destination defaults to `~/pixler/repos/<name>/`.
-- [ ] On completion, persist project row with `cloned_by_pixler = true`.
-- [ ] Handle gh-not-installed / not-authed errors with structured response.
+- [x] Clone destination defaults to `~/pixler/repos/<name>/`.
+- [x] On completion, persist project row with `cloned_by_pixler = true`.
+- [x] Handle gh-not-installed / not-authed errors with structured response.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/projects/clone.service.ts`
+- `apps/api/src/projects/projects.module.ts` (CloneService added)
+- `apps/api/src/projects/projects.controller.ts` (POST /projects/clone added)
+- `packages/shared-types/src/events.ts` (clone progress/complete/error events added)
 
 **Issues Encountered:**
 
-- _none yet_
+- EventsModule is `@Global()` so no explicit import needed in ProjectsModule.
 
 **Verify:** `pnpm --filter @pixler/api test clone` + manual: clone a small public repo, see live progress events.
 
