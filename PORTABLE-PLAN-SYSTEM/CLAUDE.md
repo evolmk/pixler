@@ -66,9 +66,12 @@ agent edits a plan and is the right place for repo-specific overrides.
 Don't mark `[x]` on faith — mark it on a passing check. Note what you ran in the sprint's
 `Verify:` line.
 
-**Committing (recommended for resumability).** Commit after each sprint completes, with a short
-message naming the sprint. A per-sprint commit history is a second, independent record of what's
-done — `git log` and the plan file should agree.
+**Committing (per-sprint, opt-in).** When a plan run begins with more than one sprint ahead, ask
+the user up front whether to commit after each sprint completes — then honor that choice for the
+whole run without re-asking. If they opt in, commit after each sprint with a short message naming
+it; a per-sprint commit history is a second, independent record of what's done, so `git log` and
+the plan file agree. If only one sprint remains, skip the up-front question and offer a single
+commit at the end. Don't commit otherwise unless the user asks.
 
 **When the whole milestone is done:** set `Status: ✅ COMPLETE`, write the final Current Status,
 and follow your repo's completion protocol — default is to move the file to `_docs/plans/done/`.

@@ -64,4 +64,5 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
 - Keep the plan file synchronized after every task — it's the durable record if the session dies.
 - Verify before marking `[x]`; never mark complete on faith.
 - Never silently downgrade or remove dependencies — stop and ask the user.
-- No auto-commit, push, or PR unless the user asks.
+- No auto-commit, push, or PR unless the user asks — the per-sprint commit opt-in at step 4 counts
+  as the user asking, for the duration of that run.
