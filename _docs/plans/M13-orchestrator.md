@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — AgentRunnerService + PromptTemplatesService wired.
+**Current Status:** Sprint 3 complete — full NestJS orchestrator module + Linear bridge wired.
 
 ---
 
@@ -129,28 +129,34 @@ node-pty.
 
 ## Sprint 3 — Orchestrator controller + endpoints + approval gates + Linear bridge
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** HTTP surface exists; auto-approve toggles work; workspace state transitions update
 Linear.
 
 **Tasks:**
 
-- [ ] `OrchestratorModule` + `OrchestratorService` + `OrchestratorController`.
-- [ ] `POST /start`, `/approve`, `/reject`, `/interrupt`, `/stop`; `GET /state`.
-- [ ] Approval gates from `settings.gates.autoApprovePlan/Validation/PR` — auto-fire with short
+- [x] `OrchestratorModule` + `OrchestratorService` + `OrchestratorController`.
+- [x] `POST /start`, `/approve`, `/reject`, `/interrupt`, `/stop`; `GET /state`.
+- [x] Approval gates from `settings.gates.autoApprovePlan/Validation/PR` — auto-fire with short
   visible delay.
-- [ ] Loop limits: 3× rejection → pause and require human action.
-- [ ] Interrupt forwards SIGINT to agent PTY; transitions to safe rest state.
-- [ ] `linear-bridge.service.ts` — workspace start → `Todo → In Progress`; PR opened →
+- [x] Loop limits: 3× rejection → pause and require human action.
+- [x] Interrupt forwards SIGINT to agent PTY; transitions to safe rest state.
+- [x] `linear-bridge.service.ts` — workspace start → `Todo → In Progress`; PR opened →
   `In Progress → In Review`; PR merged → `In Review → Done`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/orchestrator/orchestrator.module.ts` (new)
+- `apps/api/src/orchestrator/orchestrator.service.ts` (new)
+- `apps/api/src/orchestrator/orchestrator.controller.ts` (new)
+- `apps/api/src/orchestrator/linear-bridge.service.ts` (new)
+- `apps/api/src/app.module.ts` (OrchestratorModule registered)
+- `apps/api/src/linear/linear.module.ts` (StateMapService exported)
+- `apps/api/src/settings/registry.ts` (gates.* settings added)
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/api test orchestrator` + manual: full loop on a test ticket.
 

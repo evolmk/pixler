@@ -12,9 +12,10 @@ import { DiffModule } from './diff/diff.module';
 import { RunModule } from './run/run.module';
 import { IdeModule } from './ide/ide.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
+import { OrchestratorModule } from './orchestrator/orchestrator.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule],
   controllers: [HealthController],
 })
 export class AppModule {}

@@ -51,4 +51,8 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'ide.default', type: 'string', default: '', scopes: ['global'], label: 'Default IDE', description: 'IDE id to use by default (vscode, cursor, zed, etc.)' },
   { key: 'onboarding.completedAt', type: 'number', default: 0, scopes: ['global'], label: 'Onboarding Completed At', description: 'Unix timestamp when onboarding was completed (0 = not complete)' },
   { key: 'onboarding.currentStep', type: 'number', default: 1, scopes: ['global'], label: 'Onboarding Current Step', description: 'Last active onboarding step (1–5)' },
+  { key: 'gates.autoApprovePlan', type: 'boolean', default: false, scopes: ['global', 'project'], label: 'Auto-Approve Plan', description: 'Skip human plan-approval gate' },
+  { key: 'gates.autoApproveValidation', type: 'boolean', default: false, scopes: ['global', 'project'], label: 'Auto-Approve Validation', description: 'Skip human validation-approval gate' },
+  { key: 'gates.autoApprovePr', type: 'boolean', default: false, scopes: ['global', 'project'], label: 'Auto-Approve PR', description: 'Skip human PR-approval gate' },
+  { key: 'gates.loopLimit', type: 'number', default: 3, scopes: ['global', 'project'], label: 'Loop Limit', description: 'Max plan-review rejections before pausing (1–5)' },
 ];

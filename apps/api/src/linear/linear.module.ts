@@ -11,6 +11,6 @@ import { SettingsModule } from '../settings/settings.module';
   imports: [SettingsModule],
   controllers: [LinearController],
   providers: [LinearService, SecretStoreService, SyncScheduler, StateMapService, LinearMutationsService],
-  exports: [LinearService, SyncScheduler],
+  exports: [LinearService, SyncScheduler, StateMapService],
 })
 export class LinearModule {}
