@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — gesture wiring done. Sprint 2 in-progress.
+**Current Status:** Sprint 2 complete — animation pass done. Sprint 3 in-progress.
 
 ---
 
@@ -82,26 +82,32 @@ apps/web/src/components/SettingsDrawer/ExternalToolsPanel.tsx (extend with URL s
 
 ## Sprint 2 — Animation pass + theme switch fade + ImageLightbox
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Audit Motion entrance/exit across modals/drawers/dropdowns/tabs; stagger sidebar list;
 theme switch fades cleanly.
 
 **Tasks:**
 
-- [ ] `lib/motion.ts` — shared variants used across the app.
-- [ ] Audit every modal/drawer/dropdown/tab change for Motion exit + enter.
-- [ ] Stagger entrance for sidebar workspace list (`delay` per item).
-- [ ] Theme switch: 200ms fade on `--pixler-bg` swap.
-- [ ] Respect `appearance.animationLevel` globally.
-- [ ] `ImageLightbox.tsx` — chat image click opens dedicated file tab + click-to-fullscreen.
+- [x] `lib/motion.ts` — shared variants used across the app.
+- [x] Audit every modal/drawer/dropdown/tab change for Motion exit + enter.
+- [x] Stagger entrance for sidebar workspace list (`delay` per item).
+- [x] Theme switch: 200ms fade on `--pixler-bg` swap.
+- [x] Respect `appearance.animationLevel` globally.
+- [x] `ImageLightbox.tsx` — chat image click opens dedicated file tab + click-to-fullscreen.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/lib/motion.ts` — shared Motion variants (fadeIn, slideUp, scaleIn, stagger)
+- `apps/web/src/components/CenterTabs.tsx` — fade-in on tab switch
+- `apps/web/src/components/WorkspacesSidebar.tsx` — stagger entrance for workspace list
+- `apps/web/src/stores/theme.ts` — `withThemeFade` adds `.theme-transitioning` class
+- `apps/web/src/styles/app.css` — `.theme-transitioning` CSS transition rule
+- `apps/web/src/routes/project.tsx` — `MotionConfig` respects `appearance.animationLevel`
+- `apps/web/src/components/ImageLightbox.tsx` — fullscreen image overlay with enter/exit
 
 **Issues Encountered:**
 
-- _none yet_
+- `AnimatePresence` + Radix `TabsContent` conflict: Radix manages visibility via CSS, so forceMount+null-filtering conflicted. Resolved by keeping Radix tabs normal and using a `motion.div key={activeTab}` inside each panel for entrance animation only.
 
 **Verify:** `pnpm -w typecheck` + manual: animation level off → motion stripped; theme switch fades.
 

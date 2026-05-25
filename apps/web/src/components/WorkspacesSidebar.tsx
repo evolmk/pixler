@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { motion } from 'motion/react';
+import { staggerContainer, staggerItem } from '../lib/motion';
 import { Maximize2, Minimize2, Plus } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { useParams } from '@tanstack/react-router';
@@ -9,6 +11,7 @@ import { GuidedNewWorkspaceDialog } from './GuidedNewWorkspaceDialog';
 import { RemoveWorkspaceModal } from './RemoveWorkspaceModal';
 import { BigTerminalToggle } from './BigTerminalToggle';
 import { LinearTicketList } from './LinearTicketList';
+import { ActivityFeed } from './ActivityFeed';
 import type { Workspace } from '@pixler/shared-types';
 
 export function WorkspacesSidebar() {
@@ -74,15 +77,21 @@ export function WorkspacesSidebar() {
             </button>
           </div>
         )}
-        <div className="space-y-0.5">
+        <motion.div
+          className="space-y-0.5"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {active.map((ws) => (
-            <WorkspaceCard
-              key={ws.id}
-              workspace={ws}
-              onRemove={() => setPendingRemove(ws)}
-            />
+            <motion.div key={ws.id} variants={staggerItem}>
+              <WorkspaceCard
+                workspace={ws}
+                onRemove={() => setPendingRemove(ws)}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {archived.length > 0 && (
           <details className="mt-3">
@@ -103,6 +112,8 @@ export function WorkspacesSidebar() {
       </div>
 
       {projectId && <LinearTicketList projectId={projectId} />}
+
+      {projectId && <ActivityFeed projectId={projectId} />}
 
       <BigTerminalToggle />
 

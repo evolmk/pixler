@@ -1,3 +1,9 @@
 @import 'tailwindcss';
 @import '@pixler/ui-styles/src/css/globals.css';
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
+
+/* Theme fade transition applied transiently by theme store */
+html.theme-transitioning,
+html.theme-transitioning * {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease !important;
+}

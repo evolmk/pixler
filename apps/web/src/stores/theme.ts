@@ -37,6 +37,12 @@ function saveToStorage(theme: ThemeName, mode: ThemeMode) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme, mode }));
 }
 
+function withThemeFade(fn: () => void) {
+  document.documentElement.classList.add('theme-transitioning');
+  fn();
+  setTimeout(() => document.documentElement.classList.remove('theme-transitioning'), 220);
+}
+
 const initial = loadFromStorage();
 const initialResolved = resolveMode(initial.mode);
 applyTheme(initial.theme, initialResolved);
@@ -48,14 +54,14 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
 
   setTheme: (theme) => {
     const resolved = resolveMode(get().mode);
-    applyTheme(theme, resolved);
+    withThemeFade(() => applyTheme(theme, resolved));
     saveToStorage(theme, get().mode);
     set({ theme, resolvedMode: resolved });
   },
 
   setMode: (mode) => {
     const resolved = resolveMode(mode);
-    applyTheme(get().theme, resolved);
+    withThemeFade(() => applyTheme(get().theme, resolved));
     saveToStorage(get().theme, mode);
     set({ mode, resolvedMode: resolved });
   },

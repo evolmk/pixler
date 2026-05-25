@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { motion } from 'motion/react';
+import { fadeIn } from '../lib/motion';
 import {
   CheckSquare,
   FileText,
@@ -121,26 +123,34 @@ export function CenterTabs() {
           value={tab.value}
           className="mt-0 h-[calc(100%-40px-53px)] overflow-hidden"
         >
-          {tab.value === 'diff' ? (
-            <DiffTab />
-          ) : tab.value === 'run' ? (
-            <RunLogsTab />
-          ) : tab.value === 'plan' ? (
-            <PlanTab />
-          ) : tab.value === 'checkpoints' ? (
-            <CheckpointsTab />
-          ) : tab.value === 'checks' ? (
-            <ChecksTab onOpenDiff={() => setActiveTab('diff')} />
-          ) : (
-            <div className="flex h-full min-h-48 items-center justify-center p-4">
-              <EmptyState
-                icon={tab.icon}
-                title={tab.emptyTitle}
-                body={tab.emptyBody}
-                className="max-w-xs border-none"
-              />
-            </div>
-          )}
+          <motion.div
+            key={activeTab}
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+            className="h-full"
+          >
+            {tab.value === 'diff' ? (
+              <DiffTab />
+            ) : tab.value === 'run' ? (
+              <RunLogsTab />
+            ) : tab.value === 'plan' ? (
+              <PlanTab />
+            ) : tab.value === 'checkpoints' ? (
+              <CheckpointsTab />
+            ) : tab.value === 'checks' ? (
+              <ChecksTab onOpenDiff={() => setActiveTab('diff')} />
+            ) : (
+              <div className="flex h-full min-h-48 items-center justify-center p-4">
+                <EmptyState
+                  icon={tab.icon}
+                  title={tab.emptyTitle}
+                  body={tab.emptyBody}
+                  className="max-w-xs border-none"
+                />
+              </div>
+            )}
+          </motion.div>
         </TabsContent>
       ))}
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { MotionConfig } from 'motion/react';
 import { usePaletteActions } from '../hooks/usePaletteActions';
 import { ResizableSplit } from '@pixler/ui/components/resizable-split';
 import { Toaster } from '@pixler/ui/components/sonner';
@@ -11,6 +12,8 @@ import { RightPane } from '../components/RightPane';
 import { SettingsDrawer } from '../components/SettingsDrawer';
 import { ProjectSettingsDrawer } from '../components/ProjectSettingsDrawer';
 import { TeamConfigDiffModal } from '../components/TeamConfigDiffModal';
+import { ToastBridge } from '../components/ToastBridge';
+import { useNativeNotifications } from '../hooks/useNativeNotifications';
 
 /**
  * 3-pane shell for `/p/$projectId` and `/p/$projectId/w/$workspaceId`.
@@ -19,6 +22,7 @@ import { TeamConfigDiffModal } from '../components/TeamConfigDiffModal';
  */
 export function ProjectShell() {
   usePaletteActions();
+  useNativeNotifications();
   const panes = useLayoutStore((s) => s.panes);
   const setOuter = useLayoutStore((s) => s.setOuter);
   const setInner = useLayoutStore((s) => s.setInner);
@@ -27,6 +31,7 @@ export function ProjectShell() {
   const fullBleed = useLayoutStore((s) => s.fullBleed);
 
   const { value: persisted, set: persist } = useSetting<PaneLayout>('layout.paneSizes');
+  const { value: animationLevel = 'full' } = useSetting<string>('appearance.animationLevel');
 
   const hydrated = useRef(false);
   useEffect(() => {
@@ -83,7 +88,10 @@ export function ProjectShell() {
     );
   };
 
+  const motionReducedMode = animationLevel === 'none' ? 'always' : animationLevel === 'reduced' ? 'user' : 'never';
+
   return (
+    <MotionConfig reducedMotion={motionReducedMode}>
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
       <TopBar />
       <div className="min-h-0 flex-1">
@@ -97,8 +105,9 @@ export function ProjectShell() {
       {/* Team config diff — appears when a project with pixler.json is added */}
       <TeamConfigDiffModal />
 
-      {/* Activity toast viewport — M18 populates this */}
+      <ToastBridge />
       <Toaster position="bottom-right" />
     </div>
+    </MotionConfig>
   );
 }
