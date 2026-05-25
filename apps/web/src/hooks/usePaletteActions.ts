@@ -21,11 +21,13 @@ import {
   GitMerge,
   Terminal,
   Globe,
+  Timer,
 } from 'lucide-react';
 import { registerAction, unregisterAction } from '../lib/palette/registry';
 import { useLayoutStore } from '../stores/layout';
 import { useThemeStore } from '../stores/theme';
 import { useSetting } from './useSetting';
+import { useTakeCheckpoint } from './useCheckpoints';
 import type { ThemeMode, ThemeName } from '@pixler/ui-styles';
 import { themeNames } from '@pixler/ui-styles';
 
@@ -74,7 +76,9 @@ export function usePaletteActions() {
 
   const params = useParams({ strict: false }) as { projectId?: string; workspaceId?: string };
   const projectId = params.projectId;
+  const workspaceId = params.workspaceId;
   const navigate = useNavigate();
+  const takeCheckpoint = useTakeCheckpoint(workspaceId);
 
   const handleTheme = useCallback(
     (name: ThemeName) => {
@@ -147,6 +151,16 @@ export function usePaletteActions() {
       keywords: ['terminal', 'expand', 'big', 'fullscreen'],
       icon: Terminal,
       perform: () => toggleBigTerminal(),
+    });
+
+    registerAction({
+      id: 'workspace.take-checkpoint',
+      title: 'Take Checkpoint',
+      group: 'actions',
+      keywords: ['checkpoint', 'snapshot', 'rollback', 'save'],
+      icon: Timer,
+      when: () => !!workspaceId,
+      perform: () => takeCheckpoint.mutate({}),
     });
 
     // — Mode actions —
@@ -241,6 +255,7 @@ export function usePaletteActions() {
         'setting.terminal.copyOnSelect',
         'setting.terminal.pasteWarning',
         'setting.telemetry',
+        'workspace.take-checkpoint',
         ...themeNames.map((n) => `theme.color.${n}`),
       ];
       for (const id of ids) unregisterAction(id);
@@ -252,6 +267,7 @@ export function usePaletteActions() {
     handleTheme,
     handleMode,
     projectId,
+    workspaceId,
     navigate,
     autoMerge,
     setAutoMerge,
@@ -261,5 +277,6 @@ export function usePaletteActions() {
     setPasteWarning,
     telemetry,
     setTelemetry,
+    takeCheckpoint,
   ]);
 }

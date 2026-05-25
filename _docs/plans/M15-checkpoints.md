@@ -1,8 +1,8 @@
 # M15 — Checkpoints (snapshot + rollback)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — auto-triggers wired; Sprint 3 (web UI) pending.
+**Current Status:** All sprints complete — checkpoints fully implemented.
 
 ---
 
@@ -115,26 +115,31 @@ apps/web/src/hooks/useCheckpoints.ts
 
 ## Sprint 3 — Web UI: Checkpoints tab + cards + rollback modal
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Center pane widens to include Checkpoints tab; users can see history + roll back with
 confirmation.
 
 **Tasks:**
 
-- [ ] Extend `CenterTabs` tab strip with **Checkpoints**.
-- [ ] `CheckpointsTab.tsx` — reverse-chronological list.
-- [ ] `CheckpointCard.tsx` — timestamp · label · files · lines · trigger-kind icon · Rollback btn.
-- [ ] `RollbackConfirmModal.tsx` — warns if uncommitted changes; offers checkpoint-first.
-- [ ] `hooks/useCheckpoints.ts`.
-- [ ] `⌘K` "Checkpoint" + "Take checkpoint" button in the workspace toolbar.
+- [x] Extend `CenterTabs` tab strip with **Checkpoints**.
+- [x] `CheckpointsTab.tsx` — reverse-chronological list.
+- [x] `CheckpointCard.tsx` — timestamp · label · files · lines · trigger-kind icon · Rollback btn.
+- [x] `RollbackConfirmModal.tsx` — warns if uncommitted changes; offers checkpoint-first.
+- [x] `hooks/useCheckpoints.ts`.
+- [x] `⌘K` "Checkpoint" + "Take checkpoint" button in the workspace toolbar.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useCheckpoints.ts`
+- `apps/web/src/components/CheckpointCard.tsx`
+- `apps/web/src/components/CheckpointsTab.tsx`
+- `apps/web/src/components/RollbackConfirmModal.tsx`
+- `apps/web/src/components/CenterTabs.tsx`
+- `apps/web/src/hooks/usePaletteActions.ts`
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual: trigger rollback, confirm restored state.
 

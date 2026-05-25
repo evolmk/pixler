@@ -9,6 +9,7 @@ import {
   Minimize2,
   SendHorizontal,
   Terminal,
+  Timer,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@pixler/ui/components/tabs';
@@ -18,6 +19,7 @@ import { useLayoutStore } from '../stores/layout';
 import { DiffTab } from './DiffTab';
 import { RunLogsTab } from './RunLogsTab';
 import { PlanTab } from './PlanTab';
+import { CheckpointsTab } from './CheckpointsTab';
 
 interface TabConfig {
   value: string;
@@ -70,6 +72,13 @@ const TABS: TabConfig[] = [
     emptyTitle: 'Run logs',
     emptyBody: '',
   },
+  {
+    value: 'checkpoints',
+    label: 'Checkpoints',
+    icon: Timer,
+    emptyTitle: 'Checkpoints',
+    emptyBody: '',
+  },
 ];
 
 export function CenterTabs() {
@@ -117,6 +126,8 @@ export function CenterTabs() {
             <RunLogsTab />
           ) : tab.value === 'plan' ? (
             <PlanTab />
+          ) : tab.value === 'checkpoints' ? (
+            <CheckpointsTab />
           ) : (
             <div className="flex h-full min-h-48 items-center justify-center p-4">
               <EmptyState
