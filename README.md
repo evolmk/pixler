@@ -63,7 +63,7 @@ Pixler will:
 Then create a workspace from any Linear ticket and watch it go.
 
 ### Prerequisites
-
+doews 
 You'll want these authenticated on your machine first:
 
 ```bash
