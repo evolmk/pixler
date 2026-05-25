@@ -8,3 +8,4 @@ export type { Workspace, WorkspaceState, WorkspaceMode, TicketSource, CreateWork
 export { COLOR_NAMES } from './color-names';
 export type { ColorName } from './color-names';
 export type { LinearTicket, LinearStatusDto, LinearTeamDto, LinearProjectDto, ConnectLinearDto } from './linear';
+export type { Terminal, ResizeTerminalDto } from './terminals';

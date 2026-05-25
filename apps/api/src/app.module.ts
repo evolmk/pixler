@@ -6,9 +6,10 @@ import { SettingsModule } from './settings/settings.module';
 import { ProjectsModule } from './projects/projects.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { LinearModule } from './linear/linear.module';
+import { TerminalsModule } from './terminals/terminals.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule],
   controllers: [HealthController],
 })
 export class AppModule {}

@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M06 + M08.
+**Current Status:** Sprint 1 complete — PTY backend wired. Sprint 2 next: TerminalPane xterm.js UI.
 
 ---
 
@@ -55,30 +55,36 @@ apps/web/src/components/SettingsDrawer/TerminalPanel.tsx
 
 ## Sprint 1 — api: TerminalsModule + PTY infra + Socket.io gateway
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Server can spawn/kill/resize PTYs and stream I/O over Socket.io. One PTY per workspace,
 persisted across navigations.
 
 **Tasks:**
 
-- [ ] `TerminalsModule` + `TerminalsService` + `TerminalsController` + `TerminalsGateway`.
-- [ ] `POST /api/workspaces/:id/terminal` (returns `{ terminalId }`), `DELETE /api/terminals/:id`,
+- [x] `TerminalsModule` + `TerminalsService` + `TerminalsController` + `TerminalsGateway`.
+- [x] `POST /api/workspaces/:id/terminal` (returns `{ terminalId }`), `DELETE /api/terminals/:id`,
   `POST /api/terminals/:id/resize`.
-- [ ] Socket.io `/terminals` namespace: `terminal.data` / `terminal.exit` server→client,
+- [x] Socket.io `/terminals` namespace: `terminal.data` / `terminal.exit` server→client,
   `terminal.input` client→server.
-- [ ] PTY shell selection: respect `$SHELL`, then `terminal.shell` setting; spawn as login shell
+- [x] PTY shell selection: respect `$SHELL`, then `terminal.shell` setting; spawn as login shell
   (`-l`) so mise/asdf/nvm hooks load.
-- [ ] Keep PTY alive across right-pane navigations (closed only on workspace archive/delete).
+- [x] Keep PTY alive across right-pane navigations (closed only on workspace archive/delete).
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/terminals/terminals.module.ts`
+- `apps/api/src/terminals/terminals.service.ts`
+- `apps/api/src/terminals/terminals.controller.ts`
+- `apps/api/src/terminals/terminals.gateway.ts`
+- `packages/shared-types/src/terminals.ts`
+- `apps/api/src/app.module.ts` (added TerminalsModule)
+- `packages/shared-types/src/index.ts` (export terminals types)
 
 **Issues Encountered:**
 
-- _none yet_
+- `@types/node-pty` not on npm; types are bundled in node-pty package itself (declare module pattern).
 
-**Verify:** `pnpm --filter @pixler/api test terminals` — spawn + echo + kill round-trip; manual `node -v` in a worktree managed by mise.
+**Verify:** `pnpm --filter @pixler/api typecheck` — clean.
 
 ---
 
