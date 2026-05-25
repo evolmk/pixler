@@ -1,20 +1,21 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M10-linear-sdk
+**Last Plan Completed:** M08-workspaces
 **Next Plan:** M09-terminal
 
 ---
 
 ## Currently Running
 
-| Slot | Plan | Status |
-|------|------|--------|
-| Track A | _(idle)_ | — |
-| Track B | _(idle)_ | — |
+| Instance                              | Plan           | Status         |
+|---------------------------------------|----------------|----------------|
+| **evolmk** (default `~/.claude`)      | M09-terminal   | 🔄 in progress |
+| **evolmikek** (`~/.claude-evolmikek`) | M10-linear-sdk | 🔄 in progress |
 
-> Update this table when a plan starts (`[-]` in the list below) and clear it when done.
-> Check the Wave schedule below to confirm B is safe to run alongside A.
+> Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
+> show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.
+> Check the Wave schedule to confirm the two plans are safe to run in parallel.
 
 ---
 
@@ -28,8 +29,8 @@
 - [x] **M06** — App shell
 - [x] **M07** — Projects
 - [x] **M08** — Workspaces _(Wave 3 / Track A)_
-- [ ] **M09** — Terminal _(Wave 4 / Track A)_
-- [x] **M10** — Linear SDK _(Wave 3 / Track B)_
+- [-] **M09** — Terminal _(Wave 4 / Track A)_ **(evolmk)**
+- [-] **M10** — Linear SDK _(Wave 3 / Track B)_ **(evolmikek)**
 - [ ] **M11** — Linear CLI _(Wave 5 / Track A)_
 - [ ] **M12** — GitHub (gh) _(Wave 4 / Track B)_
 - [ ] **M13** — Orchestrator _(Wave 6 / Track A)_
@@ -64,20 +65,20 @@ Real parallelism starts at **M08** (the first wave with two independent runnable
 
 ### Schedule (Track A = critical path, Track B = conflict-free filler)
 
-| Wave | Track A | Track B | Why B is safe to run alongside A |
-|------|---------|---------|----------------------------------|
-| 1  | **M06** app-shell | — | nothing else unblocked |
-| 2  | **M07** projects | — | M08/M10 both need M07 |
-| 3  | **M08** workspaces | **M10** linear-sdk | disjoint files (db 0003 vs 0004, `workspaces/` vs `linear/`) — see sidebar caveat |
-| 4  | **M09** terminal | **M12** github-gh | `terminals/` vs `github/`; no shared files |
-| 5  | **M11** linear-cli | **M17** diff-viewer | `linear-cli/` + root `package.json` vs `diff/` + web `package.json` (different files) |
-| 6  | **M13** orchestrator | **M19** run-ide | `orchestrator/` vs `run/`+`ide/`; no overlap |
-| 7  | **M16** chat-ui | **M14** plan-storage | `messages/`+ChatPane vs `plans/`+PlanTab; no overlap |
-| 8  | **M20** themes | **M15** checkpoints | `ui-styles/`+theme vs `checkpoints/`; no overlap |
-| 9  | **M21** onboarding | **M18** checks-activity | `onboarding/` vs `activity/`+ChecksTab; no overlap |
-| 10 | **M22** palette-keys | **M23** token-health | palette + web `package.json` vs `usage/`; no overlap |
-| 11 | **M24** gestures-deeplinks | **M26** e2e-smoke | M24 web `package.json` vs M26 root `package.json`+`turbo.json` (different files) |
-| 12 | **M25** ship | — | depends on everything |
+| Wave | Track A                    | Track B                 | Why B is safe to run alongside A                                                      |
+|------|----------------------------|-------------------------|---------------------------------------------------------------------------------------|
+| 1    | **M06** app-shell          | —                       | nothing else unblocked                                                                |
+| 2    | **M07** projects           | —                       | M08/M10 both need M07                                                                 |
+| 3    | **M08** workspaces         | **M10** linear-sdk      | disjoint files (db 0003 vs 0004, `workspaces/` vs `linear/`) — see sidebar caveat     |
+| 4    | **M09** terminal           | **M12** github-gh       | `terminals/` vs `github/`; no shared files                                            |
+| 5    | **M11** linear-cli         | **M17** diff-viewer     | `linear-cli/` + root `package.json` vs `diff/` + web `package.json` (different files) |
+| 6    | **M13** orchestrator       | **M19** run-ide         | `orchestrator/` vs `run/`+`ide/`; no overlap                                          |
+| 7    | **M16** chat-ui            | **M14** plan-storage    | `messages/`+ChatPane vs `plans/`+PlanTab; no overlap                                  |
+| 8    | **M20** themes             | **M15** checkpoints     | `ui-styles/`+theme vs `checkpoints/`; no overlap                                      |
+| 9    | **M21** onboarding         | **M18** checks-activity | `onboarding/` vs `activity/`+ChecksTab; no overlap                                    |
+| 10   | **M22** palette-keys       | **M23** token-health    | palette + web `package.json` vs `usage/`; no overlap                                  |
+| 11   | **M24** gestures-deeplinks | **M26** e2e-smoke       | M24 web `package.json` vs M26 root `package.json`+`turbo.json` (different files)      |
+| 12   | **M25** ship               | —                       | depends on everything                                                                 |
 
 21 milestones pack into **12 waves** (≈40% faster than the 21-wave serial path). The only
 idle slots are forced by structure: waves 1, 2, and 12.
