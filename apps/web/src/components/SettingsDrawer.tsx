@@ -35,6 +35,7 @@ import { useLayoutStore } from '../stores/layout';
 import { AppearancePanel } from './SettingsDrawer/AppearancePanel';
 import { LinearPanel } from './SettingsDrawer/LinearPanel';
 import { TerminalPanel } from './SettingsDrawer/TerminalPanel';
+import { ProvidersPanel } from './SettingsDrawer/ProvidersPanel';
 
 interface CategoryConfig {
   id: string;
@@ -46,7 +47,7 @@ interface CategoryConfig {
 const CATEGORIES: CategoryConfig[] = [
   { id: 'account', label: 'Account', icon: UserCircle, milestone: 'M21' },
   { id: 'models', label: 'Models', icon: Bot, milestone: 'M07' },
-  { id: 'providers', label: 'Providers', icon: Package, milestone: 'M07' },
+  { id: 'providers', label: 'Providers', icon: Package },
   { id: 'env', label: 'Environment', icon: Key, milestone: 'M08' },
   { id: 'linear', label: 'Linear', icon: Link, milestone: 'M10' },
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
@@ -104,6 +105,8 @@ export function SettingsDrawer() {
               <LinearPanel />
             ) : activeId === 'terminal' ? (
               <TerminalPanel />
+            ) : activeId === 'providers' ? (
+              <ProvidersPanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState

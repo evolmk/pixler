@@ -1,6 +1,8 @@
 import { useParams } from '@tanstack/react-router';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 import { Label } from '@pixler/ui/components/label';
 import { useLinearStatus, useLinearTeams, useLinearProjects } from '../../hooks/useLinear';
+import { useGithubStatus } from '../../hooks/useGithubStatus';
 import { useSetting } from '../../hooks/useSetting';
 
 type AgentMode = 'cli' | 'mcp' | 'both';
@@ -25,6 +27,7 @@ export function IntegrationsPanel() {
   const projectId = params.projectId;
   void projectId;
 
+  const { data: ghStatus } = useGithubStatus();
   const { data: status } = useLinearStatus();
   const { data: teams = [] } = useLinearTeams();
 
@@ -37,17 +40,28 @@ export function IntegrationsPanel() {
 
   const showTokenWarning = agentMode === 'mcp' || agentMode === 'both';
 
-  if (!status?.connected) {
-    return (
-      <p className="text-xs text-muted-foreground">
-        Connect your Linear account in{' '}
-        <span className="font-medium">Settings → Linear</span> first.
-      </p>
-    );
-  }
-
   return (
     <div className="space-y-6">
+      <Section label="GitHub">
+        {ghStatus?.authed ? (
+          <p className="flex items-center gap-1.5 text-xs text-success">
+            <CheckCircle className="size-3.5" />
+            Logged in as <span className="font-medium">{ghStatus.username}</span>
+          </p>
+        ) : (
+          <p className="flex items-center gap-1.5 text-xs text-destructive">
+            <AlertCircle className="size-3.5" />
+            Not authenticated — run <code className="font-mono text-[11px]">gh auth login</code> in your terminal.
+          </p>
+        )}
+      </Section>
+
+      {!status?.connected ? (
+        <p className="text-xs text-muted-foreground">
+          Connect your Linear account in{' '}
+          <span className="font-medium">Settings → Linear</span> to configure Linear integrations.
+        </p>
+      ) : (<>
       <Section label="Linear team">
         <div className="space-y-1.5">
           <Label htmlFor="proj-linear-team" className="text-xs">Team override</Label>
@@ -110,6 +124,7 @@ export function IntegrationsPanel() {
           </ul>
         </Section>
       )}
+      </>)}
     </div>
   );
 }

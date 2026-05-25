@@ -21,6 +21,7 @@ import { GeneralPanel } from './ProjectSettingsDrawer/GeneralPanel';
 import { ScriptsPanel } from './ProjectSettingsDrawer/ScriptsPanel';
 import { FilesToCopyPanel } from './ProjectSettingsDrawer/FilesToCopyPanel';
 import { IntegrationsPanel } from './ProjectSettingsDrawer/IntegrationsPanel';
+import { GitPanel } from './ProjectSettingsDrawer/GitPanel';
 
 interface CategoryConfig {
   id: string;
@@ -33,7 +34,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'general', label: 'General', icon: Settings },
   { id: 'scripts', label: 'Scripts', icon: Terminal },
   { id: 'files-to-copy', label: 'Files to copy', icon: Files },
-  { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
+  { id: 'git', label: 'Git', icon: GitBranch },
   { id: 'integrations', label: 'Integrations', icon: Zap },
 ];
 
@@ -79,6 +80,8 @@ export function ProjectSettingsDrawer() {
                 <ScriptsPanel />
               ) : activeId === 'files-to-copy' ? (
                 <FilesToCopyPanel />
+              ) : activeId === 'git' ? (
+                <GitPanel />
               ) : activeId === 'integrations' ? (
                 <IntegrationsPanel />
               ) : (

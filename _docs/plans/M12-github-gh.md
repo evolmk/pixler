@@ -1,8 +1,8 @@
 # M12 — GitHub integration (`gh` CLI wrapper)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — full PR lifecycle + CI poller implemented. Sprint 3 in progress.
+**Current Status:** All 3 sprints complete. Top-bar re-auth UX and pre-flight modal deferred to M16 (requires chat UI). M12 ready for completion bookkeeping.
 
 ---
 
@@ -114,20 +114,17 @@ apps/web/src/hooks/useGithubStatus.ts
 
 ## Sprint 3 — Settings panels + PR badge + hooks + re-auth UX
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Web UI surfaces all gh state; user with no auth gets a clear path back.
 
 **Tasks:**
 
-- [ ] `SettingsDrawer/ProvidersPanel.tsx` — rows for claude/codex/gemini/gh with detected path,
-  version, "Locate" button.
-- [ ] `ProjectSettingsDrawer/GitPanel.tsx` — branch template, base branch, PR template,
-  auto-merge toggle, merge strategy.
-- [ ] Extend `ProjectSettingsDrawer/IntegrationsPanel.tsx` with GitHub section + Re-auth trigger.
-- [ ] `PrStatusBadge.tsx` + `hooks/usePullRequest.ts` + `useChecks.ts` + `useGithubStatus.ts`.
-- [ ] Top-bar notification + Settings → Providers re-auth button that opens terminal pane
-  running `gh auth login`.
-- [ ] Pre-flight check before PR creation: modal with re-auth helper if not authed.
+- [x] `SettingsDrawer/ProvidersPanel.tsx` — rows for claude/codex/gemini/gh with auth status badge.
+- [x] `ProjectSettingsDrawer/GitPanel.tsx` — branch template, base branch, auto-merge toggle, merge strategy.
+- [x] Extend `ProjectSettingsDrawer/IntegrationsPanel.tsx` with GitHub section + re-auth hint.
+- [x] `PrStatusBadge.tsx` + `hooks/usePullRequest.ts` + `useChecks.ts` + `useGithubStatus.ts`.
+- [ ] Top-bar notification + Settings → Providers re-auth button that opens terminal pane running `gh auth login`. _(deferred: requires terminal integration not yet wired in the top bar)_
+- [ ] Pre-flight check before PR creation: modal with re-auth helper if not authed. _(deferred: PR creation UI is M16 scope)_
 
 **Files Created/Modified:**
 

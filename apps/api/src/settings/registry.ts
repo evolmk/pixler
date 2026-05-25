@@ -28,6 +28,7 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'git.branchTemplate', type: 'string', default: '{ticket}-{slug}', scopes: ['global', 'project'], label: 'Branch Template', description: 'Template for branch names' },
   { key: 'git.baseBranch', type: 'string', default: 'main', scopes: ['global', 'project'], label: 'Base Branch', description: 'Default base branch' },
   { key: 'git.autoMerge', type: 'boolean', default: false, scopes: ['global', 'project'], label: 'Auto-Merge', description: 'Auto-merge passing PRs' },
+  { key: 'git.mergeStrategy', type: 'string', default: 'squash', scopes: ['global', 'project'], label: 'Merge Strategy', description: 'PR merge strategy: merge | squash | rebase' },
   { key: 'workspaces.maxParallel', type: 'number', default: 3, scopes: ['global'], label: 'Max Parallel', description: 'Max simultaneous workspaces' },
   { key: 'providers.claude', type: 'string', default: 'claude', scopes: ['global'], label: 'Claude Path', description: 'Path to claude CLI' },
   { key: 'providers.codex', type: 'string', default: 'codex', scopes: ['global'], label: 'Codex Path', description: 'Path to codex CLI' },
