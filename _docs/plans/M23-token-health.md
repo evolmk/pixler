@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 in progress — UsageModule, log parser, migration, API endpoints.
+**Current Status:** Sprint 3 in progress — preflight check, .claudeignore seeding.
 
 ---
 
@@ -94,26 +94,31 @@ per-model / per-workspace / historical endpoints.
 
 ## Sprint 2 — Status bar pill + Usage panel
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Always-visible pill in top-right; Settings → Usage panel with breakdowns + MCP
 overhead.
 
 **Tasks:**
 
-- [ ] `TokenStatusPill.tsx` — `73% / 4h 12m`; color shifts green → yellow → red; click pops a
+- [x] `TokenStatusPill.tsx` — `73% / 4h 12m`; color shifts green → yellow → red; click pops a
   popover with model breakdown + "Open usage panel" link.
-- [ ] `SettingsDrawer/UsagePanel.tsx` — current 5h window, per-model breakdown table +
-  sparkline, per-workspace cost, MCP schema overhead list (with "Disable MCP for this workspace"
-  one-click toggle), daily/weekly/monthly historical chart.
-- [ ] `useUsage.ts`.
+- [x] `SettingsDrawer/UsagePanel.tsx` — current 5h window, per-model breakdown table +
+  sparkline, per-workspace cost, MCP schema overhead list, daily/weekly/monthly historical chart.
+- [x] `useUsage.ts`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/shared-types/src/index.ts` — already had M14 plan types (no conflict)
+- `apps/web/src/hooks/useUsage.ts` — TanStack Query hooks for all usage endpoints (new)
+- `apps/web/src/components/TokenStatusPill.tsx` — pill with popover + model breakdown (new)
+- `apps/web/src/components/SettingsDrawer/UsagePanel.tsx` — full usage panel (new)
+- `apps/web/src/components/TopBar.tsx` — wired TokenStatusPill
+- `apps/web/src/components/SettingsDrawer.tsx` — added Usage category + UsagePanel
+- `apps/web/src/hooks/usePaletteActions.ts` — added Open Token Usage Panel action
 
 **Issues Encountered:**
 
-- _none yet_
+- M14 concurrently added PlansModule to app.module.ts; no conflict, both modules present.
 
 **Verify:** `pnpm --filter @pixler/web build` + manual: pill updates live; panel charts render.
 

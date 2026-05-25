@@ -21,6 +21,7 @@ import { useLayoutStore } from '../stores/layout';
 import { useSetting } from '../hooks/useSetting';
 import { useProjects } from '../hooks/useProjects';
 import { usePaletteStore } from '../stores/palette';
+import { TokenStatusPill } from './TokenStatusPill';
 import { NewProjectDialog } from './NewProjectDialog';
 import { LinearStatusPill } from './LinearStatusPill';
 import { RunButton } from './RunButton';
@@ -151,6 +152,7 @@ export function TopBar() {
 
       <span className="flex-1" />
 
+      <TokenStatusPill />
       <LinearStatusPill />
 
       {workspaceId && (

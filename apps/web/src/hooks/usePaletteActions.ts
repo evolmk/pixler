@@ -123,6 +123,15 @@ export function usePaletteActions() {
     });
 
     registerAction({
+      id: 'app.open-settings-usage',
+      title: 'Open Token Usage Panel',
+      group: 'actions',
+      keywords: ['usage', 'tokens', 'cost', 'spending', 'rate limit'],
+      icon: Waves,
+      perform: () => setSettingsOpen(true, 'usage'),
+    });
+
+    registerAction({
       id: 'workspace.new',
       title: 'New Workspace',
       group: 'actions',
@@ -222,6 +231,7 @@ export function usePaletteActions() {
         'app.open-settings',
         'app.open-settings-keyboard',
         'app.open-settings-appearance',
+        'app.open-settings-usage',
         'workspace.new',
         'layout.toggle-big-terminal',
         'theme.mode.light',

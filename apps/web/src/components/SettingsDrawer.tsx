@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
+  ActivitySquare,
   Bell,
   Bot,
   FileText,
@@ -39,6 +40,7 @@ import { TerminalPanel } from './SettingsDrawer/TerminalPanel';
 import { ProvidersPanel } from './SettingsDrawer/ProvidersPanel';
 import { ExternalToolsPanel } from './SettingsDrawer/ExternalToolsPanel';
 import { KeyboardPanel } from './SettingsDrawer/KeyboardPanel';
+import { UsagePanel } from './SettingsDrawer/UsagePanel';
 
 interface CategoryConfig {
   id: string;
@@ -56,6 +58,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
   { id: 'plans', label: 'Plans', icon: FileText, milestone: 'M14' },
   { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'usage', label: 'Usage', icon: ActivitySquare },
   { id: 'keyboard', label: 'Keyboard', icon: Keyboard, milestone: 'M22' },
   { id: 'notifications', label: 'Notifications', icon: Bell, milestone: 'M18' },
   { id: 'terminal', label: 'Terminal', icon: Terminal },
@@ -121,6 +124,8 @@ export function SettingsDrawer() {
               <ExternalToolsPanel />
             ) : activeId === 'keyboard' ? (
               <KeyboardPanel />
+            ) : activeId === 'usage' ? (
+              <UsagePanel />
             ) : (
               <div className="flex h-full min-h-40 items-center justify-center">
                 <EmptyState
