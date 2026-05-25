@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — GithubModule wired, auth/repo endpoints live. Sprint 2 in progress.
+**Current Status:** Sprint 2 complete — full PR lifecycle + CI poller implemented. Sprint 3 in progress.
 
 ---
 
@@ -89,18 +89,16 @@ apps/web/src/hooks/useGithubStatus.ts
 
 ## Sprint 2 — PR create/view/merge/comments + CI polling
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Full PR lifecycle works via `gh`; CI checks poll and emit live events.
 
 **Tasks:**
 
-- [ ] `POST /api/workspaces/:id/pr { title?, bodyFile?, draft? }` — `gh pr create` with proper
-  flags.
-- [ ] `GET /api/workspaces/:id/pr`, `POST /api/workspaces/:id/pr/merge { strategy }`.
-- [ ] `GET /api/workspaces/:id/pr/checks`, `GET /api/workspaces/:id/pr/comments`.
-- [ ] `checks-poller.service.ts` — every 30s while PR open; emit `pr.checks-updated` with diff.
-- [ ] `pr-body-template.service.ts` — project template → repo `.github/PULL_REQUEST_TEMPLATE.md` →
-  auto-generated; defines `{plan_link}`, `{execution_log}`, `{ticket}` placeholders.
+- [x] `POST /api/workspaces/:id/pr { title?, bodyFile?, draft? }` — `gh pr create` with proper flags.
+- [x] `GET /api/workspaces/:id/pr`, `POST /api/workspaces/:id/pr/merge { strategy }`.
+- [x] `GET /api/workspaces/:id/pr/checks`, `GET /api/workspaces/:id/pr/comments`.
+- [x] `checks-poller.service.ts` — every 30s while PR open; emit `pr.checks-updated` with diff.
+- [x] `pr-body-template.service.ts` — project template → repo `.github/PULL_REQUEST_TEMPLATE.md` → auto-generated; defines `{plan_link}`, `{execution_log}`, `{ticket}` placeholders.
 
 **Files Created/Modified:**
 

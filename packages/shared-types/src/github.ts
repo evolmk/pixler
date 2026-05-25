@@ -23,6 +23,7 @@ export interface PullRequest {
   baseRefName: string;
   body: string;
   createdAt: string;
+  mergedAt: string | null;
   mergeable?: 'MERGEABLE' | 'CONFLICTING' | 'UNKNOWN';
 }
 
