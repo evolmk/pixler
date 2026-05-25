@@ -6,6 +6,18 @@
 
 ---
 
+## Currently Running
+
+| Slot | Plan | Status |
+|------|------|--------|
+| Track A | M08 workspaces (user session) | ⏳ in-progress |
+| Track B | M10 linear-sdk (this session) | ⏳ in-progress |
+
+> Update this table when a plan starts (`[-]` in the list below) and clear it when done.
+> Check the Wave schedule below to confirm B is safe to run alongside A.
+
+---
+
 ## Milestones
 
 - [x] **M01** — Monorepo scaffold + `npx pixler` boot
@@ -15,25 +27,25 @@
 - [x] **M05** — SQLite + settings
 - [x] **M06** — App shell
 - [x] **M07** — Projects
-- [ ] **M08** — Workspaces
-- [ ] **M09** — Terminal
-- [ ] **M10** — Linear SDK
-- [ ] **M11** — Linear CLI
-- [ ] **M12** — GitHub (gh)
-- [ ] **M13** — Orchestrator
-- [ ] **M14** — Plan storage
-- [ ] **M15** — Checkpoints
-- [ ] **M16** — Chat UI
-- [ ] **M17** — Diff viewer
-- [ ] **M18** — Checks + activity
-- [ ] **M19** — Run + IDE
-- [ ] **M20** — Themes
-- [ ] **M21** — Onboarding
-- [ ] **M22** — Palette + keys
-- [ ] **M23** — Token health
-- [ ] **M24** — Gestures + deep links
-- [ ] **M25** — Ship
-- [ ] **M26** — Playwright E2E smoke suite
+- [ ] **M08** — Workspaces _(Wave 3 / Track A)_
+- [ ] **M09** — Terminal _(Wave 4 / Track A)_
+- [ ] **M10** — Linear SDK _(Wave 3 / Track B)_
+- [ ] **M11** — Linear CLI _(Wave 5 / Track A)_
+- [ ] **M12** — GitHub (gh) _(Wave 4 / Track B)_
+- [ ] **M13** — Orchestrator _(Wave 6 / Track A)_
+- [ ] **M14** — Plan storage _(Wave 7 / Track B)_
+- [ ] **M15** — Checkpoints _(Wave 8 / Track B)_
+- [ ] **M16** — Chat UI _(Wave 7 / Track A)_
+- [ ] **M17** — Diff viewer _(Wave 5 / Track B)_
+- [ ] **M18** — Checks + activity _(Wave 9 / Track B)_
+- [ ] **M19** — Run + IDE _(Wave 6 / Track B)_
+- [ ] **M20** — Themes _(Wave 8 / Track A)_
+- [ ] **M21** — Onboarding _(Wave 9 / Track A)_
+- [ ] **M22** — Palette + keys _(Wave 10 / Track A)_
+- [ ] **M23** — Token health _(Wave 10 / Track B)_
+- [ ] **M24** — Gestures + deep links _(Wave 11 / Track A)_
+- [ ] **M25** — Ship _(Wave 12 — serial, last)_
+- [ ] **M26** — Playwright E2E smoke suite _(Wave 11 / Track B)_
 
 ---
 

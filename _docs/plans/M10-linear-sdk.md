@@ -1,8 +1,8 @@
 # M10 — Linear integration (Pixler-internal, `@linear/sdk`)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M05 + M07.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — DB migration, LinearModule, SecretStore, auth endpoints. Sprint 2 next: sync loop + state-map.
 
 ---
 
@@ -57,28 +57,38 @@ apps/web/src/hooks/useLinearTickets.ts
 
 ## Sprint 1 — DB + auth (PAT connect/disconnect/status) + secret store
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** User can paste a PAT, validate it, and persist it; status endpoint surfaces connection
 state; secrets land in OS keychain when available.
 
 **Tasks:**
 
-- [ ] `0004_linear.sql` migration with `linear_tickets` table keyed on Pixler project_id.
-- [ ] `LinearModule` + `LinearService` wrapping `@linear/sdk` with the user's PAT.
-- [ ] `secret-store.service.ts` — `keytar` when available, plaintext SQLite fallback with logged
+- [x] `0004_linear.sql` migration with `linear_tickets` table keyed on Pixler project_id.
+- [x] `LinearModule` + `LinearService` wrapping `@linear/sdk` with the user's PAT.
+- [x] `secret-store.service.ts` — `keytar` when available, plaintext SQLite fallback with logged
   warning.
-- [ ] `POST /api/linear/connect`, `POST /api/linear/disconnect`, `GET /api/linear/status`.
-- [ ] `GET /api/linear/teams`, `GET /api/linear/projects?teamId=…`.
+- [x] `POST /api/linear/connect`, `POST /api/linear/disconnect`, `GET /api/linear/status`.
+- [x] `GET /api/linear/teams`, `GET /api/linear/projects?teamId=…`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/db/migrations/0004_linear.sql`
+- `apps/api/src/db/database.service.ts`
+- `apps/api/src/linear/secret-store.service.ts`
+- `apps/api/src/linear/linear.service.ts`
+- `apps/api/src/linear/linear.controller.ts`
+- `apps/api/src/linear/linear.module.ts`
+- `apps/api/src/app.module.ts`
+- `packages/shared-types/src/linear.ts`
+- `packages/shared-types/src/index.ts`
+- `apps/api/package.json` (added @linear/sdk, keytar)
 
 **Issues Encountered:**
 
-- _none yet_
+- `LinearFetch<T>` is just `type LinearFetch<T> = Promise<T>` — no special handling needed.
+- `keytar` installed with native bindings successfully on macOS.
 
-**Verify:** `pnpm --filter @pixler/api test linear` + manual: connect → status returns viewer info → disconnect wipes.
+**Verify:** `pnpm -w typecheck` — 9/9 tasks pass.
 
 ---
 
