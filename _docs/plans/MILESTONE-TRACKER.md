@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M05-sqlite-settings
-**Next Plan:** M06-app-shell
+**Last Plan Completed:** M06-app-shell
+**Next Plan:** M07-projects
 
 ---
 
@@ -13,7 +13,7 @@
 - [x] **M03** — UI kit
 - [x] **M04** — API core
 - [x] **M05** — SQLite + settings
-- [ ] **M06** — App shell
+- [x] **M06** — App shell
 - [ ] **M07** — Projects
 - [ ] **M08** — Workspaces
 - [ ] **M09** — Terminal

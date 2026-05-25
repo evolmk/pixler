@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Bell, ChevronDown, Command, Monitor, Moon, Plus, Settings, Sun } from 'lucide-react';
+import { Bell, ChevronDown, Command, Monitor, Moon, Plus, Settings, Settings2, Sun } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@pixler/ui/components/dropdown-menu';
 import {
@@ -39,6 +40,7 @@ export function TopBar() {
 
   const { mode, resolvedMode, setMode } = useThemeStore();
   const setSettingsOpen = useLayoutStore((s) => s.setSettingsOpen);
+  const setProjectSettingsOpen = useLayoutStore((s) => s.setProjectSettingsOpen);
 
   const { set: persistMode } = useSetting<ThemeMode>('appearance.mode');
 
@@ -69,6 +71,14 @@ export function TopBar() {
         <DropdownMenuContent align="start" className="w-48">
           <DropdownMenuItem disabled className="text-xs text-muted-foreground">
             Projects load in M07
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => setProjectSettingsOpen(true)}
+            className="gap-2 text-xs"
+          >
+            <Settings2 className="size-3.5" />
+            Project settings
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

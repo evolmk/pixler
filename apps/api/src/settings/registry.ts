@@ -12,7 +12,7 @@ export interface SettingDefinition {
 export const settingsRegistry: SettingDefinition[] = [
   { key: 'appearance.theme', type: 'string', default: 'forest', scopes: ['global'], label: 'Theme', description: 'Color theme name' },
   { key: 'appearance.mode', type: 'string', default: 'system', scopes: ['global'], label: 'Mode', description: 'Light, dark, or system' },
-  { key: 'appearance.density', type: 'string', default: 'default', scopes: ['global'], label: 'Density', description: 'UI density' },
+  { key: 'appearance.density', type: 'string', default: 'comfortable', scopes: ['global'], label: 'Density', description: 'UI density: compact | comfortable | spacious' },
   { key: 'appearance.animationLevel', type: 'string', default: 'full', scopes: ['global'], label: 'Animation', description: 'Animation level' },
   { key: 'linear.pat', type: 'string', default: '', scopes: ['global'], label: 'Linear PAT', description: 'Personal access token for Linear' },
   { key: 'linear.workspace', type: 'string', default: '', scopes: ['global'], label: 'Linear Workspace', description: 'Linear workspace slug' },

@@ -1,18 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { ResizableSplit } from '@pixler/ui/components/resizable-split';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@pixler/ui/components/dialog';
+import { Toaster } from '@pixler/ui/components/sonner';
 import { useSetting } from '../hooks/useSetting';
 import { useLayoutStore, type PaneLayout } from '../stores/layout';
 import { TopBar } from '../components/TopBar';
 import { WorkspacesSidebar } from '../components/WorkspacesSidebar';
 import { CenterTabs } from '../components/CenterTabs';
 import { RightPane } from '../components/RightPane';
+import { SettingsDrawer } from '../components/SettingsDrawer';
+import { ProjectSettingsDrawer } from '../components/ProjectSettingsDrawer';
 
 /**
  * 3-pane shell for `/p/$projectId` and `/p/$projectId/w/$workspaceId`.
@@ -26,8 +22,6 @@ export function ProjectShell() {
   const hydrate = useLayoutStore((s) => s.hydrate);
   const bigTerminal = useLayoutStore((s) => s.bigTerminal);
   const fullBleed = useLayoutStore((s) => s.fullBleed);
-  const settingsOpen = useLayoutStore((s) => s.settingsOpen);
-  const setSettingsOpen = useLayoutStore((s) => s.setSettingsOpen);
 
   const { value: persisted, set: persist } = useSetting<PaneLayout>('layout.paneSizes');
 
@@ -59,7 +53,6 @@ export function ProjectShell() {
     schedulePersist();
   };
 
-  // Full-bleed: bypass splits and show only the expanded pane.
   const renderPanes = () => {
     if (bigTerminal || fullBleed === 'right') {
       return <RightPane />;
@@ -94,17 +87,12 @@ export function ProjectShell() {
         {renderPanes()}
       </div>
 
-      {/* Settings drawer stub — Sprint 4 replaces with real Vaul drawer */}
-      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Settings</DialogTitle>
-            <DialogDescription>
-              Full settings drawer ships in Sprint 4. Appearance, Linear, Git, and more.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      {/* Global drawers */}
+      <SettingsDrawer />
+      <ProjectSettingsDrawer />
+
+      {/* Activity toast viewport — M18 populates this */}
+      <Toaster position="bottom-right" />
     </div>
   );
 }

@@ -74,7 +74,7 @@ export function WorkspacesSidebar() {
                 <Button
                   variant="ghost"
                   size="icon-xs"
-                  className="opacity-0 transition-opacity group-hover:opacity-100"
+                  className="opacity-0 motion-safe:transition-opacity group-hover:opacity-100"
                   aria-label="Workspace options"
                 >
                   <MoreHorizontal />
