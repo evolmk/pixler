@@ -21,3 +21,4 @@ export type { ActivityScope, ActivitySeverity, ActivityKind, Activity, RecordAct
 export type { CheckpointTrigger, Checkpoint, TakeCheckpointDto } from './checkpoints';
 export type { AuthMethod, AuthService, OAuthInitDto, ConnectGithubPATDto, DisconnectAuthDto } from './auth';
 export type { ModelVersion, ModelFamily, ProviderModels, ModelRegistryDto } from './models';
+export type { WorkflowStepDto, WorkflowDefDto, WorkflowStepStatusDto, WorkflowStatusDto, SaveWorkflowDto } from './workflows';

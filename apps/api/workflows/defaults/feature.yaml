@@ -1,0 +1,42 @@
+name: feature
+description: "Full feature: plan → review → implement → QA → PR"
+version: 1
+model: claude-sonnet-4-6
+
+steps:
+  - id: review_issue
+    type: builtin:review_issue
+    label: "Review Issue"
+
+  - id: create_plan
+    type: builtin:create_plan
+    label: "Create Implementation Plan"
+    model: claude-opus-4-7
+    skip_if: "$issue.planLinked"
+
+  - id: approve_plan
+    type: approval
+    label: "Approve Plan"
+    message: "Review {{ plan_filename }} then approve to begin implementation."
+    skip_if: "$workflow.skipPlanReview"
+
+  - id: review_plan
+    type: builtin:review_plan
+    label: "Plan Review"
+    model: claude-opus-4-7
+    skip_if: "$workflow.skipPlanReview"
+
+  - id: implement
+    type: builtin:run_plan
+    label: "Implement"
+    model: claude-sonnet-4-6
+
+  - id: qa_review
+    type: builtin:qa_review
+    label: "QA Code Review"
+    model: claude-opus-4-7
+    on_findings: prompt_user
+
+  - id: open_pr
+    type: builtin:open_pr
+    label: "Open Pull Request"

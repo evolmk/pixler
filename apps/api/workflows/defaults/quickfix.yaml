@@ -1,0 +1,17 @@
+name: quickfix
+description: "One-liner fix: issue → implement (no plan, no QA gate)"
+version: 1
+
+steps:
+  - id: review_issue
+    type: builtin:review_issue
+    label: "Review Issue"
+
+  - id: implement
+    type: builtin:run_plan
+    label: "Implement"
+    model: claude-haiku-4-5-20251001
+
+  - id: open_pr
+    type: builtin:open_pr
+    label: "Open Pull Request"

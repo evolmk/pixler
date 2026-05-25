@@ -1,0 +1,22 @@
+name: bugfix
+description: "Simple bug fix: issue → implement → QA → PR"
+version: 1
+
+steps:
+  - id: review_issue
+    type: builtin:review_issue
+    label: "Review Issue"
+
+  - id: implement
+    type: builtin:run_plan
+    label: "Implement"
+    model: claude-sonnet-4-6
+
+  - id: qa_review
+    type: builtin:qa_review
+    label: "QA Code Review"
+    on_findings: prompt_user
+
+  - id: open_pr
+    type: builtin:open_pr
+    label: "Open Pull Request"

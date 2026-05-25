@@ -10,3 +10,18 @@ export {
   MIN_MAX_REJECTIONS,
   MAX_MAX_REJECTIONS,
 } from './loop-limit.js';
+export type {
+  StepType,
+  OnError,
+  OnFindings,
+  StepStatus,
+  RetryConfig,
+  WorkflowStep,
+  WorkflowDef,
+  WorkflowContext,
+  StepState,
+  WorkflowRunState,
+  StepEvent,
+  StepEventType,
+  StepExecutor,
+} from './workflow-types.js';

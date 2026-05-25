@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 4 (model picker UI) complete — starting Sprint 5 (workflow engine core)
+**Current Status:** Sprint 5 (workflow engine core) complete — starting Sprint 6 (workflow backend integration)
 
 ---
 
@@ -244,26 +244,37 @@ apps/web/src/components/OnboardingDrawer.tsx  # extend steps 2 + 3
 
 ## Sprint 5 — Workflow engine core (packages/orchestrator)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Build the workflow runner, loader, and type system in the orchestrator package. Ship the 3 built-in workflow presets.
 
 **Tasks:**
 
-- [ ] Create `packages/orchestrator/src/workflow-types.ts` — TypeScript types for workflow YAML: `WorkflowDef`, `WorkflowStep`, `StepType`, `ConditionalFields`, `TemplateVariables`
-- [ ] Create `packages/orchestrator/src/workflow-loader.ts` — discovers workflow YAML files from three locations (built-in defaults, repo `.pixler/workflows/`, user `~/.config/pixler/workflows/`); resolves priority order (repo > user > built-in); parses YAML with `js-yaml`; validates against TypeScript types
-- [ ] Create `packages/orchestrator/src/workflow-runner.ts` — `WorkflowRunner` class: takes a `WorkflowDef` + issue context; executes steps sequentially; handles `approval` step pauses (emits event, waits for resolution); handles `skip_if` evaluation; handles `on_error` (fail/skip/retry); emits step-start/step-complete/step-error events via callback
-- [ ] Create 3 built-in workflow YAML files: `apps/api/workflows/defaults/feature.yaml`, `bugfix.yaml`, `quickfix.yaml` per `_docs/spec-workflow-engine.md`
-- [ ] Add `js-yaml` + `@types/js-yaml` to `packages/orchestrator/package.json`
-- [ ] Export `WorkflowRunner`, `WorkflowLoader`, and types from `packages/orchestrator/src/index.ts`
-- [ ] Add shared-types DTOs: `WorkflowDefDto`, `WorkflowStepDto`, `WorkflowStatusDto`
+- [x] Create `packages/orchestrator/src/workflow-types.ts` — TypeScript types for workflow YAML: `WorkflowDef`, `WorkflowStep`, `StepType`, `ConditionalFields`, `TemplateVariables`
+- [x] Create `packages/orchestrator/src/workflow-loader.ts` — discovers workflow YAML files from three locations (built-in defaults, repo `.pixler/workflows/`, user `~/.config/pixler/workflows/`); resolves priority order (repo > user > built-in); parses YAML with `js-yaml`; validates against TypeScript types
+- [x] Create `packages/orchestrator/src/workflow-runner.ts` — `WorkflowRunner` class: takes a `WorkflowDef` + issue context; executes steps sequentially; handles `approval` step pauses (emits event, waits for resolution); handles `skip_if` evaluation; handles `on_error` (fail/skip/retry); emits step-start/step-complete/step-error events via callback
+- [x] Create 3 built-in workflow YAML files: `apps/api/workflows/defaults/feature.yaml`, `bugfix.yaml`, `quickfix.yaml` per `_docs/spec-workflow-engine.md`
+- [x] Add `js-yaml` + `@types/js-yaml` to `packages/orchestrator/package.json`
+- [x] Export `WorkflowRunner`, `WorkflowLoader`, and types from `packages/orchestrator/src/index.ts`
+- [x] Add shared-types DTOs: `WorkflowDefDto`, `WorkflowStepDto`, `WorkflowStatusDto`
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/orchestrator/src/workflow-types.ts` — new: all workflow type definitions
+- `packages/orchestrator/src/workflow-loader.ts` — new: YAML discovery + parsing (3 locations, priority order)
+- `packages/orchestrator/src/workflow-runner.ts` — new: WorkflowRunner class with step execution, approval gates, skip_if, retry
+- `packages/orchestrator/src/server.ts` — new: server-only export (Node.js classes + types)
+- `packages/orchestrator/src/index.ts` — extended: pure type exports only (web-safe)
+- `packages/orchestrator/package.json` — added js-yaml, @types/node, @types/js-yaml; added ./server export
+- `packages/orchestrator/tsconfig.json` — added types: ["node"]
+- `apps/api/workflows/defaults/feature.yaml` — new built-in
+- `apps/api/workflows/defaults/bugfix.yaml` — new built-in
+- `apps/api/workflows/defaults/quickfix.yaml` — new built-in
+- `packages/shared-types/src/workflows.ts` — new: WorkflowDefDto, WorkflowStepDto, WorkflowStatusDto, SaveWorkflowDto
+- `packages/shared-types/src/index.ts` — exported workflow types
 
 **Issues Encountered:**
 
-- _none yet_
+- WorkflowLoader/WorkflowRunner use Node.js fs/path/os — can't be in main orchestrator index (web imports it). Created a `./server` sub-export for Node-only classes.
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/orchestrator test` — unit tests for workflow loader (discovers + parses built-in YAMLs) and workflow runner (executes steps, handles approval pause, handles skip_if)
 

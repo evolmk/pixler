@@ -8,6 +8,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "default": "./dist/server.js"
     }
   },
   "scripts": {
@@ -18,8 +22,13 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^4.1.7",
     "typescript": "^5.8.0",
     "vitest": "^4.1.7"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
   }
 }
