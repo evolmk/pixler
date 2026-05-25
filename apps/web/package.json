@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
+    "@pixler/orchestrator": "workspace:*",
     "@pixler/shared-types": "workspace:*",
     "@pixler/ui": "workspace:*",
     "@pixler/ui-styles": "workspace:*",

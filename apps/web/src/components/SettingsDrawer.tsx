@@ -34,6 +34,7 @@ import {
 import { useLayoutStore } from '../stores/layout';
 import { AppearancePanel } from './SettingsDrawer/AppearancePanel';
 import { LinearPanel } from './SettingsDrawer/LinearPanel';
+import { ModelsPanel } from './SettingsDrawer/ModelsPanel';
 import { TerminalPanel } from './SettingsDrawer/TerminalPanel';
 import { ProvidersPanel } from './SettingsDrawer/ProvidersPanel';
 import { ExternalToolsPanel } from './SettingsDrawer/ExternalToolsPanel';
@@ -108,6 +109,8 @@ export function SettingsDrawer() {
           <div className="flex-1 overflow-y-auto p-6">
             {activeId === 'appearance' ? (
               <AppearancePanel />
+            ) : activeId === 'models' ? (
+              <ModelsPanel />
             ) : activeId === 'linear' ? (
               <LinearPanel />
             ) : activeId === 'terminal' ? (

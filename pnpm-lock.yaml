@@ -99,6 +99,9 @@ importers:
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@pixler/orchestrator':
+        specifier: workspace:*
+        version: link:../../packages/orchestrator
       '@pixler/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types

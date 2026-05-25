@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { GitBranch, Palette, Settings, Zap, Terminal, Files } from 'lucide-react';
+import { Bot, GitBranch, LayoutGrid, Palette, Settings, Zap, Terminal, Files } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -18,11 +18,13 @@ import {
 import { ScrollArea } from '@pixler/ui/components/scroll-area';
 import { useLayoutStore } from '../stores/layout';
 import { GeneralPanel } from './ProjectSettingsDrawer/GeneralPanel';
+import { ModelsPanel } from './ProjectSettingsDrawer/ModelsPanel';
 import { ScriptsPanel } from './ProjectSettingsDrawer/ScriptsPanel';
 import { FilesToCopyPanel } from './ProjectSettingsDrawer/FilesToCopyPanel';
 import { IntegrationsPanel } from './ProjectSettingsDrawer/IntegrationsPanel';
 import { GitPanel } from './ProjectSettingsDrawer/GitPanel';
 import { ThemePanel } from './ProjectSettingsDrawer/ThemePanel';
+import { WorkspacesPanel } from './ProjectSettingsDrawer/WorkspacesPanel';
 
 interface CategoryConfig {
   id: string;
@@ -33,6 +35,8 @@ interface CategoryConfig {
 
 const CATEGORIES: CategoryConfig[] = [
   { id: 'general', label: 'General', icon: Settings },
+  { id: 'models', label: 'Models', icon: Bot },
+  { id: 'workspaces', label: 'Workspaces', icon: LayoutGrid },
   { id: 'scripts', label: 'Scripts', icon: Terminal },
   { id: 'files-to-copy', label: 'Files to copy', icon: Files },
   { id: 'git', label: 'Git', icon: GitBranch },
@@ -78,6 +82,10 @@ export function ProjectSettingsDrawer() {
             <div className="p-6">
               {activeId === 'general' ? (
                 <GeneralPanel />
+              ) : activeId === 'models' ? (
+                <ModelsPanel />
+              ) : activeId === 'workspaces' ? (
+                <WorkspacesPanel />
               ) : activeId === 'scripts' ? (
                 <ScriptsPanel />
               ) : activeId === 'files-to-copy' ? (

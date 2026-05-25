@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { Maximize2, MessageSquare, Minimize2, StopCircle, Terminal, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { Maximize2, MessageSquare, Minimize2, Terminal } from 'lucide-react';
 import { useParams } from '@tanstack/react-router';
 import { SegmentedControl } from '@pixler/ui/components/segmented-control';
 import { Button } from '@pixler/ui/components/button';
@@ -9,6 +9,7 @@ import { useLayoutStore } from '../stores/layout';
 import { TerminalPane } from './TerminalPane';
 import { TerminalSwitcher } from './TerminalSwitcher';
 import { useTerminalList } from '../hooks/useTerminal';
+import { RightPaneControls } from './RightPaneControls';
 
 type RightPaneMode = 'chat' | 'terminal';
 
@@ -115,24 +116,9 @@ export function RightPane() {
 
       {/* Persistent action buttons */}
       <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border p-3">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={mode !== 'terminal' || !activeTerminalId}
-          onClick={handleInterrupt}
-          className="gap-1.5 text-xs"
-        >
-          <StopCircle className="size-3.5" />
-          Interrupt
-        </Button>
-        <Button variant="outline" size="sm" disabled className="gap-1.5 text-xs">
-          <ThumbsDown className="size-3.5" />
-          Reject
-        </Button>
-        <Button size="sm" disabled className="gap-1.5 text-xs">
-          <ThumbsUp className="size-3.5" />
-          Approve
-        </Button>
+        {params.workspaceId ? (
+          <RightPaneControls workspaceId={params.workspaceId} onInterrupt={handleInterrupt} />
+        ) : null}
       </div>
     </div>
   );
