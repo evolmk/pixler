@@ -1,6 +1,7 @@
 export interface GithubAuthStatus {
   authed: boolean;
   authMethod?: 'pat' | 'oauth' | 'cli' | null;
+  storedMethods?: Array<'pat' | 'oauth'>;
   username?: string;
   hostname?: string;
   scopes?: string[];

@@ -47,6 +47,13 @@ export class GithubAuthService {
     return null;
   }
 
+  async getStoredMethods(): Promise<Array<'pat' | 'oauth'>> {
+    const methods: Array<'pat' | 'oauth'> = [];
+    if (await this.secrets.get(GITHUB_PAT_KEY)) methods.push('pat');
+    if (await this.secrets.get(GITHUB_OAUTH_TOKEN_KEY)) methods.push('oauth');
+    return methods;
+  }
+
   private async validatePat(pat: string): Promise<string | undefined> {
     const res = await fetch('https://api.github.com/user', {
       headers: { Authorization: `token ${pat}`, Accept: 'application/vnd.github.v3+json' },

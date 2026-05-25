@@ -24,19 +24,21 @@ export class GithubService {
   async getAuthStatus(): Promise<GithubAuthStatus> {
     const activeMethod = await this.githubAuth.getActiveMethod();
 
+    const storedMethods = await this.githubAuth.getStoredMethods();
+
     // OAuth or PAT path
     if (activeMethod === 'oauth' || activeMethod === 'pat') {
       const token = await this.githubAuth.getToken();
-      if (!token) return { authed: false, authMethod: activeMethod };
+      if (!token) return { authed: false, authMethod: activeMethod, storedMethods };
       try {
         const res = await fetch('https://api.github.com/user', {
           headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
         });
-        if (!res.ok) return { authed: false, authMethod: activeMethod, error: 'Token invalid' };
+        if (!res.ok) return { authed: false, authMethod: activeMethod, storedMethods, error: 'Token invalid' };
         const data = await res.json() as { login: string };
-        return { authed: true, authMethod: activeMethod, username: data.login, hostname: 'github.com' };
+        return { authed: true, authMethod: activeMethod, storedMethods, username: data.login, hostname: 'github.com' };
       } catch (err) {
-        return { authed: false, authMethod: activeMethod, error: String(err) };
+        return { authed: false, authMethod: activeMethod, storedMethods, error: String(err) };
       }
     }
 
@@ -47,18 +49,14 @@ export class GithubService {
       const scopesLine = stdout.match(/Token scopes: (.+)/)?.[1];
       const scopes = scopesLine ? scopesLine.split(',').map((s) => s.trim().replace(/'/g, '')) : [];
       const authed = !!username;
-      if (authed && activeMethod === null) {
-        // Auto-detect CLI auth without explicit method set
-        await this.githubAuth.getActiveMethod(); // no mutation, just informational
-      }
-      return { authed, authMethod: activeMethod ?? (authed ? 'cli' : null), username: username ?? undefined, hostname: 'github.com', scopes };
+      return { authed, authMethod: activeMethod ?? (authed ? 'cli' : null), storedMethods, username: username ?? undefined, hostname: 'github.com', scopes };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('not logged in') || msg.includes('not yet authenticated')) {
-        return { authed: false, authMethod: null };
+        return { authed: false, authMethod: null, storedMethods };
       }
       this.logger.warn(`gh auth status error: ${msg}`);
-      return { authed: false, authMethod: null, error: msg };
+      return { authed: false, authMethod: null, storedMethods, error: msg };
     }
   }
 

@@ -7,6 +7,7 @@ import {
   FileText,
   FlaskConical,
   GitBranch,
+  Github,
   HardDrive,
   Info,
   Key,
@@ -35,6 +36,7 @@ import {
 import { useLayoutStore } from '../stores/layout';
 import { AppearancePanel } from './SettingsDrawer/AppearancePanel';
 import { LinearPanel } from './SettingsDrawer/LinearPanel';
+import { GitHubPanel } from './SettingsDrawer/GitHubPanel';
 import { ModelsPanel } from './SettingsDrawer/ModelsPanel';
 import { TerminalPanel } from './SettingsDrawer/TerminalPanel';
 import { ProvidersPanel } from './SettingsDrawer/ProvidersPanel';
@@ -60,6 +62,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'providers', label: 'Providers', icon: Package },
   { id: 'env', label: 'Environment', icon: Key, milestone: 'M08' },
   { id: 'linear', label: 'Linear', icon: Link, milestone: 'M10' },
+  { id: 'github', label: 'GitHub', icon: Github, milestone: 'M28' },
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
   { id: 'plans', label: 'Plans', icon: FileText },
   { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -121,6 +124,8 @@ export function SettingsDrawer() {
               <ModelsPanel />
             ) : activeId === 'linear' ? (
               <LinearPanel />
+            ) : activeId === 'github' ? (
+              <GitHubPanel />
             ) : activeId === 'terminal' ? (
               <TerminalPanel />
             ) : activeId === 'providers' ? (

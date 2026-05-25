@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { CheckCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { CheckCircle, Eye, EyeOff, Loader2, LogIn } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { Input } from '@pixler/ui/components/input';
 import { Label } from '@pixler/ui/components/label';
-import { useLinearStatus, useLinearTeams, useConnectLinear } from '../../hooks/useLinear';
+import { Separator } from '@pixler/ui/components/separator';
+import { useLinearStatus, useLinearTeams, useConnectLinear, useLinearOAuthUrl } from '../../hooks/useLinear';
 import { useSetting } from '../../hooks/useSetting';
 
 interface Props {
@@ -14,6 +15,7 @@ export function Step3Linear({ onNext: _onNext }: Props = {}) {
   const { data: status } = useLinearStatus();
   const { data: teams = [] } = useLinearTeams();
   const connect = useConnectLinear();
+  const oauthUrl = useLinearOAuthUrl();
   const { value: teamKey = '', set: setTeamKey } = useSetting<string>('linear.team');
 
   const [pat, setPat] = useState('');
@@ -65,6 +67,22 @@ export function Step3Linear({ onNext: _onNext }: Props = {}) {
       <p className="text-sm text-muted-foreground">
         Connect Linear so Pixler can read tickets and update their status automatically.
       </p>
+
+      <Button
+        variant="outline"
+        className="w-full gap-2"
+        onClick={() => oauthUrl.mutateAsync()}
+        disabled={oauthUrl.isPending}
+      >
+        {oauthUrl.isPending ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
+        Connect with Linear OAuth
+      </Button>
+
+      <div className="flex items-center gap-2">
+        <Separator className="flex-1" />
+        <span className="text-[10px] uppercase text-muted-foreground">or use a PAT</span>
+        <Separator className="flex-1" />
+      </div>
 
       <div className="space-y-2">
         <Label className="text-xs">Personal API Key</Label>

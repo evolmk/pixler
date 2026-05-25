@@ -94,8 +94,9 @@ export class LinearService {
   async status(): Promise<LinearStatusDto> {
     const rawMethod = await this.secrets.getAuthMethod('linear');
     const method = (rawMethod === 'cli' ? null : rawMethod) as 'pat' | 'oauth' | null;
+    const storedMethods = await this.getStoredMethods();
     const client = await this.getClient();
-    if (!client) return { connected: false, authMethod: method };
+    if (!client) return { connected: false, authMethod: method, storedMethods };
 
     try {
       const viewer = await client.viewer;
@@ -103,13 +104,21 @@ export class LinearService {
       return {
         connected: true,
         authMethod: method,
+        storedMethods,
         viewerName: viewer.name,
         viewerEmail: viewer.email,
         organization: org?.name,
       };
     } catch {
-      return { connected: false, authMethod: method };
+      return { connected: false, authMethod: method, storedMethods };
     }
+  }
+
+  private async getStoredMethods(): Promise<Array<'pat' | 'oauth'>> {
+    const methods: Array<'pat' | 'oauth'> = [];
+    if (await this.secrets.get(PAT_KEY)) methods.push('pat');
+    if (await this.secrets.get(OAUTH_TOKEN_KEY)) methods.push('oauth');
+    return methods;
   }
 
   async teams(): Promise<LinearTeamDto[]> {

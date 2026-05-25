@@ -1,18 +1,16 @@
 import { useState } from 'react';
-import { Check, Eye, EyeOff, Loader2, LogIn, Trash2, Unplug, Zap } from 'lucide-react';
+import { Check, Eye, EyeOff, Github, Loader2, Terminal, Trash2, Unplug } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { Input } from '@pixler/ui/components/input';
 import { Label } from '@pixler/ui/components/label';
 import { Separator } from '@pixler/ui/components/separator';
 import {
-  useLinearStatus,
-  useLinearTeams,
-  useConnectLinear,
-  useDisconnectLinear,
-  useRemoveLinearCredential,
-  useLinearOAuthUrl,
-} from '../../hooks/useLinear';
-import { useSetting } from '../../hooks/useSetting';
+  useGithubAuthStatus,
+  useGithubOAuthUrl,
+  useConnectGithubPAT,
+  useDisconnectGithub,
+  useRemoveGithubCredential,
+} from '../../hooks/useGithubAuth';
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -23,83 +21,108 @@ function Section({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-function MethodBadge({ method }: { method: 'pat' | 'oauth' }) {
+function MethodBadge({ method }: { method: 'pat' | 'oauth' | 'cli' }) {
+  const labels: Record<string, string> = { pat: 'PAT', oauth: 'OAuth', cli: 'gh CLI' };
   return (
     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
-      {method === 'oauth' ? 'OAuth' : 'PAT'}
+      {labels[method] ?? method}
     </span>
   );
 }
 
-export function LinearPanel() {
-  const { data: status } = useLinearStatus();
-  const { data: teams = [] } = useLinearTeams();
-  const connect = useConnectLinear();
-  const disconnect = useDisconnectLinear();
-  const removeCredential = useRemoveLinearCredential();
-  const oauthUrl = useLinearOAuthUrl();
-
-  const { value: teamKey = '', set: setTeamKey } = useSetting<string>('linear.team');
-  const { value: syncIntervalMs = 60000, set: setSyncIntervalMs } = useSetting<number>('linear.syncIntervalMs');
+export function GitHubPanel() {
+  const { data: status } = useGithubAuthStatus();
+  const oauthUrl = useGithubOAuthUrl();
+  const connectPAT = useConnectGithubPAT();
+  const disconnect = useDisconnectGithub();
+  const removeCredential = useRemoveGithubCredential();
 
   const [pat, setPat] = useState('');
   const [showPat, setShowPat] = useState(false);
-  const [error, setError] = useState('');
+  const [patError, setPatError] = useState('');
 
-  const handleConnect = async () => {
+  const handlePATConnect = async () => {
     if (!pat.trim()) return;
-    setError('');
+    setPatError('');
     try {
-      await connect.mutateAsync(pat.trim());
+      await connectPAT.mutateAsync(pat.trim());
       setPat('');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Invalid PAT');
+      setPatError(e instanceof Error ? e.message : 'Invalid PAT');
     }
   };
 
   const storedMethods = status?.storedMethods ?? [];
+  const isConnected = status?.authed && !!status.authMethod;
 
   return (
     <div className="space-y-6">
-      {/* Connection status */}
       <Section label="Connection">
-        {status?.connected ? (
+        {isConnected ? (
           <div className="space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-                  <Zap className="size-4 fill-emerald-500 text-emerald-500" />
+                  <Github className="size-4 text-emerald-500" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <p className="text-sm font-medium">{status.viewerName ?? 'Connected'}</p>
-                    {status.authMethod && <MethodBadge method={status.authMethod} />}
+                    <p className="text-sm font-medium">{status?.username ?? 'Connected'}</p>
+                    {status?.authMethod && <MethodBadge method={status.authMethod} />}
                   </div>
-                  {status.organization && (
-                    <p className="text-xs text-muted-foreground">{status.organization}</p>
+                  {status?.hostname && (
+                    <p className="text-xs text-muted-foreground">{status.hostname}</p>
                   )}
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => disconnect.mutateAsync()}
-                disabled={disconnect.isPending}
-                className="gap-1.5 text-xs"
-              >
-                <Unplug className="size-3" />
-                Disconnect
-              </Button>
+              {status?.authMethod !== 'cli' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => disconnect.mutateAsync()}
+                  disabled={disconnect.isPending}
+                  className="gap-1.5 text-xs"
+                >
+                  <Unplug className="size-3" />
+                  Disconnect
+                </Button>
+              )}
             </div>
-            <p className="text-[11px] text-muted-foreground">
-              Disconnect deactivates the credential without removing it. Use "Remove key" to fully delete.
-            </p>
+            {status?.authMethod !== 'cli' && (
+              <p className="text-[11px] text-muted-foreground">
+                Disconnect deactivates the credential without removing it.
+              </p>
+            )}
+            {status?.authMethod === 'cli' && (
+              <p className="text-[11px] text-muted-foreground">
+                Authenticated via gh CLI. Use <code className="font-mono">gh auth logout</code> to disconnect, or set up OAuth / PAT to switch methods.
+              </p>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
+            {/* gh CLI notice */}
+            <div className="rounded-md border border-border bg-muted/30 px-3 py-2 space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Terminal className="size-3.5 text-muted-foreground" />
+                <span className="text-xs font-medium">GitHub CLI</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                {status?.authed && !status.authMethod
+                  ? `Detected: gh CLI logged in as ${status.username ?? 'unknown'}.`
+                  : 'Run gh auth login in your terminal to use gh CLI authentication.'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Separator className="flex-1" />
+              <span className="text-[10px] uppercase text-muted-foreground">or connect with</span>
+              <Separator className="flex-1" />
+            </div>
+
             {/* OAuth section */}
             <div className="space-y-2">
-              <Label className="text-xs">Connect with OAuth</Label>
+              <Label className="text-xs">GitHub OAuth</Label>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -111,9 +134,9 @@ export function LinearPanel() {
                   {oauthUrl.isPending ? (
                     <Loader2 className="size-3.5 animate-spin" />
                   ) : (
-                    <LogIn className="size-3.5" />
+                    <Github className="size-3.5" />
                   )}
-                  Connect with Linear
+                  Connect with GitHub
                 </Button>
                 {storedMethods.includes('oauth') && (
                   <Button
@@ -138,20 +161,15 @@ export function LinearPanel() {
 
             {/* PAT section */}
             <div className="space-y-2">
-              <Label className="text-xs">Personal API Key</Label>
-              {!status?.connected && storedMethods.includes('pat') && (
-                <p className="text-[11px] text-muted-foreground">
-                  A PAT is stored but inactive — enter it again to reconnect, or switch to OAuth.
-                </p>
-              )}
+              <Label className="text-xs">Personal Access Token</Label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Input
                     type={showPat ? 'text' : 'password'}
-                    placeholder="lin_api_…"
+                    placeholder="ghp_…"
                     value={pat}
                     onChange={(e) => setPat(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleConnect(); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handlePATConnect(); }}
                     className="pr-8 font-mono text-xs"
                   />
                   <button
@@ -164,12 +182,12 @@ export function LinearPanel() {
                   </button>
                 </div>
                 <Button
-                  onClick={handleConnect}
-                  disabled={connect.isPending || !pat.trim()}
+                  onClick={handlePATConnect}
+                  disabled={connectPAT.isPending || !pat.trim()}
                   size="sm"
                   className="gap-1.5"
                 >
-                  {connect.isPending ? (
+                  {connectPAT.isPending ? (
                     <Loader2 className="size-3.5 animate-spin" />
                   ) : (
                     <Check className="size-3.5" />
@@ -188,53 +206,14 @@ export function LinearPanel() {
                   </Button>
                 )}
               </div>
-              {error && <p className="text-xs text-destructive">{error}</p>}
+              {patError && <p className="text-xs text-destructive">{patError}</p>}
               <p className="text-xs text-muted-foreground">
-                Create a Personal Access Token in Linear → Settings → API.
+                Create a token at GitHub → Settings → Developer settings → Personal access tokens. Needs <code className="font-mono">repo</code> scope.
               </p>
             </div>
           </div>
         )}
       </Section>
-
-      {status?.connected && (
-        <>
-          <Separator />
-
-          {/* Default team */}
-          <Section label="Default team">
-            <select
-              value={teamKey}
-              onChange={(e) => setTeamKey(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            >
-              <option value="">None</option>
-              {teams.map((t) => (
-                <option key={t.id} value={t.key}>
-                  {t.name} ({t.key})
-                </option>
-              ))}
-            </select>
-          </Section>
-
-          <Separator />
-
-          {/* Sync interval */}
-          <Section label="Sync interval">
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                min={10000}
-                step={5000}
-                value={syncIntervalMs}
-                onChange={(e) => setSyncIntervalMs(Number(e.target.value))}
-                className="w-28 text-sm"
-              />
-              <span className="text-xs text-muted-foreground">ms ({Math.round(syncIntervalMs / 1000)}s)</span>
-            </div>
-          </Section>
-        </>
-      )}
     </div>
   );
 }

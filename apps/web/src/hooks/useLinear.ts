@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { socket } from '../lib/socket';
 import type { LinearStatusDto, LinearTeamDto, LinearProjectDto } from '@pixler/shared-types';
 
 async function fetchStatus(): Promise<LinearStatusDto> {
@@ -19,6 +21,18 @@ async function fetchProjects(teamId: string): Promise<LinearProjectDto[]> {
 }
 
 export function useLinearStatus() {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    const handler = (event: { type: string }) => {
+      if (event.type === 'auth:linear:connected' || event.type === 'auth:linear:disconnected') {
+        void qc.invalidateQueries({ queryKey: ['linear'] });
+      }
+    };
+    socket.on('app:event', handler);
+    return () => { socket.off('app:event', handler); };
+  }, [qc]);
+
   return useQuery({
     queryKey: ['linear', 'status'],
     queryFn: fetchStatus,
@@ -68,10 +82,39 @@ export function useDisconnectLinear() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      await fetch('/api/linear/disconnect', { method: 'POST' });
+      await fetch('/api/auth/linear/disconnect', { method: 'POST' });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['linear'] });
+    },
+  });
+}
+
+export function useRemoveLinearCredential() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (method: 'pat' | 'oauth') => {
+      await fetch('/api/auth/linear/credential', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method }),
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['linear'] });
+    },
+  });
+}
+
+export function useLinearOAuthUrl() {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/auth/linear/url');
+      if (!res.ok) throw new Error('Failed to get Linear OAuth URL');
+      return res.json() as Promise<{ url: string; state: string }>;
+    },
+    onSuccess: ({ url }) => {
+      window.open(url, '_blank', 'noopener,noreferrer');
     },
   });
 }

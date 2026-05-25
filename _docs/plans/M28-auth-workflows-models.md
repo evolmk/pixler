@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 (auth backend) complete — starting Sprint 2 (auth UI)
+**Current Status:** Sprint 2 (auth UI) complete — starting Sprint 3 (model prober backend)
 
 ---
 
@@ -145,27 +145,39 @@ apps/web/src/components/OnboardingDrawer.tsx  # extend steps 2 + 3
 
 ## Sprint 2 — Auth UI (frontend)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Redesign LinearPanel with PAT + OAuth toggle, create GitHubPanel with 3-method picker, update SettingsDrawer to include GitHub category, update onboarding steps 2 + 3.
 
 **Tasks:**
 
-- [ ] Redesign `LinearPanel.tsx` — show both PAT and OAuth options; active method highlighted, alternatives greyed out with "Disconnect current method to switch" hint; disconnect button deactivates (doesn't delete); "Remove key" button next to stored credentials
-- [ ] Create `GitHubPanel.tsx` — three auth methods (gh CLI / OAuth / PAT) with same mutual-exclusivity UX; OAuth "Connect with GitHub" button triggers redirect; PAT field for manual entry; gh CLI shows current `gh auth status`
-- [ ] Add GitHub category to `SettingsDrawer.tsx` CATEGORIES array (between Linear and Git)
-- [ ] Create `useGithubAuth.ts` hook — mutations for connect (OAuth initiate, PAT submit), disconnect, remove; queries for auth status
-- [ ] Extend `useLinear.ts` — add `useLinearOAuthUrl` mutation (gets the OAuth initiate URL from backend), update `useConnectLinear` to support both methods
-- [ ] Update `OnboardingDrawer.tsx` Step 2 — add GitHub OAuth + PAT options alongside gh CLI
-- [ ] Update `OnboardingDrawer.tsx` Step 3 — add "Connect with Linear" OAuth button alongside PAT field
-- [ ] Update `ProvidersPanel.tsx` — remove GitHub auth status display (now in dedicated GitHubPanel)
+- [x] Redesign `LinearPanel.tsx` — show both PAT and OAuth options; active method highlighted, alternatives greyed out with "Disconnect current method to switch" hint; disconnect button deactivates (doesn't delete); "Remove key" button next to stored credentials
+- [x] Create `GitHubPanel.tsx` — three auth methods (gh CLI / OAuth / PAT) with same mutual-exclusivity UX; OAuth "Connect with GitHub" button triggers redirect; PAT field for manual entry; gh CLI shows current `gh auth status`
+- [x] Add GitHub category to `SettingsDrawer.tsx` CATEGORIES array (between Linear and Git)
+- [x] Create `useGithubAuth.ts` hook — mutations for connect (OAuth initiate, PAT submit), disconnect, remove; queries for auth status
+- [x] Extend `useLinear.ts` — add `useLinearOAuthUrl` mutation (gets the OAuth initiate URL from backend), update `useConnectLinear` to support both methods
+- [x] Update `OnboardingDrawer.tsx` Step 2 — add GitHub OAuth + PAT options alongside gh CLI
+- [x] Update `OnboardingDrawer.tsx` Step 3 — add "Connect with Linear" OAuth button alongside PAT field
+- [x] Update `ProvidersPanel.tsx` — remove GitHub auth status display (now in dedicated GitHubPanel)
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useLinear.ts` — extended: socket invalidation, useLinearOAuthUrl, useRemoveLinearCredential, soft-disconnect endpoint
+- `apps/web/src/hooks/useGithubAuth.ts` — new: GitHub auth hooks (status, OAuth URL, PAT connect, disconnect, remove)
+- `apps/web/src/components/SettingsDrawer/LinearPanel.tsx` — redesigned: OAuth + PAT sections, method badge, Remove key buttons
+- `apps/web/src/components/SettingsDrawer/GitHubPanel.tsx` — new: 3-method panel (gh CLI / OAuth / PAT)
+- `apps/web/src/components/SettingsDrawer.tsx` — GitHub category added
+- `apps/web/src/components/Onboarding/Step2Tools.tsx` — GithubAuthSection added
+- `apps/web/src/components/Onboarding/Step3Linear.tsx` — OAuth button + separator added
+- `apps/web/src/components/SettingsDrawer/ProvidersPanel.tsx` — GitHub auth display removed
+- `packages/shared-types/src/linear.ts` — storedMethods field
+- `packages/shared-types/src/github.ts` — storedMethods field
+- `apps/api/src/linear/linear.service.ts` — storedMethods in status()
+- `apps/api/src/github/github-auth.service.ts` — getStoredMethods()
+- `apps/api/src/github/github.service.ts` — storedMethods in getAuthStatus()
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w typecheck && pnpm -w dev` — manually test Linear OAuth flow, GitHub OAuth flow, PAT entry, disconnect/reconnect cycle
 

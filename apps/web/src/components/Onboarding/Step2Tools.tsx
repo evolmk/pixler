@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { CheckCircle, XCircle, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
+import { CheckCircle, XCircle, RefreshCw, ChevronDown, ChevronRight, Github } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { useDetectTools } from '../../hooks/useOnboarding';
+import { useGithubAuthStatus, useGithubOAuthUrl, useConnectGithubPAT } from '../../hooks/useGithubAuth';
 import type { ToolStatus } from '../../hooks/useOnboarding';
 
 function ToolRow({
@@ -34,6 +35,59 @@ function ToolRow({
         ) : (
           <XCircle className="size-4 text-destructive" />
         )}
+      </div>
+    </div>
+  );
+}
+
+function GithubAuthSection() {
+  const { data: ghStatus } = useGithubAuthStatus();
+  const oauthUrl = useGithubOAuthUrl();
+  const connectPAT = useConnectGithubPAT();
+  const [pat, setPat] = useState('');
+  const [patError, setPatError] = useState('');
+
+  if (ghStatus?.authed) return null;
+
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-3">
+      <p className="text-xs font-medium text-muted-foreground">GitHub not authenticated — connect via:</p>
+      <div className="flex flex-col gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 w-full justify-start"
+          onClick={() => oauthUrl.mutateAsync()}
+          disabled={oauthUrl.isPending}
+        >
+          <Github className="size-3.5" />
+          Connect with GitHub OAuth
+        </Button>
+        <div className="flex gap-2">
+          <input
+            type="password"
+            placeholder="ghp_… (PAT)"
+            value={pat}
+            onChange={(e) => setPat(e.target.value)}
+            className="flex-1 rounded-md border border-border bg-background px-2 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!pat.trim() || connectPAT.isPending}
+            onClick={async () => {
+              setPatError('');
+              try { await connectPAT.mutateAsync(pat.trim()); setPat(''); }
+              catch (e) { setPatError(e instanceof Error ? e.message : 'Invalid'); }
+            }}
+          >
+            Connect
+          </Button>
+        </div>
+        {patError && <p className="text-[11px] text-destructive">{patError}</p>}
+        <p className="text-[10px] text-muted-foreground">
+          Or run <code className="font-mono">gh auth login</code> in your terminal.
+        </p>
       </div>
     </div>
   );
@@ -103,6 +157,8 @@ export function Step2Tools({ onNext: _onNext }: Props = {}) {
         <RefreshCw className="size-3.5" />
         Re-check all
       </Button>
+
+      <GithubAuthSection />
     </div>
   );
 }

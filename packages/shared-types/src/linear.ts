@@ -18,6 +18,7 @@ export interface LinearTicket {
 export interface LinearStatusDto {
   connected: boolean;
   authMethod?: 'pat' | 'oauth' | null;
+  storedMethods?: Array<'pat' | 'oauth'>;
   viewerName?: string;
   viewerEmail?: string;
   organization?: string;
