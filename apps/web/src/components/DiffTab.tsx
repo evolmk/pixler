@@ -1,17 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { RefreshCw } from 'lucide-react';
 import { EmptyState } from '@pixler/ui/components/empty-state';
 import { GitCompare } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
+import { useLayoutStore } from '../stores/layout';
 import { useDiffFiles, useDiffFile } from '../hooks/useDiff';
 import { DiffFileTree } from './DiffFileTree';
 import { DiffEditor } from './DiffEditor';
+import { HunkList } from './HunkList';
 
 export function DiffTab() {
   const params = useParams({ strict: false }) as { workspaceId?: string };
   const workspaceId = params.workspaceId;
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
+
+  const fullBleed = useLayoutStore((s) => s.fullBleed);
+  const setFullBleed = useLayoutStore((s) => s.setFullBleed);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        setFullBleed(fullBleed === 'center' ? null : 'center');
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [fullBleed, setFullBleed]);
 
   const { data: files = [], isLoading, refetch } = useDiffFiles(workspaceId);
   const { data: fileDetail, isLoading: isDetailLoading } = useDiffFile(workspaceId, selectedPath ?? undefined);
@@ -46,20 +62,25 @@ export function DiffTab() {
       </div>
 
       {/* Editor area */}
-      <div className="flex-1 overflow-hidden">
-        {selectedPath && fileDetail ? (
-          <DiffEditor file={fileDetail} />
-        ) : isDetailLoading ? (
-          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Loading…</div>
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <EmptyState
-              icon={GitCompare}
-              title={files.length > 0 ? 'Select a file' : 'No changes'}
-              body={files.length > 0 ? 'Click a file in the tree to view its diff.' : 'All files are clean.'}
-              className="border-none"
-            />
-          </div>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex-1 overflow-hidden">
+          {selectedPath && fileDetail ? (
+            <DiffEditor file={fileDetail} />
+          ) : isDetailLoading ? (
+            <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Loading…</div>
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <EmptyState
+                icon={GitCompare}
+                title={files.length > 0 ? 'Select a file' : 'No changes'}
+                body={files.length > 0 ? 'Click a file in the tree to view its diff.' : 'All files are clean.'}
+                className="border-none"
+              />
+            </div>
+          )}
+        </div>
+        {selectedPath && fileDetail && workspaceId && (
+          <HunkList workspaceId={workspaceId} file={fileDetail} />
         )}
       </div>
     </div>

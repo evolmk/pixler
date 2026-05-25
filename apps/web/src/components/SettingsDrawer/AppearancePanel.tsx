@@ -102,6 +102,42 @@ export function AppearancePanel() {
           onChange={setAnimationLevel}
         />
       </Section>
+
+      <Section label="Diff viewer">
+        <DiffSettings />
+      </Section>
+    </div>
+  );
+}
+
+type DiffWordWrap = 'off' | 'on';
+type DiffWhitespace = 'none' | 'boundary' | 'all';
+
+const WORD_WRAP_OPTIONS: SegmentedOption<DiffWordWrap>[] = [
+  { value: 'off', label: 'Off' },
+  { value: 'on', label: 'On' },
+];
+
+const WHITESPACE_OPTIONS: SegmentedOption<DiffWhitespace>[] = [
+  { value: 'none', label: 'None' },
+  { value: 'boundary', label: 'Boundary' },
+  { value: 'all', label: 'All' },
+];
+
+function DiffSettings() {
+  const { value: wordWrap = 'off', set: setWordWrap } = useSetting<DiffWordWrap>('diff.wordWrap');
+  const { value: whitespace = 'none', set: setWhitespace } = useSetting<DiffWhitespace>('diff.renderWhitespace');
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-1.5">
+        <p className="text-xs text-muted-foreground">Word wrap</p>
+        <SegmentedControl options={WORD_WRAP_OPTIONS} value={wordWrap} onChange={setWordWrap} />
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-xs text-muted-foreground">Render whitespace</p>
+        <SegmentedControl options={WHITESPACE_OPTIONS} value={whitespace} onChange={setWhitespace} />
+      </div>
     </div>
   );
 }

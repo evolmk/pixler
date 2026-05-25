@@ -1,8 +1,8 @@
 # M17 — Diff viewer (Monaco)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — Monaco DiffTab live in CenterTabs. Sprint 3 in progress.
+**Current Status:** All sprints complete — HunkList staging, diff settings in AppearancePanel, ⌘+Shift+D shortcut.
 
 ---
 
@@ -103,26 +103,29 @@ filesystem changes.
 
 ## Sprint 3 — HunkList + staging + theme + shortcuts
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Users can stage/unstage hunks; diff settings live in Appearance; `⌘+Shift+D` toggles
 full-bleed diff.
 
 **Tasks:**
 
-- [ ] `HunkList.tsx` bottom strip with checkboxes; "Stage selected" / "Unstage selected" wire
+- [x] `HunkList.tsx` bottom strip with checkboxes; "Stage selected" / "Unstage selected" wire
   to `POST /api/workspaces/:id/diff/stage` and `/unstage`.
-- [ ] Extend `SettingsDrawer/AppearancePanel.tsx` with diff word-wrap and render-whitespace
+- [x] Extend `SettingsDrawer/AppearancePanel.tsx` with diff word-wrap and render-whitespace
   options.
-- [ ] Monaco theme follows `pixler.theme` (vs-dark / vs baseline tinted with CSS vars).
-- [ ] `⌘+Shift+D` toggles full-bleed via M06 mechanism.
+- [x] Monaco theme follows `pixler.theme` (vs-dark / vs baseline tinted with CSS vars).
+- [x] `⌘+Shift+D` toggles full-bleed via M06 mechanism.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/HunkList.tsx` — created
+- `apps/web/src/components/DiffTab.tsx` — added ⌘+Shift+D shortcut + useLayoutStore
+- `apps/web/src/components/SettingsDrawer/AppearancePanel.tsx` — added DiffSettings section
+- `apps/api/src/settings/registry.ts` — added diff.wordWrap, diff.renderWhitespace keys
 
 **Issues Encountered:**
 
-- _none yet_
+- Missing `useLayoutStore` import in DiffTab.tsx was caught by typecheck; added.
 
 **Verify:** `pnpm -w typecheck` + manual: stage a hunk, `/commit` via M16, verify only unstaged remain.
 

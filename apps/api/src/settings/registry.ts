@@ -44,4 +44,6 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'terminal.pasteWarning', type: 'boolean', default: true, scopes: ['global'], label: 'Paste Warning', description: 'Warn when pasting multi-line content' },
   { key: 'layout.paneSizes', type: 'json', default: { outer: [22, 78], inner: [62, 38] }, scopes: ['global'], label: 'Pane Sizes', description: '3-pane split sizes: outer [sidebar, rest], inner [center, right]' },
   { key: 'layout.bigTerminal', type: 'boolean', default: false, scopes: ['global'], label: 'Big Terminal', description: 'Right pane expanded full-bleed' },
+  { key: 'diff.wordWrap', type: 'string', default: 'off', scopes: ['global'], label: 'Diff Word Wrap', description: 'Word wrap in diff viewer: off | on' },
+  { key: 'diff.renderWhitespace', type: 'string', default: 'none', scopes: ['global'], label: 'Diff Whitespace', description: 'Render whitespace in diff viewer: none | boundary | all' },
 ];

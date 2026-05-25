@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react';
 import { Columns2, AlignLeft } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
+import { useSetting } from '../hooks/useSetting';
 import type { DiffFileDetail } from '@pixler/shared-types';
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
 export function DiffEditor({ file }: Props) {
   const [sideBySide, setSideBySide] = useState(true);
   const editorRef = useRef<unknown>(null);
+  const { value: wordWrap = 'off' } = useSetting<'off' | 'on'>('diff.wordWrap');
+  const { value: renderWhitespace = 'none' } = useSetting<'none' | 'boundary' | 'all'>('diff.renderWhitespace');
 
   if (file.isBinary) {
     return (
@@ -55,8 +58,8 @@ export function DiffEditor({ file }: Props) {
             scrollBeyondLastLine: false,
             fontSize: 13,
             lineNumbers: 'on',
-            wordWrap: 'off',
-            renderWhitespace: 'none',
+            wordWrap: wordWrap,
+            renderWhitespace: renderWhitespace,
             overviewRulerBorder: false,
             hideCursorInOverviewRuler: true,
           }}
