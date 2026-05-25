@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — sync scheduler, state-map, tickets endpoint. Sprint 3 next: comments, attachments, sub-issues.
+**Current Status:** Sprint 3 complete — mutations service (comments, attachments, sub-issues). Sprint 4 next: Web UI.
 
 ---
 
