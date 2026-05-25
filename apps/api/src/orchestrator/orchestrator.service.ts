@@ -1,13 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { createMachine, step } from '@pixler/orchestrator';
-import type { MachineContext, SideEffect } from '@pixler/orchestrator';
+import { WorkflowRunner } from '@pixler/orchestrator/server';
+import type { MachineContext, SideEffect, WorkflowStep, WorkflowContext, StepEvent } from '@pixler/orchestrator';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { SettingsService } from '../settings/settings.service';
 import { EventsService } from '../events/events.service';
 import { AgentRunnerService } from './agent-runner.service';
 import { PromptTemplatesService } from './prompt-templates.service';
 import { LinearBridgeService } from './linear-bridge.service';
+import { LinearService } from '../linear/linear.service';
 import { TriggersService } from '../checkpoints/triggers.service';
+import { WorkflowsService } from '../workflows/workflows.service';
 
 const AUTO_APPROVE_DELAY_MS = 800;
 
@@ -15,6 +18,7 @@ const AUTO_APPROVE_DELAY_MS = 800;
 export class OrchestratorService {
   private readonly logger = new Logger(OrchestratorService.name);
   private machines = new Map<string, MachineContext>();
+  private workflowRunners = new Map<string, WorkflowRunner>();
 
   constructor(
     private readonly workspaces: WorkspacesService,
@@ -23,7 +27,9 @@ export class OrchestratorService {
     private readonly runner: AgentRunnerService,
     private readonly templates: PromptTemplatesService,
     private readonly linearBridge: LinearBridgeService,
+    private readonly linear: LinearService,
     private readonly triggers: TriggersService,
+    private readonly workflowsService: WorkflowsService,
   ) {}
 
   getState(workspaceId: string): MachineContext | null {
@@ -44,6 +50,17 @@ export class OrchestratorService {
     const ws = this.workspaces.findOne(workspaceId);
     const projectId = ws.project_id;
 
+    // Check if any ticket label matches a workflow name
+    if (ws.ticket_id) {
+      const workflow = await this.findWorkflowForTicket(ws.ticket_id, ws.worktree_path ?? undefined);
+      if (workflow) {
+        this.logger.log(`[Workflow] Running '${workflow.name}' for ticket ${ws.ticket_id}`);
+        await this.runWorkflow(workspaceId, workflow, ws.ticket_id);
+        return;
+      }
+    }
+
+    // Fall back to the hardcoded state machine
     const ctx = createMachine({
       maxRejections: (this.settings.get('gates.loopLimit', { projectId }) as number) ?? 3,
       autoApprovePlan: (this.settings.get('gates.autoApprovePlan', { projectId }) as boolean) ?? false,
@@ -56,7 +73,171 @@ export class OrchestratorService {
     this.applyAndDrive(workspaceId, ctx, [{ type: 'START', ticketId: ws.ticket_id ?? undefined }]);
   }
 
+  private async findWorkflowForTicket(ticketId: string, repoDir?: string) {
+    try {
+      const ticket = await this.linear.fetchTicket(ticketId);
+      const labelNames = ticket.labels.map((l) => l.name.toLowerCase());
+      if (!labelNames.length) return null;
+      const workflows = this.workflowsService.list(repoDir);
+      return workflows.find((wf) => !wf.archived && labelNames.includes(wf.name.toLowerCase())) ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  private async runWorkflow(workspaceId: string, workflowDto: { name: string }, ticketId: string): Promise<void> {
+    const ws = this.workspaces.findOne(workspaceId);
+    const loader = this.workflowsService.getLoader();
+    const workflowDef = loader.loadByName(workflowDto.name, ws.worktree_path ?? undefined);
+    if (!workflowDef) return;
+
+    let issueTitle = ticketId;
+    let issueDescription: string | null = null;
+    try {
+      const ticket = await this.linear.fetchTicket(ticketId);
+      issueTitle = ticket.title;
+      issueDescription = ticket.description;
+    } catch {
+      // non-fatal — use ticketId as title
+    }
+
+    const context: WorkflowContext = {
+      issue: {
+        id: ticketId,
+        title: issueTitle,
+        description: issueDescription,
+      },
+      workflow: {},
+      steps: {},
+    };
+
+    const workflowRunner = new WorkflowRunner(
+      workflowDef,
+      context,
+      (event: StepEvent) => {
+        this.events.emitWorkspaceEvent(workspaceId, {
+          ...event,
+          type: 'workflow.step',
+          workspaceId,
+          timestamp: Date.now(),
+        });
+      },
+      (wfStep: WorkflowStep, ctx: WorkflowContext) => this.executeWorkflowStep(workspaceId, wfStep, ctx),
+    );
+
+    this.workflowRunners.set(workspaceId, workflowRunner);
+
+    try {
+      void this.linearBridge.onWorkspaceStart(ticketId, ws.project_id);
+      const finalState = await workflowRunner.run();
+      this.workflowRunners.delete(workspaceId);
+
+      if (finalState.status === 'completed') {
+        void this.linearBridge.onPrMerged(ticketId, ws.project_id);
+        this.events.emitWorkspaceEvent(workspaceId, {
+          type: 'agent.done',
+          workspaceId,
+          prUrl: undefined,
+          timestamp: Date.now(),
+        });
+      } else {
+        this.events.emitWorkspaceEvent(workspaceId, {
+          type: 'agent.error',
+          workspaceId,
+          error: `Workflow ${finalState.status}`,
+          timestamp: Date.now(),
+        });
+      }
+    } catch (err) {
+      this.workflowRunners.delete(workspaceId);
+      this.events.emitWorkspaceEvent(workspaceId, {
+        type: 'agent.error',
+        workspaceId,
+        error: String(err),
+        timestamp: Date.now(),
+      });
+    }
+  }
+
+  private async executeWorkflowStep(
+    workspaceId: string,
+    step: WorkflowStep,
+    ctx: WorkflowContext,
+  ): Promise<unknown> {
+    const ws = this.workspaces.findOne(workspaceId);
+    const phaseMap: Partial<Record<WorkflowStep['type'], 'planning' | 'reviewing' | 'executing' | 'validating'>> = {
+      'builtin:create_plan': 'planning',
+      'builtin:review_issue': 'reviewing',
+      'builtin:review_plan': 'reviewing',
+      'builtin:run_plan': 'executing',
+      'builtin:qa_review': 'validating',
+    };
+
+    const phase = phaseMap[step.type];
+
+    if (step.type === 'builtin:open_pr') {
+      void this.linearBridge.onPrOpened(ctx.issue.id, ws.project_id);
+      this.events.emitWorkspaceEvent(workspaceId, {
+        type: 'agent.state-changed',
+        workspaceId,
+        from: 'executing',
+        to: 'pr_open',
+        timestamp: Date.now(),
+      });
+      return null;
+    }
+
+    if (phase) {
+      if (phase === 'executing') void this.triggers.onBeforeExecution(workspaceId);
+
+      const prompt = step.prompt
+        ? step.prompt
+        : this.templates.build(phase, {
+            workspaceId,
+            ticketId: ctx.issue.id,
+            planPath: `docs/plans/${ctx.issue.id}.md`,
+          });
+
+      this.events.emitWorkspaceEvent(workspaceId, {
+        type: 'agent.state-changed',
+        workspaceId,
+        from: 'idle',
+        to: phase,
+        timestamp: Date.now(),
+      });
+
+      return this.runner.run({
+        workspaceId,
+        worktreePath: ws.worktree_path ?? process.cwd(),
+        phase,
+        prompt,
+        ticketId: ctx.issue.id,
+        branch: ws.branch ?? undefined,
+        onData: phase === 'executing' ? (data) => void this.triggers.onAgentOutput(workspaceId, data) : undefined,
+      });
+    }
+
+    if (step.type === 'prompt' && step.prompt) {
+      return this.runner.run({
+        workspaceId,
+        worktreePath: ws.worktree_path ?? process.cwd(),
+        phase: 'executing',
+        prompt: step.prompt,
+        ticketId: ctx.issue.id,
+        branch: ws.branch ?? undefined,
+      });
+    }
+
+    this.logger.warn(`[Workflow] Unsupported step type '${step.type}' — skipping`);
+    return null;
+  }
+
   approve(workspaceId: string): void {
+    const wfRunner = this.workflowRunners.get(workspaceId);
+    if (wfRunner) {
+      wfRunner.resolve(true);
+      return;
+    }
     const ctx = this.machines.get(workspaceId);
     if (!ctx) return;
     const { context, effects } = step(ctx, { type: 'PLAN_APPROVED' });
@@ -71,6 +252,11 @@ export class OrchestratorService {
   }
 
   reject(workspaceId: string, note?: string): void {
+    const wfRunner = this.workflowRunners.get(workspaceId);
+    if (wfRunner) {
+      wfRunner.resolve(false);
+      return;
+    }
     const ctx = this.machines.get(workspaceId);
     if (!ctx) return;
     const { context, effects } = step(ctx, { type: 'PLAN_REJECTED', note });
@@ -82,6 +268,13 @@ export class OrchestratorService {
   }
 
   interrupt(workspaceId: string): void {
+    const wfRunner = this.workflowRunners.get(workspaceId);
+    if (wfRunner) {
+      wfRunner.cancel();
+      this.workflowRunners.delete(workspaceId);
+      this.runner.interrupt(workspaceId);
+      return;
+    }
     const ctx = this.machines.get(workspaceId);
     if (!ctx) return;
     this.runner.interrupt(workspaceId);
@@ -91,6 +284,11 @@ export class OrchestratorService {
   }
 
   stop(workspaceId: string): void {
+    const wfRunner = this.workflowRunners.get(workspaceId);
+    if (wfRunner) {
+      wfRunner.cancel();
+      this.workflowRunners.delete(workspaceId);
+    }
     this.runner.interrupt(workspaceId);
     this.machines.delete(workspaceId);
   }

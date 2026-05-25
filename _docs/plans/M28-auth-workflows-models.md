@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 5 (workflow engine core) complete — starting Sprint 6 (workflow backend integration)
+**Current Status:** Sprint 6 (workflow backend integration) complete — starting Sprint 7 (workflow UI)
 
 ---
 
@@ -282,25 +282,36 @@ apps/web/src/components/OnboardingDrawer.tsx  # extend steps 2 + 3
 
 ## Sprint 6 — Workflow backend integration (apps/api)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Create the workflows API module, integrate WorkflowRunner into the orchestrator service, and add storage provider service.
 
 **Tasks:**
 
-- [ ] Create `apps/api/src/workflows/workflows.module.ts` — registers workflows service and controller
-- [ ] Create `apps/api/src/workflows/workflows.service.ts` — CRUD for workflow files: list all discovered workflows, read YAML, write (save user-global), duplicate, archive (set `archived: true`)
-- [ ] Create `apps/api/src/workflows/workflows.controller.ts` — REST endpoints: `GET /workflows`, `GET /workflows/:name`, `PUT /workflows/:name`, `POST /workflows/:name/duplicate`, `PATCH /workflows/:name/archive`
-- [ ] Create `apps/api/src/workflows/storage-provider.service.ts` — reads `~/.config/pixler/storage.yaml`; implements local storage provider (write plan to configured local path); stub interface for future S3/GDrive
-- [ ] Extend `apps/api/src/orchestrator/orchestrator.service.ts` — when starting a workspace, check if a workflow YAML matches the issue label; if found, delegate to `WorkflowRunner` instead of hardcoded state machine; if not found, fall back to existing behavior
-- [ ] Wire `WorkflowsModule` into `AppModule`
+- [x] Create `apps/api/src/workflows/workflows.module.ts` — registers workflows service and controller
+- [x] Create `apps/api/src/workflows/workflows.service.ts` — CRUD for workflow files: list all discovered workflows, read YAML, write (save user-global), duplicate, archive (set `archived: true`)
+- [x] Create `apps/api/src/workflows/workflows.controller.ts` — REST endpoints: `GET /workflows`, `GET /workflows/:name`, `PUT /workflows/:name`, `POST /workflows/:name/duplicate`, `PATCH /workflows/:name/archive`
+- [x] Create `apps/api/src/workflows/storage-provider.service.ts` — reads `~/.config/pixler/storage.yaml`; implements local storage provider (write plan to configured local path); stub interface for future S3/GDrive
+- [x] Extend `apps/api/src/orchestrator/orchestrator.service.ts` — when starting a workspace, check if a workflow YAML matches the issue label; if found, delegate to `WorkflowRunner` instead of hardcoded state machine; if not found, fall back to existing behavior
+- [x] Wire `WorkflowsModule` into `AppModule`
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/workflows/workflows.module.ts` — new
+- `apps/api/src/workflows/workflows.service.ts` — new: list, read, save, duplicate, archive workflow files
+- `apps/api/src/workflows/workflows.controller.ts` — new: GET/PUT/POST/PATCH workflow REST endpoints
+- `apps/api/src/workflows/storage-provider.service.ts` — new: local storage provider (stub for S3/GDrive)
+- `apps/api/src/orchestrator/orchestrator.service.ts` — extended: WorkflowRunner integration, findWorkflowForTicket, runWorkflow, executeWorkflowStep, approve/interrupt/stop handle WorkflowRunner
+- `apps/api/src/orchestrator/orchestrator.module.ts` — imports WorkflowsModule
+- `apps/api/src/app.module.ts` — imports WorkflowsModule
+- `apps/api/tsconfig.json` — (unchanged from Sprint 5)
+- `packages/orchestrator/package.json` — added typesVersions for moduleResolution:node compat
+- `apps/api/package.json` — added js-yaml + @types/js-yaml
 
 **Issues Encountered:**
 
-- _none yet_
+- `@pixler/orchestrator/server` subpath not resolvable with `moduleResolution: "node"` in the API tsconfig. Fixed by adding `typesVersions` to orchestrator package.json (pointing to dist declaration files), which supports node resolution mode.
+- `js-yaml` lacks bundled types — required adding `@types/js-yaml` to API devDependencies.
+- Spread `...event` after `type:` literal caused TS2783 duplicate-key error — fixed by spreading first.
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/api test` — verify workflow CRUD endpoints return correct data, orchestrator delegates to WorkflowRunner for labeled issues
 
