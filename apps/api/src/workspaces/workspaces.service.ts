@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { execSync } from 'child_process';
+import { existsSync, writeFileSync } from 'fs';
 import { DatabaseService } from '../db/database.service';
 import { PortAllocatorService } from './port-allocator.service';
 import { NameGeneratorService } from './name-generator.service';
@@ -84,6 +85,8 @@ export class WorkspacesService {
     const globs = teamConfig?.filesToCopy ?? [];
     await this.filesToCopy.copy({ repoPath: project.path, worktreePath, globs });
 
+    this.seedClaudeIgnore(worktreePath);
+
     const workspace = this.findOne(id);
     const setupScript = teamConfig?.scripts?.setup;
     if (setupScript) {
@@ -147,6 +150,32 @@ export class WorkspacesService {
     }
 
     return { ok: true };
+  }
+
+  private seedClaudeIgnore(worktreePath: string): void {
+    const { join } = require('path') as typeof import('path');
+    const dest = join(worktreePath, '.claudeignore');
+    if (existsSync(dest)) return;
+    const content = [
+      'node_modules/',
+      'dist/',
+      '.next/',
+      '.nuxt/',
+      'build/',
+      'coverage/',
+      '*.lock',
+      'pnpm-lock.yaml',
+      'yarn.lock',
+      'package-lock.json',
+      '.git/',
+      '*.log',
+      '.DS_Store',
+    ].join('\n') + '\n';
+    try {
+      writeFileSync(dest, content, 'utf-8');
+    } catch {
+      // non-fatal if worktree not yet ready
+    }
   }
 
   listFiles(id: string): { files: string[] } {

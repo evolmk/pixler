@@ -20,3 +20,4 @@
 | M21 | 2026-05-25 | Onboarding (5-step Vaul drawer, tool-detector, guided workspace CTA, Help re-run) |
 | M22 | 2026-05-25 | Command palette (cmdk, action registry, dynamic sections, hotkey engine, KeyboardPanel, presets) |
 | M13 | 2026-05-25 | Orchestrator state machine + agent process spawning (pure FSM package, NestJS service, Linear bridge, web UI controls) |
+| M23 | 2026-05-25 | Token health panel (usage parsing, status pill, per-model/workspace breakdowns, preflight modal, .claudeignore, /clear on switch) |

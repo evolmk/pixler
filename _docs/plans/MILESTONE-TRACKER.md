@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M13-orchestrator
-**Next Plan:** M14-plan-storage
+**Last Plan Completed:** M23-token-health
+**Next Plan:** M24-gestures-deeplinks
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Instance                              | Plan              | Status         |
 |---------------------------------------|-------------------|----------------|
-| **evolmk** (default `~/.claude`)      | M23-token-health  | 🔄 in-progress |
+| **evolmk** (default `~/.claude`)      | M23-token-health  | ✅ complete    |
 | **evolmikek** (`~/.claude-evolmikek`) | M14-plan-storage  | 🔄 in-progress (assumed) |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
@@ -43,7 +43,7 @@
 - [x] **M20** — Themes _(Wave 8 / Track A)_
 - [x] **M21** — Onboarding _(Wave 9 / Track A)_
 - [x] **M22** — Palette + keys _(Wave 10 / Track A)_
-- [ ] **M23** — Token health _(Wave 10 / Track B)_
+- [x] **M23** — Token health _(Wave 10 / Track B)_
 - [ ] **M24** — Gestures + deep links _(Wave 11 / Track A)_
 - [ ] **M25** — Ship _(Wave 12 — serial, last)_
 - [ ] **M26** — Playwright E2E smoke suite _(Wave 11 / Track B)_

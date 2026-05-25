@@ -1,0 +1,174 @@
+# M23 — Token health panel + status bar + pre-flight check
+
+**Status:** ✅ COMPLETE
+**Modified:** 2026-05-25
+**Current Status:** All 3 sprints complete — usage panel, token pill, preflight modal, .claudeignore seeding, workspace-switch /clear, context-spike hints.
+
+---
+
+## Goal
+
+Implement SPEC §12.3 + §12.4 + §12.5: a per-user 5-hour-window token usage view derived from
+local `~/.claude/projects/` JSONL transcripts, a status-bar pill that's always visible, and a
+pre-flight check before spawning parallel agents.
+
+## Depends on
+
+- M05 (settings — to find the `~/.claude/projects/` path, exposed via setting
+  `providers.claudeProjectsPath`)
+- M08 (workspaces — per-workspace cost attribution)
+- M13 (orchestrator — pre-flight check fires before spawning agents)
+
+## Acceptance
+
+- Opening Pixler shows the status pill with a live %.
+- Per-workspace attribution lights up after running an agent in one workspace and not another.
+- Starting a 3rd agent while at 78% surfaces the confirmation modal.
+- `.claudeignore` is seeded in fresh workspaces.
+- `pnpm -w typecheck` clean.
+
+## Out of scope
+
+- Cross-machine token reconciliation — local-only in v1.
+- Provider-side rate-limit API integration — parsing the local transcripts is enough.
+
+## Files (expected surface)
+
+```
+apps/api/src/db/migrations/0009_usage.sql
+apps/api/src/usage/usage.module.ts
+apps/api/src/usage/usage.service.ts
+apps/api/src/usage/usage.controller.ts
+apps/api/src/usage/claude-log-parser.service.ts
+apps/api/src/usage/mcp-overhead-estimator.service.ts
+apps/api/src/orchestrator/preflight.service.ts
+packages/shared-types/src/usage.ts
+apps/web/src/components/TokenStatusPill.tsx
+apps/web/src/components/SettingsDrawer/UsagePanel.tsx
+apps/web/src/components/PreflightModal.tsx
+apps/web/src/hooks/useUsage.ts
+```
+
+---
+
+## Sprint 1 — UsageModule + claude-log parser + usage_snapshots
+
+**Status:** ✅ complete
+**Goal:** Backend reads `~/.claude/projects/` JSONL, builds a time-series, and exposes window /
+per-model / per-workspace / historical endpoints.
+
+**Tasks:**
+
+- [x] `0009_usage.sql` migration with `usage_snapshots` (filed as 0005_usage.sql — earlier migrations weren't 0005–0008).
+- [x] `UsageModule` + `UsageService` + `UsageController`.
+- [x] `claude-log-parser.service.ts` — walks `~/.claude/projects/`, parses JSONL transcripts;
+  emits per-message tokens (input/output/cache-read/cache-write), model, ts.
+- [x] Flush summary snapshots every N seconds.
+- [x] `GET /api/usage/window?hours=5` (with % of cap heuristic from last 4 weeks; fallback
+  `usage.5hCap`).
+- [x] `GET /api/usage/per-model?since=&until=`, `GET /api/usage/per-workspace?workspaceId=`
+  (cwd-match), `GET /api/usage/historical?range=`.
+- [x] `mcp-overhead-estimator.service.ts` + `GET /api/usage/mcp-overhead`.
+
+**Files Created/Modified:**
+
+- `apps/api/src/db/migrations/0005_usage.sql` — usage_snapshots table + indexes (new)
+- `apps/api/src/db/database.service.ts` — migration 5 registered
+- `apps/api/src/settings/registry.ts` — added providers.claudeProjectsPath + usage.5hCap
+- `packages/shared-types/src/usage.ts` — UsageWindow/PerModel/PerWorkspace/Historical/MCP DTOs (new)
+- `packages/shared-types/src/index.ts` — exports added
+- `apps/api/src/usage/claude-log-parser.service.ts` — JSONL transcript walker (new)
+- `apps/api/src/usage/mcp-overhead-estimator.service.ts` — MCP cost estimator (new)
+- `apps/api/src/usage/usage.service.ts` — aggregation + flush loop (new)
+- `apps/api/src/usage/usage.controller.ts` — REST endpoints (new)
+- `apps/api/src/usage/usage.module.ts` — module (new)
+- `apps/api/src/app.module.ts` — UsageModule registered
+
+**Issues Encountered:**
+
+- Plan referenced migration 0009 but only 4 prior migrations exist — used 0005 instead.
+
+**Verify:** `pnpm --filter @pixler/api test usage` + manual: parse a known transcript dir, GET /window returns coherent %.
+
+---
+
+## Sprint 2 — Status bar pill + Usage panel
+
+**Status:** ✅ complete
+**Goal:** Always-visible pill in top-right; Settings → Usage panel with breakdowns + MCP
+overhead.
+
+**Tasks:**
+
+- [x] `TokenStatusPill.tsx` — `73% / 4h 12m`; color shifts green → yellow → red; click pops a
+  popover with model breakdown + "Open usage panel" link.
+- [x] `SettingsDrawer/UsagePanel.tsx` — current 5h window, per-model breakdown table +
+  sparkline, per-workspace cost, MCP schema overhead list, daily/weekly/monthly historical chart.
+- [x] `useUsage.ts`.
+
+**Files Created/Modified:**
+
+- `packages/shared-types/src/index.ts` — already had M14 plan types (no conflict)
+- `apps/web/src/hooks/useUsage.ts` — TanStack Query hooks for all usage endpoints (new)
+- `apps/web/src/components/TokenStatusPill.tsx` — pill with popover + model breakdown (new)
+- `apps/web/src/components/SettingsDrawer/UsagePanel.tsx` — full usage panel (new)
+- `apps/web/src/components/TopBar.tsx` — wired TokenStatusPill
+- `apps/web/src/components/SettingsDrawer.tsx` — added Usage category + UsagePanel
+- `apps/web/src/hooks/usePaletteActions.ts` — added Open Token Usage Panel action
+
+**Issues Encountered:**
+
+- M14 concurrently added PlansModule to app.module.ts; no conflict, both modules present.
+
+**Verify:** `pnpm --filter @pixler/web build` + manual: pill updates live; panel charts render.
+
+---
+
+## Sprint 3 — Pre-flight check + token-saving defaults
+
+**Status:** ✅ complete
+**Goal:** Spawning N parallel agents above 70% triggers a confirmation modal; fresh workspaces
+seed `.claudeignore`; workspace switch dispatches `/clear`.
+
+**Tasks:**
+
+- [x] `preflight.service.ts` — checks `UsageService.getWindow(5).percent`; if > 70% with N
+  parallel running → controller returns `{started:false, needsConfirmation:true, preflight:{...}}`.
+- [x] `PreflightModal.tsx` — dialog with AlertTriangle, percent + parallelCount, Run anyway /
+  Cancel / View usage details actions.
+- [x] On first workspace creation: write `.claudeignore` (node_modules/, dist/, .next/, *.lock,
+  common artifacts; skip if file exists).
+- [x] On workspace switch: `useWorkspaceClearOnSwitch` hook watches workspaceId; calls
+  `POST /api/workspaces/:prev/terminals/clear` (sends `/clear\r` to all terminals); controlled by
+  `workspace.clearOnSwitch` setting (default true).
+- [x] On context-spike token events: `UsageService.detectSpikes()` runs after each flush; if a
+  workspace's batch tokens > 3× rolling average and ≥ 5000 tokens, emits
+  `agent.activity {level:'hint', message:'Consider running /compact…'}`.
+
+**Files Created/Modified:**
+
+- `apps/api/src/settings/registry.ts` — added `workspace.clearOnSwitch` boolean (default true)
+- `apps/api/src/terminals/terminals.controller.ts` — added `POST workspaces/:id/terminals/clear`
+- `apps/api/src/usage/usage.service.ts` — added `EventsService` injection + `detectSpikes()` + `rollingAvgTokens` EWA
+- `apps/api/src/orchestrator/preflight.service.ts` — preflight check against UsageService (new)
+- `apps/api/src/orchestrator/orchestrator.module.ts` — PreflightService provider + UsageModule import
+- `apps/api/src/orchestrator/orchestrator.controller.ts` — preflight guard on POST start + GET preflight endpoint
+- `apps/api/src/orchestrator/orchestrator.service.ts` — countRunning() method
+- `apps/api/src/workspaces/workspaces.service.ts` — seedClaudeIgnore() called on workspace create
+- `apps/web/src/hooks/useOrchestrator.ts` — StartResponse + override param + useOrchestratorStart
+- `apps/web/src/components/PreflightModal.tsx` — preflight confirmation dialog (new)
+- `apps/web/src/components/RightPaneControls.tsx` — Start Agent button + PreflightModal wiring
+- `apps/web/src/hooks/useWorkspaceClearOnSwitch.ts` — workspace switch /clear hook (new)
+- `apps/web/src/components/RightPane.tsx` — useWorkspaceClearOnSwitch wired
+
+**Issues Encountered:**
+
+- _none_
+
+**Verify:** `pnpm -w typecheck` ✅ clean. Manual: at 78%, spawn 3rd agent → modal appears; fresh workspace gets `.claudeignore`.
+
+---
+
+## Prompt that created this plan
+
+_(Predates merged template; preserved as historical record. Plan re-shaped into sprints on 2026-05-24.)_

@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DatabaseService } from '../db/database.service';
 import { SettingsService } from '../settings/settings.service';
+import { EventsService } from '../events/events.service';
 import { ClaudeLogParserService } from './claude-log-parser.service';
 import type {
   UsageWindow,
@@ -11,6 +12,8 @@ import type {
 
 const FLUSH_INTERVAL_MS = 30_000;
 const FOUR_WEEKS_S = 4 * 7 * 24 * 3600;
+const SPIKE_MULTIPLIER = 3;
+const SPIKE_MIN_TOKENS = 5_000;
 
 interface SnapshotRow {
   ts: number;
@@ -27,11 +30,13 @@ export class UsageService implements OnModuleInit {
   private readonly logger = new Logger(UsageService.name);
   private flushTimer: ReturnType<typeof setInterval> | null = null;
   private lastParsedTs = 0;
+  private rollingAvgTokens = 0;
 
   constructor(
     private readonly db: DatabaseService,
     private readonly settings: SettingsService,
     private readonly parser: ClaudeLogParserService,
+    private readonly events: EventsService,
   ) {}
 
   onModuleInit() {
@@ -64,8 +69,48 @@ export class UsageService implements OnModuleInit {
       insertMany();
 
       this.lastParsedTs = Math.max(...entries.map((e) => e.ts));
+
+      this.detectSpikes(entries);
     } catch (err) {
       this.logger.warn(`Usage flush error: ${err}`);
+    }
+  }
+
+  private detectSpikes(entries: Array<{ inputTokens: number; outputTokens: number; cacheReadTokens: number; cacheWriteTokens: number; workspaceId?: string | null }>): void {
+    const byWorkspace = new Map<string, number>();
+    for (const e of entries) {
+      const key = e.workspaceId ?? '';
+      const total = e.inputTokens + e.outputTokens + e.cacheReadTokens + e.cacheWriteTokens;
+      byWorkspace.set(key, (byWorkspace.get(key) ?? 0) + total);
+    }
+
+    for (const [workspaceId, tokens] of byWorkspace) {
+      if (!workspaceId) continue;
+      const isSpike =
+        tokens >= SPIKE_MIN_TOKENS &&
+        this.rollingAvgTokens > 0 &&
+        tokens > this.rollingAvgTokens * SPIKE_MULTIPLIER;
+
+      if (isSpike) {
+        this.events.emitWorkspaceEvent(workspaceId, {
+          type: 'agent.activity',
+          workspaceId,
+          level: 'hint',
+          message: 'Consider running /compact to reduce context size.',
+          timestamp: Date.now(),
+        });
+      }
+    }
+
+    const batchTotal = entries.reduce(
+      (s, e) => s + e.inputTokens + e.outputTokens + e.cacheReadTokens + e.cacheWriteTokens,
+      0,
+    );
+    if (batchTotal > 0) {
+      this.rollingAvgTokens =
+        this.rollingAvgTokens === 0
+          ? batchTotal
+          : Math.round(this.rollingAvgTokens * 0.8 + batchTotal * 0.2);
     }
   }
 

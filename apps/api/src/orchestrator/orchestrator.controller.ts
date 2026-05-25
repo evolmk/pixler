@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Param, Body, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, NotFoundException } from '@nestjs/common';
 import { OrchestratorService } from './orchestrator.service';
+import { PreflightService } from './preflight.service';
 
 @Controller('api/workspaces/:workspaceId/orchestrator')
 export class OrchestratorController {
-  constructor(private readonly orchestrator: OrchestratorService) {}
+  constructor(
+    private readonly orchestrator: OrchestratorService,
+    private readonly preflight: PreflightService,
+  ) {}
 
   @Get('state')
   getState(@Param('workspaceId') workspaceId: string) {
@@ -12,8 +16,22 @@ export class OrchestratorController {
     return state;
   }
 
+  @Get('preflight')
+  getPreflight(@Query('parallel') parallel?: string) {
+    return this.preflight.check(parallel ? parseInt(parallel, 10) : 1);
+  }
+
   @Post('start')
-  async start(@Param('workspaceId') workspaceId: string) {
+  async start(
+    @Param('workspaceId') workspaceId: string,
+    @Query('override') override?: string,
+  ) {
+    if (override !== 'true') {
+      const check = this.preflight.check(this.orchestrator.countRunning());
+      if (!check.ok) {
+        return { started: false, needsConfirmation: true, preflight: check };
+      }
+    }
     await this.orchestrator.start(workspaceId);
     return { started: true };
   }

@@ -10,6 +10,7 @@ import { TerminalPane } from './TerminalPane';
 import { TerminalSwitcher } from './TerminalSwitcher';
 import { useTerminalList } from '../hooks/useTerminal';
 import { RightPaneControls } from './RightPaneControls';
+import { useWorkspaceClearOnSwitch } from '../hooks/useWorkspaceClearOnSwitch';
 
 type RightPaneMode = 'chat' | 'terminal';
 
@@ -26,6 +27,8 @@ export function RightPane() {
   const setFullBleed = useLayoutStore((s) => s.setFullBleed);
   const isExpanded = fullBleed === 'right';
   const params = useParams({ strict: false }) as { workspaceId?: string };
+
+  useWorkspaceClearOnSwitch(params.workspaceId);
 
   const { terminals, addTerminal } = useTerminalList(
     mode === 'terminal' ? params.workspaceId : null,

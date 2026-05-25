@@ -28,6 +28,16 @@ export class OrchestratorService {
     return this.machines.get(workspaceId) ?? null;
   }
 
+  countRunning(): number {
+    let count = 0;
+    for (const ctx of this.machines.values()) {
+      if (ctx.phase !== 'idle' && ctx.phase !== 'done' && ctx.phase !== 'error') {
+        count++;
+      }
+    }
+    return count;
+  }
+
   async start(workspaceId: string): Promise<void> {
     const ws = this.workspaces.findOne(workspaceId);
     const projectId = ws.project_id;

@@ -41,4 +41,13 @@ export class TerminalsController {
     this.terminals.interrupt(id);
     return { ok: true };
   }
+
+  @Post('workspaces/:id/terminals/clear')
+  clearWorkspace(@Param('id') workspaceId: string) {
+    const ids = this.terminals.getForWorkspace(workspaceId);
+    for (const id of ids) {
+      try { this.terminals.write(id, '/clear\r'); } catch { /* terminal may be gone */ }
+    }
+    return { ok: true, count: ids.length };
+  }
 }
