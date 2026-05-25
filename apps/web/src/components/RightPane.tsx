@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Maximize2, MessageSquare, Minimize2, StopCircle, Terminal, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { useParams } from '@tanstack/react-router';
 import { SegmentedControl } from '@pixler/ui/components/segmented-control';
 import { Button } from '@pixler/ui/components/button';
 import { EmptyState } from '@pixler/ui/components/empty-state';
 import type { SegmentedOption } from '@pixler/ui/components/segmented-control';
 import { useLayoutStore } from '../stores/layout';
+import { TerminalPane } from './TerminalPane';
 
 type RightPaneMode = 'chat' | 'terminal';
 
@@ -18,6 +20,7 @@ export function RightPane() {
   const fullBleed = useLayoutStore((s) => s.fullBleed);
   const setFullBleed = useLayoutStore((s) => s.setFullBleed);
   const isExpanded = fullBleed === 'right';
+  const params = useParams({ strict: false }) as { workspaceId?: string };
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -41,21 +44,27 @@ export function RightPane() {
       </div>
 
       {/* Pane content */}
-      <div className="flex flex-1 items-center justify-center overflow-auto p-4">
+      <div className="relative flex flex-1 overflow-hidden">
         {mode === 'chat' ? (
-          <EmptyState
-            icon={MessageSquare}
-            title="Chat pane ships in M16"
-            body="Agent conversation will stream here during workspace runs."
-            className="max-w-xs border-none"
-          />
+          <div className="flex h-full w-full items-center justify-center p-4">
+            <EmptyState
+              icon={MessageSquare}
+              title="Chat pane ships in M16"
+              body="Agent conversation will stream here during workspace runs."
+              className="max-w-xs border-none"
+            />
+          </div>
+        ) : params.workspaceId ? (
+          <TerminalPane workspaceId={params.workspaceId} />
         ) : (
-          <EmptyState
-            icon={Terminal}
-            title="Terminal ships in M09"
-            body="The PTY terminal will stream agent output here."
-            className="max-w-xs border-none"
-          />
+          <div className="flex h-full w-full items-center justify-center p-4">
+            <EmptyState
+              icon={Terminal}
+              title="Select a workspace"
+              body="Open a workspace to start a terminal session."
+              className="max-w-xs border-none"
+            />
+          </div>
         )}
       </div>
 

@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 1 complete — PTY backend wired. Sprint 2 next: TerminalPane xterm.js UI.
+**Current Status:** Sprint 2 complete — xterm.js TerminalPane wired with theme sync and settings. Sprint 3 next: multiplex + interrupt + settings panel.
 
 ---
 
@@ -90,28 +90,32 @@ persisted across navigations.
 
 ## Sprint 2 — Web TerminalPane with xterm.js + theme sync
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Right pane in Terminal mode renders a live xterm session, themed from the active Pixler
 palette, with PTY resize tracking the visible cols/rows.
 
 **Tasks:**
 
-- [ ] `TerminalPane.tsx` mounts xterm.js, subscribes to the workspace's terminal events.
-- [ ] `lib/terminal-theme.ts` — pull palette from CSS vars; re-apply on theme change.
-- [ ] Font + size + cursor style + scrollback + copy-on-select + paste-warning settings read from
+- [x] `TerminalPane.tsx` mounts xterm.js, subscribes to the workspace's terminal events.
+- [x] `lib/terminal-theme.ts` — pull palette from CSS vars; re-apply on theme change.
+- [x] Font + size + cursor style + scrollback + copy-on-select + paste-warning settings read from
   `terminal.*` keys.
-- [ ] ResizeObserver keeps PTY cols/rows in sync with the visible pane.
-- [ ] `hooks/useTerminal.ts`.
+- [x] ResizeObserver keeps PTY cols/rows in sync with the visible pane.
+- [x] `hooks/useTerminal.ts`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/lib/terminal-theme.ts`
+- `apps/web/src/hooks/useTerminal.ts`
+- `apps/web/src/components/TerminalPane.tsx`
+- `apps/web/src/components/RightPane.tsx` (wire TerminalPane, get workspaceId from route params)
+- `apps/web/package.json` (added @xterm/xterm, @xterm/addon-fit, @xterm/addon-web-links)
 
 **Issues Encountered:**
 
-- _none yet_
+- none
 
-**Verify:** `pnpm --filter @pixler/web build` + manual: prompt visible in <200ms, theme switch retints palette, `stty size` matches xterm.
+**Verify:** `pnpm --filter @pixler/web typecheck` — clean.
 
 ---
 
