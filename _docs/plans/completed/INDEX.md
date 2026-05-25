@@ -9,3 +9,4 @@
 | M05 | 2026-05-24 | SQLite + settings |
 | M06 | 2026-05-24 | App shell (3-pane layout, top bar, settings drawer) |
 | M07 | 2026-05-24 | Project management (add local, clone from GitHub, pixler.json) |
+| M08 | 2026-05-25 | Workspaces (worktrees, naming, setup scripts, files-to-copy, web UI) |

@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M07-projects
-**Next Plan:** M08-workspaces
+**Last Plan Completed:** M08-workspaces
+**Next Plan:** M09-terminal
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Slot | Plan | Status |
 |------|------|--------|
-| Track A | M08 workspaces (user session) | ⏳ in-progress |
+| Track A | M09 terminal | ⏳ pending |
 | Track B | M10 linear-sdk (this session) | ⏳ in-progress |
 
 > Update this table when a plan starts (`[-]` in the list below) and clear it when done.
@@ -27,7 +27,7 @@
 - [x] **M05** — SQLite + settings
 - [x] **M06** — App shell
 - [x] **M07** — Projects
-- [ ] **M08** — Workspaces _(Wave 3 / Track A)_
+- [x] **M08** — Workspaces _(Wave 3 / Track A)_
 - [ ] **M09** — Terminal _(Wave 4 / Track A)_
 - [ ] **M10** — Linear SDK _(Wave 3 / Track B)_
 - [ ] **M11** — Linear CLI _(Wave 5 / Track A)_
