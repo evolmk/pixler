@@ -1,0 +1,37 @@
+import type { ThemeDefinition } from '../types';
+
+export const solarized: ThemeDefinition = {
+  name: 'solarized',
+  label: 'Solarized',
+  cssScheme: 'solarized',
+  light: {
+    background: 'oklch(0.972 0.022 88)',
+    foreground: 'oklch(0.446 0.055 215)',
+    primary: 'oklch(0.586 0.148 246)',
+    primaryForeground: 'oklch(0.972 0.022 88)',
+    secondary: 'oklch(0.928 0.02 88)',
+    secondaryForeground: 'oklch(0.446 0.055 215)',
+    muted: 'oklch(0.91 0.02 88)',
+    mutedForeground: 'oklch(0.575 0.038 210)',
+    accent: 'oklch(0.895 0.025 88)',
+    accentForeground: 'oklch(0.446 0.055 215)',
+    border: 'oklch(0.85 0.022 87)',
+    input: 'oklch(0.84 0.022 87)',
+    ring: 'oklch(0.586 0.148 246)',
+  },
+  dark: {
+    background: 'oklch(0.168 0.038 218)',
+    foreground: 'oklch(0.622 0.022 215)',
+    primary: 'oklch(0.586 0.148 246)',
+    primaryForeground: 'oklch(0.168 0.038 218)',
+    secondary: 'oklch(0.22 0.035 218)',
+    secondaryForeground: 'oklch(0.622 0.022 215)',
+    muted: 'oklch(0.22 0.035 218)',
+    mutedForeground: 'oklch(0.46 0.025 213)',
+    accent: 'oklch(0.26 0.038 218)',
+    accentForeground: 'oklch(0.622 0.022 215)',
+    border: 'oklch(0.30 0.04 218)',
+    input: 'oklch(0.32 0.04 218)',
+    ring: 'oklch(0.586 0.148 246)',
+  },
+};

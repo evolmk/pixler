@@ -1,0 +1,37 @@
+import type { ThemeDefinition } from '../types';
+
+export const nord: ThemeDefinition = {
+  name: 'nord',
+  label: 'Nord',
+  cssScheme: 'nord',
+  light: {
+    background: 'oklch(0.958 0.006 233)',
+    foreground: 'oklch(0.255 0.022 240)',
+    primary: 'oklch(0.544 0.091 239)',
+    primaryForeground: 'oklch(0.97 0.005 233)',
+    secondary: 'oklch(0.91 0.012 233)',
+    secondaryForeground: 'oklch(0.255 0.022 240)',
+    muted: 'oklch(0.895 0.012 233)',
+    mutedForeground: 'oklch(0.52 0.035 237)',
+    accent: 'oklch(0.875 0.018 233)',
+    accentForeground: 'oklch(0.255 0.022 240)',
+    border: 'oklch(0.84 0.016 234)',
+    input: 'oklch(0.83 0.016 234)',
+    ring: 'oklch(0.544 0.091 239)',
+  },
+  dark: {
+    background: 'oklch(0.252 0.022 242)',
+    foreground: 'oklch(0.908 0.012 234)',
+    primary: 'oklch(0.672 0.073 231)',
+    primaryForeground: 'oklch(0.252 0.022 242)',
+    secondary: 'oklch(0.31 0.022 242)',
+    secondaryForeground: 'oklch(0.908 0.012 234)',
+    muted: 'oklch(0.31 0.022 242)',
+    mutedForeground: 'oklch(0.60 0.02 237)',
+    accent: 'oklch(0.352 0.025 242)',
+    accentForeground: 'oklch(0.908 0.012 234)',
+    border: 'oklch(0.38 0.024 242)',
+    input: 'oklch(0.41 0.024 242)',
+    ring: 'oklch(0.672 0.073 231)',
+  },
+};

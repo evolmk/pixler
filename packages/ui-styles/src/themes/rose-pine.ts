@@ -1,0 +1,37 @@
+import type { ThemeDefinition } from '../types';
+
+export const rosePine: ThemeDefinition = {
+  name: 'rose-pine',
+  label: 'Rosé Pine',
+  cssScheme: 'rose-pine',
+  light: {
+    background: 'oklch(0.967 0.01 76)',
+    foreground: 'oklch(0.396 0.074 296)',
+    primary: 'oklch(0.538 0.099 348)',
+    primaryForeground: 'oklch(0.97 0.01 76)',
+    secondary: 'oklch(0.92 0.016 76)',
+    secondaryForeground: 'oklch(0.396 0.074 296)',
+    muted: 'oklch(0.90 0.015 76)',
+    mutedForeground: 'oklch(0.545 0.045 293)',
+    accent: 'oklch(0.875 0.02 76)',
+    accentForeground: 'oklch(0.396 0.074 296)',
+    border: 'oklch(0.84 0.018 75)',
+    input: 'oklch(0.83 0.018 75)',
+    ring: 'oklch(0.538 0.099 348)',
+  },
+  dark: {
+    background: 'oklch(0.126 0.022 291)',
+    foreground: 'oklch(0.898 0.038 280)',
+    primary: 'oklch(0.625 0.147 352)',
+    primaryForeground: 'oklch(0.126 0.022 291)',
+    secondary: 'oklch(0.195 0.025 291)',
+    secondaryForeground: 'oklch(0.898 0.038 280)',
+    muted: 'oklch(0.195 0.025 291)',
+    mutedForeground: 'oklch(0.565 0.035 287)',
+    accent: 'oklch(0.24 0.03 291)',
+    accentForeground: 'oklch(0.898 0.038 280)',
+    border: 'oklch(0.28 0.03 291)',
+    input: 'oklch(0.30 0.03 291)',
+    ring: 'oklch(0.625 0.147 352)',
+  },
+};

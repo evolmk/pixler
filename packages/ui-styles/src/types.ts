@@ -22,5 +22,5 @@ export interface ThemeDefinition {
   dark: ThemePalette;
 }
 
-export type ThemeName = 'forest' | 'graphite';
+export type ThemeName = 'forest' | 'graphite' | 'catppuccin' | 'tokyo-night' | 'nord' | 'rose-pine' | 'solarized' | 'mono';
 export type ThemeMode = 'light' | 'dark' | 'system';

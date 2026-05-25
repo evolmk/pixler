@@ -1,0 +1,37 @@
+import type { ThemeDefinition } from '../types';
+
+export const catppuccin: ThemeDefinition = {
+  name: 'catppuccin',
+  label: 'Catppuccin',
+  cssScheme: 'catppuccin',
+  light: {
+    background: 'oklch(0.953 0.011 252)',
+    foreground: 'oklch(0.399 0.066 289)',
+    primary: 'oklch(0.523 0.229 304)',
+    primaryForeground: 'oklch(0.97 0.01 252)',
+    secondary: 'oklch(0.905 0.015 252)',
+    secondaryForeground: 'oklch(0.399 0.066 289)',
+    muted: 'oklch(0.895 0.015 252)',
+    mutedForeground: 'oklch(0.54 0.04 280)',
+    accent: 'oklch(0.87 0.025 252)',
+    accentForeground: 'oklch(0.399 0.066 289)',
+    border: 'oklch(0.84 0.02 252)',
+    input: 'oklch(0.83 0.02 252)',
+    ring: 'oklch(0.523 0.229 304)',
+  },
+  dark: {
+    background: 'oklch(0.143 0.022 280)',
+    foreground: 'oklch(0.872 0.038 267)',
+    primary: 'oklch(0.762 0.152 296)',
+    primaryForeground: 'oklch(0.143 0.022 280)',
+    secondary: 'oklch(0.215 0.025 280)',
+    secondaryForeground: 'oklch(0.872 0.038 267)',
+    muted: 'oklch(0.215 0.025 280)',
+    mutedForeground: 'oklch(0.60 0.04 275)',
+    accent: 'oklch(0.245 0.03 280)',
+    accentForeground: 'oklch(0.872 0.038 267)',
+    border: 'oklch(0.285 0.03 280)',
+    input: 'oklch(0.30 0.03 280)',
+    ring: 'oklch(0.762 0.152 296)',
+  },
+};

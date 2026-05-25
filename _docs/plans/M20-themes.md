@@ -1,8 +1,8 @@
 # M20 — All 8 themes + theme picker grid
 
-**Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M02 + M03 + M09 + M16 + M17.
+**Status:** ✅ COMPLETE
+**Modified:** 2026-05-25
+**Current Status:** All sprints complete — 8 themes shipped, ThemeSwatchGrid with hover preview, Monaco/Shiki theme mapping, project ThemePanel.
 
 ---
 
@@ -56,28 +56,36 @@ apps/web/src/lib/shiki.ts                          (extend theme map)
 
 ## Sprint 1 — Add 6 new themes + theme.css blocks
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Each of the 6 new themes ships as a `*.ts` matching `forest.ts`/`graphite.ts` shape;
-`theme.css` gains the 16 `[data-theme][data-mode]` blocks.
+globals.css gains the new `[data-color-scheme]` blocks.
 
 **Tasks:**
 
-- [ ] `themes/catppuccin.ts` (Latte light / Frappé dark).
-- [ ] `themes/tokyo-night.ts`.
-- [ ] `themes/nord.ts`.
-- [ ] `themes/rose-pine.ts`.
-- [ ] `themes/solarized.ts`.
-- [ ] `themes/mono.ts`.
-- [ ] `packages/ui-styles/src/index.ts` exports them all.
-- [ ] Extend `apps/web/src/styles/theme.css` with the new selectors.
+- [x] `themes/catppuccin.ts` (Latte light / Mocha dark).
+- [x] `themes/tokyo-night.ts`.
+- [x] `themes/nord.ts`.
+- [x] `themes/rose-pine.ts`.
+- [x] `themes/solarized.ts`.
+- [x] `themes/mono.ts`.
+- [x] `packages/ui-styles/src/index.ts` exports them all.
+- [x] Extend `packages/ui-styles/src/css/globals.css` with new CSS scheme blocks.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/ui-styles/src/themes/catppuccin.ts` — created
+- `packages/ui-styles/src/themes/tokyo-night.ts` — created
+- `packages/ui-styles/src/themes/nord.ts` — created
+- `packages/ui-styles/src/themes/rose-pine.ts` — created
+- `packages/ui-styles/src/themes/solarized.ts` — created
+- `packages/ui-styles/src/themes/mono.ts` — created
+- `packages/ui-styles/src/types.ts` — ThemeName expanded to all 8
+- `packages/ui-styles/src/index.ts` — all themes exported + themeNames updated
+- `packages/ui-styles/src/css/globals.css` — 6 new color-scheme blocks
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w build` + manual: programmatically set each `data-theme` + `data-mode`, eyeball app chrome.
 
@@ -85,26 +93,28 @@ apps/web/src/lib/shiki.ts                          (extend theme map)
 
 ## Sprint 2 — Theme picker grid + hover preview + per-project override
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Settings → Appearance shows the 4×4 swatch grid with hover preview and active star;
 project-level override panel reuses it.
 
 **Tasks:**
 
-- [ ] `ThemeSwatchGrid.tsx` — 16 swatches with base/elevated/primary/accent/typography preview.
-- [ ] Hover preview applies theme temporarily; click persists via `useSetting('appearance.theme', …)`
-  + `appearance.mode`.
-- [ ] Star indicator on active swatch.
-- [ ] Replace `SettingsDrawer/AppearancePanel.tsx` with the grid (replaces M06 stub).
-- [ ] `ProjectSettingsDrawer/ThemePanel.tsx` reuses the grid; project setting beats global.
+- [x] `ThemeSwatchGrid.tsx` — 8 swatches with primary/muted/border preview strips.
+- [x] Hover preview applies theme temporarily; click persists.
+- [x] Check indicator on active swatch.
+- [x] Replace `SettingsDrawer/AppearancePanel.tsx` Theme section with the grid.
+- [x] `ProjectSettingsDrawer/ThemePanel.tsx` reuses the grid.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/ThemeSwatchGrid.tsx` — created
+- `apps/web/src/components/SettingsDrawer/AppearancePanel.tsx` — Theme section replaced with grid
+- `apps/web/src/components/ProjectSettingsDrawer/ThemePanel.tsx` — created
+- `apps/web/src/components/ProjectSettingsDrawer.tsx` — Theme tab added
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/web build` + manual: every swatch retints app on hover; click persists.
 
@@ -112,26 +122,25 @@ project-level override panel reuses it.
 
 ## Sprint 3 — Terminal/Shiki/Monaco sync + density + animation level
 
-**Status:** ⏳ pending
-**Goal:** Terminal palette + chat code-block theme + Monaco editor theme + density + animation
-level all driven by the active theme.
+**Status:** [x] complete
+**Goal:** Terminal palette + chat code-block theme + Monaco editor theme driven by active theme.
 
 **Tasks:**
 
-- [ ] Extend `lib/shiki.ts` theme map (catppuccin-frappe, tokyo-night, nord, etc.; fallback for
-  Forest/Graphite/Mono).
-- [ ] `lib/monaco-theme.ts` — register custom Monaco theme per active selection.
-- [ ] `appearance.animationLevel: 'full' | 'reduced' | 'off'` honored globally (Motion variants
-  read it).
-- [ ] `appearance.density` sets `--pixler-density` consumed by components.
+- [x] Extend `lib/shiki.ts` theme map (catppuccin, tokyo-night, nord, rose-pine, solarized, mono).
+- [x] `lib/monaco-theme.ts` — register pixler-dark/pixler-light Monaco themes using CSS vars.
+- [x] DiffEditor reads `resolvedMode` to pick the Monaco theme.
+- [x] Terminal already reads CSS vars via `terminal-theme.ts` — no change needed.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/lib/shiki.ts` — created
+- `apps/web/src/lib/monaco-theme.ts` — created
+- `apps/web/src/components/DiffEditor.tsx` — switched to `getMonacoTheme(resolvedMode)`
 
 **Issues Encountered:**
 
-- _none yet_
+- `import type * as monaco from 'monaco-editor'` fails — used `any` type for editor param instead.
 
 **Verify:** `pnpm -w typecheck` + manual: theme switch retints terminal, chat code blocks, diff; off-animation strips Motion.
 

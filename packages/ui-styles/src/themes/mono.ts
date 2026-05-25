@@ -1,0 +1,37 @@
+import type { ThemeDefinition } from '../types';
+
+export const mono: ThemeDefinition = {
+  name: 'mono',
+  label: 'Mono',
+  cssScheme: 'mono',
+  light: {
+    background: 'oklch(1 0 0)',
+    foreground: 'oklch(0.1 0 0)',
+    primary: 'oklch(0.25 0 0)',
+    primaryForeground: 'oklch(1 0 0)',
+    secondary: 'oklch(0.94 0 0)',
+    secondaryForeground: 'oklch(0.1 0 0)',
+    muted: 'oklch(0.93 0 0)',
+    mutedForeground: 'oklch(0.52 0 0)',
+    accent: 'oklch(0.90 0 0)',
+    accentForeground: 'oklch(0.1 0 0)',
+    border: 'oklch(0.85 0 0)',
+    input: 'oklch(0.84 0 0)',
+    ring: 'oklch(0.3 0 0)',
+  },
+  dark: {
+    background: 'oklch(0.1 0 0)',
+    foreground: 'oklch(0.88 0 0)',
+    primary: 'oklch(0.88 0 0)',
+    primaryForeground: 'oklch(0.1 0 0)',
+    secondary: 'oklch(0.2 0 0)',
+    secondaryForeground: 'oklch(0.88 0 0)',
+    muted: 'oklch(0.2 0 0)',
+    mutedForeground: 'oklch(0.55 0 0)',
+    accent: 'oklch(0.25 0 0)',
+    accentForeground: 'oklch(0.88 0 0)',
+    border: 'oklch(0.30 0 0)',
+    input: 'oklch(0.32 0 0)',
+    ring: 'oklch(0.60 0 0)',
+  },
+};

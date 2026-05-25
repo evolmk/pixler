@@ -3,7 +3,7 @@ import type { SegmentedOption } from '@pixler/ui/components/segmented-control';
 import { useThemeStore } from '../../stores/theme';
 import { useSetting } from '../../hooks/useSetting';
 import type { ThemeMode, ThemeName } from '@pixler/ui-styles';
-import { themeNames } from '@pixler/ui-styles';
+import { ThemeSwatchGrid } from '../ThemeSwatchGrid';
 
 type Density = 'compact' | 'comfortable' | 'spacious';
 type AnimationLevel = 'full' | 'reduced' | 'none';
@@ -26,11 +26,6 @@ const ANIMATION_OPTIONS: SegmentedOption<AnimationLevel>[] = [
   { value: 'none', label: 'None' },
 ];
 
-const THEME_COLORS: Record<ThemeName, string> = {
-  forest: '#16a355',
-  graphite: '#6b7280',
-};
-
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
@@ -41,7 +36,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 }
 
 export function AppearancePanel() {
-  const { theme, mode, setTheme, setMode } = useThemeStore();
+  const { theme, mode, resolvedMode, setTheme, setMode } = useThemeStore();
   const { set: persistTheme } = useSetting<ThemeName>('appearance.theme');
   const { set: persistMode } = useSetting<ThemeMode>('appearance.mode');
   const { value: density = 'comfortable', set: setDensity } = useSetting<Density>('appearance.density');
@@ -60,27 +55,12 @@ export function AppearancePanel() {
   return (
     <div className="space-y-6">
       <Section label="Theme">
-        <div className="flex gap-2">
-          {themeNames.map((t) => (
-            <button
-              key={t}
-              onClick={() => handleTheme(t)}
-              className={`flex flex-col items-center gap-1.5 rounded-md border-2 p-2 transition-colors ${
-                theme === t
-                  ? 'border-primary'
-                  : 'border-transparent hover:border-border'
-              }`}
-              aria-label={t}
-              aria-pressed={theme === t}
-            >
-              <span
-                className="size-6 rounded-full"
-                style={{ backgroundColor: THEME_COLORS[t] }}
-              />
-              <span className="text-[10px] capitalize text-muted-foreground">{t}</span>
-            </button>
-          ))}
-        </div>
+        <ThemeSwatchGrid
+          currentTheme={theme}
+          currentMode={mode}
+          resolvedMode={resolvedMode}
+          onSelect={handleTheme}
+        />
       </Section>
 
       <Section label="Mode">

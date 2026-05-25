@@ -1,0 +1,37 @@
+import type { ThemeDefinition } from '../types';
+
+export const tokyoNight: ThemeDefinition = {
+  name: 'tokyo-night',
+  label: 'Tokyo Night',
+  cssScheme: 'tokyo-night',
+  light: {
+    background: 'oklch(0.946 0.005 258)',
+    foreground: 'oklch(0.27 0.04 260)',
+    primary: 'oklch(0.60 0.16 256)',
+    primaryForeground: 'oklch(0.97 0.005 258)',
+    secondary: 'oklch(0.895 0.012 258)',
+    secondaryForeground: 'oklch(0.27 0.04 260)',
+    muted: 'oklch(0.875 0.012 258)',
+    mutedForeground: 'oklch(0.50 0.03 256)',
+    accent: 'oklch(0.86 0.018 258)',
+    accentForeground: 'oklch(0.27 0.04 260)',
+    border: 'oklch(0.82 0.016 258)',
+    input: 'oklch(0.81 0.016 258)',
+    ring: 'oklch(0.60 0.16 256)',
+  },
+  dark: {
+    background: 'oklch(0.122 0.02 265)',
+    foreground: 'oklch(0.83 0.03 265)',
+    primary: 'oklch(0.698 0.148 255)',
+    primaryForeground: 'oklch(0.122 0.02 265)',
+    secondary: 'oklch(0.21 0.022 265)',
+    secondaryForeground: 'oklch(0.83 0.03 265)',
+    muted: 'oklch(0.21 0.022 265)',
+    mutedForeground: 'oklch(0.555 0.03 260)',
+    accent: 'oklch(0.255 0.025 265)',
+    accentForeground: 'oklch(0.83 0.03 265)',
+    border: 'oklch(0.285 0.025 265)',
+    input: 'oklch(0.31 0.025 265)',
+    ring: 'oklch(0.698 0.148 255)',
+  },
+};

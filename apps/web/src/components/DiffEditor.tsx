@@ -3,6 +3,8 @@ import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react';
 import { Columns2, AlignLeft } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { useSetting } from '../hooks/useSetting';
+import { useThemeStore } from '../stores/theme';
+import { getMonacoTheme } from '../lib/monaco-theme';
 import type { DiffFileDetail } from '@pixler/shared-types';
 
 interface Props {
@@ -14,6 +16,8 @@ export function DiffEditor({ file }: Props) {
   const editorRef = useRef<unknown>(null);
   const { value: wordWrap = 'off' } = useSetting<'off' | 'on'>('diff.wordWrap');
   const { value: renderWhitespace = 'none' } = useSetting<'none' | 'boundary' | 'all'>('diff.renderWhitespace');
+  const resolvedMode = useThemeStore((s) => s.resolvedMode);
+  const monacoTheme = getMonacoTheme(resolvedMode);
 
   if (file.isBinary) {
     return (
@@ -50,7 +54,7 @@ export function DiffEditor({ file }: Props) {
           original={file.oldContent ?? ''}
           modified={file.newContent ?? ''}
           language={file.language}
-          theme="vs-dark"
+          theme={monacoTheme}
           options={{
             readOnly: true,
             renderSideBySide: sideBySide,
