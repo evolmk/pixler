@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { TelemetryService } from './telemetry.service';
 
 interface TrackDto {
@@ -14,5 +14,10 @@ export class TelemetryController {
   track(@Body() dto: TrackDto) {
     this.telemetry.track(dto.name, dto.props ?? {});
     return { ok: true };
+  }
+
+  @Get('preview')
+  preview() {
+    return { note: 'Preview shows buffered events — none pending until next flush.', buffer: [] };
   }
 }

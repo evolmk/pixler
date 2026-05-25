@@ -20,9 +20,10 @@ import { CheckpointsModule } from './checkpoints/checkpoints.module';
 import { ActivityModule } from './activity/activity.module';
 import { DeeplinkModule } from './deeplink/deeplink.module';
 import { TelemetryModule } from './telemetry/telemetry.module';
+import { CrashesModule } from './crashes/crashes.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule, ActivityModule, DeeplinkModule, TelemetryModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule, ActivityModule, DeeplinkModule, TelemetryModule, CrashesModule],
   controllers: [HealthController],
 })
 export class AppModule {}

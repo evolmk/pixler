@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 1 complete — telemetry module. Sprint 2 in-progress.
+**Current Status:** Sprint 2 complete — crash reporting + privacy panel. Sprint 3 in-progress.
 
 ---
 
@@ -85,16 +85,16 @@ LICENSE
 
 ## Sprint 2 — Crash reporting (api + web boundaries) + Privacy panel
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Uncaught exceptions and unhandled rejections land in a `crashes` table and (if
 telemetry enabled) flush sanitized payloads; users can inspect what would be sent.
 
 **Tasks:**
 
-- [ ] `CrashesModule` + `CrashesService` + `CrashesController`; top-level handlers on api.
-- [ ] `RootErrorBoundary.tsx` + global `window.onerror` / `unhandledrejection` listeners →
+- [x] `CrashesModule` + `CrashesService` + `CrashesController`; top-level handlers on api.
+- [x] `RootErrorBoundary.tsx` + global `window.onerror` / `unhandledrejection` listeners →
   POST `/api/crashes`.
-- [ ] `SettingsDrawer/AccountPanel.tsx` "Privacy controls" — telemetry + crash report toggles +
+- [x] `SettingsDrawer/AccountPanel.tsx` "Privacy controls" — telemetry + crash report toggles +
   "View what we'd send" inspector.
 
 **Files Created/Modified:**
