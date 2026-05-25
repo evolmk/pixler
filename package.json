@@ -4,7 +4,8 @@
   "description": "Local agentic SDLC orchestrator. Your stack, your team, zero LLM API cost.",
   "type": "module",
   "bin": {
-    "pixler": "./bin/pixler.js"
+    "pixler": "./bin/pixler.js",
+    "pixler-linear": "./bin/pixler-linear.js"
   },
   "scripts": {
     "dev": "turbo run dev",

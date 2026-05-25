@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — CLI package built with tsup, all ticket commands + API endpoints wired. Sprint 2 in progress.
+**Current Status:** Sprint 2 complete — all 8 commands implemented, bin wiring done, README written. Sprint 3 in progress.
 
 ---
 
@@ -98,16 +98,16 @@ against the local api.
 
 ## Sprint 2 — Subissue + attachment commands + bin wiring
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** All remaining commands implemented; CLI installable as `pixler-linear` and aliased as a
 `pixler` subcommand.
 
 **Tasks:**
 
-- [ ] `src/commands/subissue-create.ts`, `subissue-complete.ts`.
-- [ ] `src/commands/attachment-upload.ts`, `attachment-delete.ts`.
-- [ ] Root `package.json` — add `pixler-linear` to `bin`; alias under `pixler` sub-command path.
-- [ ] `packages/linear-cli/README.md` documenting every command.
+- [x] `src/commands/subissue-create.ts`, `subissue-complete.ts`.
+- [x] `src/commands/attachment-upload.ts`, `attachment-delete.ts`.
+- [x] Root `package.json` — add `pixler-linear` to `bin`; alias under `pixler` sub-command path.
+- [x] `packages/linear-cli/README.md` documenting every command.
 
 **Files Created/Modified:**
 
