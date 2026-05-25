@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M05 + M06.
+**Current Status:** Sprint 1 complete — DB migration + ProjectsModule fully wired; starting Sprint 2 (clone flow).
 
 ---
 
@@ -59,31 +59,39 @@ apps/web/src/components/TopBar.tsx   (light up the switcher)
 
 ## Sprint 1 — DB + ProjectsModule scaffold (local-add path)
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Persist projects to SQLite via `0002_projects.sql`; add/list/get/patch/delete endpoints
 work end-to-end for the local-add path.
 
 **Tasks:**
 
-- [ ] `apps/api/src/db/migrations/0002_projects.sql` with columns: `id`, `name`, `path`,
+- [x] `apps/api/src/db/migrations/0002_projects.sql` with columns: `id`, `name`, `path`,
   `default_branch`, `package_manager`, `icon_path`, `cloned_by_pixler`, `created_at`.
-- [ ] `ProjectsModule` + `ProjectsService` + `ProjectsController`.
-- [ ] `POST /api/projects/add-local` — verify git repo, detect default branch + package manager,
+- [x] `ProjectsModule` + `ProjectsService` + `ProjectsController`.
+- [x] `POST /api/projects/add-local` — verify git repo, detect default branch + package manager,
   persist, return row.
-- [ ] `GET /api/projects` and `GET /api/projects/:id` (resolved settings).
-- [ ] `PATCH /api/projects/:id` — rename, change icon.
-- [ ] `DELETE /api/projects/:id?mode=remove|delete` — both modes implemented.
-- [ ] Icon auto-detect: `icon.png` → `logo.svg` → `favicon.ico`; manual upload writes to
+- [x] `GET /api/projects` and `GET /api/projects/:id` (resolved settings).
+- [x] `PATCH /api/projects/:id` — rename, change icon.
+- [x] `DELETE /api/projects/:id?mode=remove|delete` — both modes implemented.
+- [x] Icon auto-detect: `icon.png` → `logo.svg` → `favicon.ico`; manual upload writes to
   `<project>/.pixler/icon.png`.
-- [ ] `packages/shared-types/src/projects.ts` DTOs.
+- [x] `packages/shared-types/src/projects.ts` DTOs.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/db/migrations/0002_projects.sql`
+- `apps/api/src/db/database.service.ts` (migration runner updated)
+- `apps/api/src/app.module.ts` (ProjectsModule imported)
+- `apps/api/src/projects/projects.module.ts`
+- `apps/api/src/projects/projects.service.ts`
+- `apps/api/src/projects/projects.controller.ts`
+- `apps/api/package.json` (`@pixler/shared-types` added)
+- `packages/shared-types/src/projects.ts`
+- `packages/shared-types/src/index.ts`
 
 **Issues Encountered:**
 
-- _none yet_
+- `@pixler/shared-types` was not in `apps/api/package.json`; added `"workspace:*"` dep and ran `pnpm install`.
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/api test projects` — manually POST a local repo path and round-trip via GET.
 

@@ -32,6 +32,9 @@ importers:
       '@nestjs/websockets':
         specifier: ^11.1.23
         version: 11.1.23(@nestjs/common@11.1.23(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.23)(@nestjs/platform-socket.io@11.1.23)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@pixler/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       better-sqlite3:
         specifier: ^12.10.0
         version: 12.10.0
