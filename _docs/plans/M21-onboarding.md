@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — OnboardingModule + tool-detector + status/complete/restart endpoints live.
+**Current Status:** Sprint 2 complete — OnboardingShell + 5 step components + boot-time trigger live.
 
 ---
 
@@ -87,27 +87,34 @@ each step's live state.
 
 ## Sprint 2 — Onboarding shell + 5 step components
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Fresh launch shows the Vaul drawer; each step renders and persists settings.
 
 **Tasks:**
 
-- [ ] `OnboardingShell.tsx` — Vaul drawer from right with full center column; step indicator;
+- [x] `OnboardingShell.tsx` — Vaul drawer from right with full center column; step indicator;
   "Skip — I'll do this later" link per step.
-- [ ] `Step1Appearance.tsx` — logo, pitch, embedded `ThemeSwatchGrid`, mode toggle.
-- [ ] `Step2Tools.tsx` — Git config helper, Claude version + subscription, gh auth status with
+- [x] `Step1Appearance.tsx` — logo, pitch, embedded `ThemeSwatchGrid`, mode toggle.
+- [x] `Step2Tools.tsx` — Git config helper, Claude version + subscription, gh auth status with
   walk-through, optional Codex/Gemini collapsed; Re-check all.
-- [ ] `Step3Linear.tsx` — PAT input + paste-validate + team picker + skip link.
-- [ ] `Step4Project.tsx` — three tiles (Open local / Clone / Skip); on success show settings
+- [x] `Step3Linear.tsx` — PAT input + paste-validate + team picker + skip link.
+- [x] `Step4Project.tsx` — three tiles (Open local / Clone / Skip); on success show settings
   preview.
-- [ ] `Step5Telemetry.tsx` — toggle checked by default + "What gets sent?" expandable + Finish
+- [x] `Step5Telemetry.tsx` — toggle checked by default + "What gets sent?" expandable + Finish
   button calls complete.
-- [ ] On boot: render shell if `onboarding.completedAt` not set.
-- [ ] `useOnboarding.ts`.
+- [x] On boot: render shell if `onboarding.completedAt` not set.
+- [x] `useOnboarding.ts`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/Onboarding/OnboardingShell.tsx` (new)
+- `apps/web/src/components/Onboarding/Step1Appearance.tsx` (existing, wired to shell)
+- `apps/web/src/components/Onboarding/Step2Tools.tsx` (existing, wired to shell)
+- `apps/web/src/components/Onboarding/Step3Linear.tsx` (existing, wired to shell)
+- `apps/web/src/components/Onboarding/Step4Project.tsx` (existing, wired to shell)
+- `apps/web/src/components/Onboarding/Step5Telemetry.tsx` (existing, wired to shell)
+- `apps/web/src/hooks/useOnboarding.ts` (existing, complete)
+- `apps/web/src/App.tsx` (OnboardingShell mounted on boot)
 
 **Issues Encountered:**
 

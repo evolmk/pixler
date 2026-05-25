@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useThemeStore } from './stores/theme';
 import { useAppEvents } from './hooks/useAppEvents';
+import { OnboardingShell } from './components/Onboarding/OnboardingShell';
 import type { AppEvent } from '@pixler/shared-types';
 
 export function App() {
@@ -57,6 +58,8 @@ export function App() {
           Last socket event: <code className="text-primary">{lastEvent}</code>
         </p>
       )}
+
+      <OnboardingShell />
     </div>
   );
 }
