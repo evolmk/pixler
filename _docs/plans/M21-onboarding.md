@@ -1,8 +1,8 @@
 # M21 — Onboarding flow
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M05 + M07 + M10 + M12 + M20.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — OnboardingModule + tool-detector + status/complete/restart endpoints live.
 
 ---
 
@@ -55,22 +55,27 @@ apps/web/src/hooks/useOnboarding.ts
 
 ## Sprint 1 — OnboardingModule + tool detector + status/complete/restart endpoints
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Backend exposes onboarding lifecycle + a tool-detection endpoint web can call to render
 each step's live state.
 
 **Tasks:**
 
-- [ ] `OnboardingModule` + `OnboardingService` + `OnboardingController`.
-- [ ] `GET /api/onboarding/status` — `{ complete, currentStep }`.
-- [ ] `POST /api/onboarding/complete`, `POST /api/onboarding/restart`.
-- [ ] `tool-detector.service.ts` probes git/claude/codex/gemini/gh; returns version + auth state
+- [x] `OnboardingModule` + `OnboardingService` + `OnboardingController`.
+- [x] `GET /api/onboarding/status` — `{ complete, currentStep }`.
+- [x] `POST /api/onboarding/complete`, `POST /api/onboarding/restart`.
+- [x] `tool-detector.service.ts` probes git/claude/codex/gemini/gh; returns version + auth state
   per tool.
-- [ ] `GET /api/onboarding/detect-tools`.
+- [x] `GET /api/onboarding/detect-tools`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/onboarding/onboarding.module.ts` (new)
+- `apps/api/src/onboarding/onboarding.service.ts` (new)
+- `apps/api/src/onboarding/onboarding.controller.ts` (new)
+- `apps/api/src/onboarding/tool-detector.service.ts` (new)
+- `apps/api/src/app.module.ts` (OnboardingModule registered)
+- `apps/api/src/settings/registry.ts` (onboarding.completedAt + onboarding.currentStep keys)
 
 **Issues Encountered:**
 
