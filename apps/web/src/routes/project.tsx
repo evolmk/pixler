@@ -14,6 +14,7 @@ import { ProjectSettingsDrawer } from '../components/ProjectSettingsDrawer';
 import { TeamConfigDiffModal } from '../components/TeamConfigDiffModal';
 import { ToastBridge } from '../components/ToastBridge';
 import { useNativeNotifications } from '../hooks/useNativeNotifications';
+import { useDeepLink } from '../hooks/useDeepLink';
 
 /**
  * 3-pane shell for `/p/$projectId` and `/p/$projectId/w/$workspaceId`.
@@ -23,6 +24,7 @@ import { useNativeNotifications } from '../hooks/useNativeNotifications';
 export function ProjectShell() {
   usePaletteActions();
   useNativeNotifications();
+  useDeepLink();
   const panes = useLayoutStore((s) => s.panes);
   const setOuter = useLayoutStore((s) => s.setOuter);
   const setInner = useLayoutStore((s) => s.setInner);

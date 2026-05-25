@@ -58,4 +58,6 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'notifications.events.agent.error', type: 'boolean', default: true, scopes: ['global'], label: 'Agent error', description: 'Notify on agent errors' },
   { key: 'notifications.events.pr.opened', type: 'boolean', default: true, scopes: ['global'], label: 'PR opened', description: 'Notify when PR is opened' },
   { key: 'notifications.events.pr.checks', type: 'boolean', default: true, scopes: ['global'], label: 'PR checks', description: 'Notify on CI pass/fail' },
+
+  { key: 'integrations.linear.deeplinkOnCreate', type: 'boolean', default: true, scopes: ['global', 'project'], label: 'Post deep link on create', description: 'Post a pixler:// deep link comment to the Linear ticket when a workspace is created' },
 ];

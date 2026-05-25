@@ -5,7 +5,8 @@ export type AppEvent =
   | { type: 'project.clone-complete'; projectId: string; timestamp: number }
   | { type: 'project.clone-error'; projectId: string; error: string; timestamp: number }
   | { type: 'project.team-config-diff'; projectId: string; diff: { key: string; teamValue: unknown; localValue: unknown }[]; timestamp: number }
-  | { type: 'activity.appended'; activityId: string; scope: string; scopeId: string | null; kind: string; severity: string; timestamp: number };
+  | { type: 'activity.appended'; activityId: string; scope: string; scopeId: string | null; kind: string; severity: string; timestamp: number }
+  | { type: 'deeplink.received'; url: string; resource: string; id: string; timestamp: number };
 
 export type WorkspaceEvent =
   | { type: 'workspace.created'; workspaceId: string; timestamp: number }

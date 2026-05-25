@@ -7,9 +7,10 @@ import { WorktreeService } from './worktree.service';
 import { SetupRunnerService } from './setup-runner.service';
 import { FilesToCopyService } from './files-to-copy.service';
 import { ProjectsModule } from '../projects/projects.module';
+import { DeeplinkModule } from '../deeplink/deeplink.module';
 
 @Module({
-  imports: [ProjectsModule],
+  imports: [ProjectsModule, DeeplinkModule],
   controllers: [WorkspacesController],
   providers: [
     WorkspacesService,

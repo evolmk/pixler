@@ -1,8 +1,8 @@
 # M24 — Gestures, animations polish, deep links (`pixler://`)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — animation pass done. Sprint 3 in-progress.
+**Current Status:** All 3 sprints complete. M24 done.
 
 ---
 
@@ -115,30 +115,42 @@ theme switch fades cleanly.
 
 ## Sprint 3 — Deep link infra + URL scheme + Linear deep-link comments
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** `pixler://` URL scheme registers per-OS; clicks route into running app; workspace
 creation posts a Linear comment.
 
 **Tasks:**
 
-- [ ] `DeeplinkModule` + `DeeplinkService` + `DeeplinkController`.
-- [ ] `url-scheme.installer.ts` — macOS `.app` shim posting to local api; Windows registry entry
+- [x] `DeeplinkModule` + `DeeplinkService` + `DeeplinkController`.
+- [x] `url-scheme.installer.ts` — macOS `.app` shim posting to local api; Windows registry entry
   `HKCU\Software\Classes\pixler`; Linux `xdg-mime` + `.desktop`.
-- [ ] `POST /api/deeplink { url }` — parses `pixler://workspace/<id>`, `project/<id>`,
+- [x] `POST /api/deeplink { url }` — parses `pixler://workspace/<id>`, `project/<id>`,
   `ticket/<identifier>`; emits `deeplink.received`; web navigates + focuses window.
-- [ ] Extend `SettingsDrawer/ExternalToolsPanel.tsx` with URL scheme registration status +
+- [x] Extend `SettingsDrawer/ExternalToolsPanel.tsx` with URL scheme registration status +
   Register button.
-- [ ] On workspace creation: post Linear comment with deep link + plan path (toggleable in
+- [x] On workspace creation: post Linear comment with deep link + plan path (toggleable in
   Project Settings → Integrations).
-- [ ] `useDeepLink.ts`.
+- [x] `useDeepLink.ts`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/deeplink/deeplink.module.ts`
+- `apps/api/src/deeplink/deeplink.service.ts`
+- `apps/api/src/deeplink/deeplink.controller.ts`
+- `apps/api/src/deeplink/url-scheme.installer.ts`
+- `apps/api/src/app.module.ts` — registered DeeplinkModule
+- `apps/api/src/linear/linear.module.ts` — exported LinearMutationsService
+- `apps/api/src/workspaces/workspaces.module.ts` — imported DeeplinkModule
+- `apps/api/src/workspaces/workspaces.service.ts` — injected DeeplinkService, posts comment on create
+- `packages/shared-types/src/events.ts` — added `deeplink.received` event
+- `packages/shared-types/src/settings.ts` — added `integrations.linear.deeplinkOnCreate` setting
+- `apps/web/src/hooks/useDeepLink.ts`
+- `apps/web/src/components/SettingsDrawer/ExternalToolsPanel.tsx` — URL scheme section
+- `apps/web/src/routes/project.tsx` — wired `useDeepLink`
 
 **Issues Encountered:**
 
-- _none yet_
+- `SettingsService.get` takes opts object, not bare string. Fixed call in `DeeplinkService`.
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/web build` + manual: open `pixler://workspace/<id>` from external app.
 

@@ -9,6 +9,7 @@ import { WorktreeService } from './worktree.service';
 import { SetupRunnerService } from './setup-runner.service';
 import { FilesToCopyService } from './files-to-copy.service';
 import { PixlerJsonService } from '../projects/pixler-json.service';
+import { DeeplinkService } from '../deeplink/deeplink.service';
 import type { Workspace, CreateWorkspaceDto, PatchWorkspaceDto } from '@pixler/shared-types';
 
 type DbWorkspace = Omit<Workspace, 'pinned'> & { pinned: 0 | 1 };
@@ -24,6 +25,7 @@ export class WorkspacesService {
     private readonly setupRunner: SetupRunnerService,
     private readonly filesToCopy: FilesToCopyService,
     private readonly pixlerJson: PixlerJsonService,
+    private readonly deeplink: DeeplinkService,
   ) {}
 
   findAllByProject(projectId: string): Workspace[] {
@@ -92,6 +94,8 @@ export class WorkspacesService {
     if (setupScript) {
       this.setupRunner.run(workspace, setupScript);
     }
+
+    void this.deeplink.postWorkspaceCreatedComment(id, ticketId, projectId);
 
     return this.findOne(id);
   }

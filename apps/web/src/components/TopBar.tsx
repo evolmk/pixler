@@ -31,6 +31,7 @@ import { OnboardingShell } from './Onboarding/OnboardingShell';
 import { CommandPalette } from './CommandPalette';
 import { ShortcutsHelpModal } from './ShortcutsHelpModal';
 import { useOpenInIde } from '../hooks/useIDEs';
+import { useUnseenCount } from '../hooks/useActivities';
 import type { ThemeMode } from '@pixler/ui-styles';
 
 const MODE_ICONS: Record<ThemeMode, typeof Sun> = {
@@ -59,6 +60,7 @@ export function TopBar() {
   const activeProject = projects.find((p) => p.id === params.projectId);
   const workspaceId = params.workspaceId;
   const openInIde = useOpenInIde(workspaceId ?? '');
+  const { data: unseenCount = 0 } = useUnseenCount();
 
   useEffect(() => {
     if (!workspaceId) return;
@@ -175,9 +177,12 @@ export function TopBar() {
         K
       </Button>
 
-      {/* Notification bell — M18 wires real data */}
-      <Button variant="ghost" size="icon-sm" aria-label="Notifications (ships in M18)">
+      {/* Notification bell */}
+      <Button variant="ghost" size="icon-sm" aria-label="Notifications" className="relative">
         <Bell />
+        {unseenCount > 0 && (
+          <span className="absolute right-1 top-1 flex size-2 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground" />
+        )}
       </Button>
 
       {/* Help menu */}
