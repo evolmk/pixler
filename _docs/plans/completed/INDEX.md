@@ -23,3 +23,4 @@
 | M23 | 2026-05-25 | Token health panel (usage parsing, status pill, per-model/workspace breakdowns, preflight modal, .claudeignore, /clear on switch) |
 | M14 | 2026-05-25 | Plan storage (file/inline/attachment, auto-recommender, big-plan prompt, sub-issues bridge, PlanTab, settings panels) |
 | M16 | 2026-05-25 | Chat UI (MessagesModule + PTY bridge, ChatPane with streaming markdown, Composer with @file/@command/attachments) |
+| M15 | 2026-05-25 | Checkpoints (snapshot + rollback, auto-triggers, CheckpointsTab, RollbackConfirmModal, ⌘K action) |
