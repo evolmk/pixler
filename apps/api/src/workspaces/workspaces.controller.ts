@@ -26,6 +26,16 @@ export class WorkspacesController {
     return this.workspaces.patch(id, dto);
   }
 
+  @Post(':id/archive')
+  archive(@Param('id') id: string) {
+    return this.workspaces.archive(id);
+  }
+
+  @Post(':id/rerun-setup')
+  rerunSetup(@Param('id') id: string) {
+    return this.workspaces.rerunSetup(id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.workspaces.remove(id);

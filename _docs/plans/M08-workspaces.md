@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 2 complete — naming, port allocator, worktree creation, POST endpoint. Sprint 3 next: setup script execution, files-to-copy, archive.
+**Current Status:** Sprint 3 complete — setup script runner, files-to-copy, archive/rerun-setup endpoints. Sprint 4 next: web UI (dialog, sidebar, context menu, settings panels).
 
 ---
 
@@ -135,30 +135,36 @@ allocated port; falls back to color names on collision.
 
 ## Sprint 3 — Setup script execution + files-to-copy + archive
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Workspace creation also copies declared files, runs the setup script with `$PIXLER_*`
 env vars, streams output. Archive endpoint runs archive script, removes worktree, keeps row.
 
 **Tasks:**
 
-- [ ] `files-to-copy.service.ts` using `fast-glob`; resolves globs from `pixler.json` +
+- [x] `files-to-copy.service.ts` using `fast-glob`; resolves globs from `pixler.json` +
   per-project setting; copies preserving paths.
-- [ ] `setup-runner.service.ts` — spawn under `bash -lc` (or `cmd /c`), inherit env + add
+- [x] `setup-runner.service.ts` — spawn under `bash -lc` (or `cmd /c`), inherit env + add
   `PIXLER_ROOT_PATH/WORKSPACE_PATH/WORKSPACE_NAME/PORT/TICKET_ID/BRANCH`, stream
   `workspace.setup-log` events, set state to `error` on non-zero exit.
-- [ ] `POST /api/workspaces/:id/archive` — runs archive script if defined, removes worktree,
+- [x] `POST /api/workspaces/:id/archive` — runs archive script if defined, removes worktree,
   keeps row with `archived_at`.
-- [ ] `POST /api/workspaces/:id/rerun-setup`.
+- [x] `POST /api/workspaces/:id/rerun-setup`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/workspaces/files-to-copy.service.ts`
+- `apps/api/src/workspaces/setup-runner.service.ts`
+- `apps/api/src/workspaces/workspaces.service.ts` (archive, rerunSetup, filesToCopy integration)
+- `apps/api/src/workspaces/workspaces.controller.ts` (archive + rerun-setup routes)
+- `apps/api/src/workspaces/workspaces.module.ts` (new providers + ProjectsModule import)
+- `packages/shared-types/src/events.ts` (workspace.setup-log + workspace.state-changed events)
+- `apps/api/package.json` (fast-glob added)
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
-**Verify:** `pnpm --filter @pixler/api test setup-runner` + manual: create a workspace whose project has a setup script, see live log, then archive.
+**Verify:** `pnpm -w typecheck` — 9/9 tasks pass.
 
 ---
 

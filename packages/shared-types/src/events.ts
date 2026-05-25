@@ -8,6 +8,8 @@ export type AppEvent =
 
 export type WorkspaceEvent =
   | { type: 'workspace.created'; workspaceId: string; timestamp: number }
+  | { type: 'workspace.setup-log'; workspaceId: string; line: string; timestamp: number }
+  | { type: 'workspace.state-changed'; workspaceId: string; from: string; to: string; timestamp: number }
   | { type: 'agent.output'; workspaceId: string; data: string; timestamp: number }
   | { type: 'agent.state-changed'; workspaceId: string; from: string; to: string; timestamp: number };
 
