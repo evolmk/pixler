@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M26
-**Last Plan Completed:** M12-github-gh
-**Next Plan:** M13-orchestrator
+**Last Plan Completed:** M17-diff-viewer
+**Next Plan:** M19-run-ide
 
 ---
 
@@ -11,7 +11,7 @@
 | Instance                              | Plan           | Status         |
 |---------------------------------------|----------------|----------------|
 | **evolmk** (default `~/.claude`)      | M09-terminal    | ✅ complete    |
-| **evolmikek** (`~/.claude-evolmikek`) | M17-diff-viewer | 🔄 in progress |
+| **evolmikek** (`~/.claude-evolmikek`) | M19-run-ide     | 🔄 in progress |
 
 > Update this table when a plan starts/finishes. In the Milestones list below, in-progress plans
 > show `[-]` and are annotated with the instance name `(evolmk)` or `(evolmikek)`.
@@ -37,9 +37,9 @@
 - [ ] **M14** — Plan storage _(Wave 7 / Track B)_
 - [ ] **M15** — Checkpoints _(Wave 8 / Track B)_
 - [ ] **M16** — Chat UI _(Wave 7 / Track A)_
-- [-] **M17** — Diff viewer _(Wave 5 / Track B)_ **(evolmikek)**
+- [x] **M17** — Diff viewer _(Wave 5 / Track B)_
 - [ ] **M18** — Checks + activity _(Wave 9 / Track B)_
-- [ ] **M19** — Run + IDE _(Wave 6 / Track B)_
+- [-] **M19** — Run + IDE _(Wave 6 / Track B)_ **(evolmikek)**
 - [ ] **M20** — Themes _(Wave 8 / Track A)_
 - [ ] **M21** — Onboarding _(Wave 9 / Track A)_
 - [ ] **M22** — Palette + keys _(Wave 10 / Track A)_
