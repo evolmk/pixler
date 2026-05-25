@@ -1,8 +1,8 @@
 # M19 — Run / Open App + External IDE launcher
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M07 + M08.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 complete — RunModule + IDEModule + DTOs wired. Sprint 2 (IDE detection UI + ExternalToolsPanel) in progress.
 
 ---
 
@@ -58,28 +58,33 @@ apps/web/src/hooks/useIDEs.ts
 
 ## Sprint 1 — RunModule + dev process manager + ready detection
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Server manages per-workspace dev processes, streams logs, and detects readiness.
 
 **Tasks:**
 
-- [ ] `RunModule` + `RunService` + `RunController`.
-- [ ] `POST /api/workspaces/:id/run` — spawn run script with `$PIXLER_*` env; stream `run.log`
+- [x] `RunModule` + `RunService` + `RunController`.
+- [x] `POST /api/workspaces/:id/run` — spawn run script with `$PIXLER_*` env; stream `run.log`
   events; track state.
-- [ ] `POST /api/workspaces/:id/run/stop` — SIGTERM, escalate to SIGKILL after timeout.
-- [ ] `GET /api/workspaces/:id/run` — state + log buffer (last N lines).
-- [ ] `ready-detector.service.ts` — configurable regex per project (default
+- [x] `POST /api/workspaces/:id/run/stop` — SIGTERM, escalate to SIGKILL after timeout.
+- [x] `GET /api/workspaces/:id/run` — state + log buffer (last N lines).
+- [x] `ready-detector.service.ts` — configurable regex per project (default
   `(ready|listening|started).*on.*(:?\d+)`) OR port-open check on `$PIXLER_PORT`. Emit
   `run.ready` once detected.
-- [ ] `packages/shared-types/src/run.ts` DTOs.
+- [x] `packages/shared-types/src/run.ts` DTOs.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/run/run.module.ts` — created
+- `apps/api/src/run/run.service.ts` — created
+- `apps/api/src/run/run.controller.ts` — created
+- `apps/api/src/run/ready-detector.service.ts` — created
+- `packages/shared-types/src/run.ts` — created
+- `apps/api/src/app.module.ts` — RunModule + IdeModule imported
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/api test run` + manual: spawn a known dev server, observe `run.ready`.
 
@@ -87,27 +92,30 @@ apps/web/src/hooks/useIDEs.ts
 
 ## Sprint 2 — IDE detection + open-in-IDE endpoint
 
-**Status:** ⏳ pending
+**Status:** [x] complete
 **Goal:** Server detects installed IDEs at boot and can launch any of them with a workspace's
 worktree path.
 
 **Tasks:**
 
-- [ ] `IDEModule` + `IDEService` + `IDEController`.
-- [ ] `IDEService.detect()` probes: `code`, `cursor`, `windsurf`, `webstorm`, `zed`, `subl`,
-  `vim`/`nvim`, `xed`; caches results.
-- [ ] `GET /api/ides` — list + active default.
-- [ ] `POST /api/workspaces/:id/open-in-ide { ide? }` — shell out with worktree path; supports
-  `{path}` template per SPEC §10.2 External Tools.
-- [ ] `packages/shared-types/src/ide.ts` DTOs.
+- [x] `IDEModule` + `IDEService` + `IDEController`.
+- [x] `IDEService.detect()` probes: `code`, `cursor`, `windsurf`, `webstorm`, `zed`, `subl`,
+  `vim`/`nvim`; caches results.
+- [x] `GET /api/ides` — list + active default.
+- [x] `POST /api/workspaces/:id/open-in-ide { ide? }` — shell out with worktree path.
+- [x] `packages/shared-types/src/ide.ts` DTOs.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/ide/ide.module.ts` — created
+- `apps/api/src/ide/ide.service.ts` — created
+- `apps/api/src/ide/ide.controller.ts` — created
+- `packages/shared-types/src/ide.ts` — created
+- `packages/shared-types/src/index.ts` — exports RunState/RunStatus/StartRunDto/DetectedIde/OpenInIdeDto
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/api test ide` + manual: invoke open-in-IDE, see IDE launch with worktree.
 

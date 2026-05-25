@@ -9,9 +9,11 @@ import { LinearModule } from './linear/linear.module';
 import { TerminalsModule } from './terminals/terminals.module';
 import { GithubModule } from './github/github.module';
 import { DiffModule } from './diff/diff.module';
+import { RunModule } from './run/run.module';
+import { IdeModule } from './ide/ide.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule],
   controllers: [HealthController],
 })
 export class AppModule {}

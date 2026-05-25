@@ -11,3 +11,5 @@ export type { LinearTicket, LinearStatusDto, LinearTeamDto, LinearProjectDto, Co
 export type { Terminal, ResizeTerminalDto } from './terminals';
 export type { DiffStatus, DiffFileSummary, DiffHunk, DiffFileDetail } from './diff';
 export type { GithubAuthStatus, GithubRepoInfo, PullRequest, PrCheck, PrComment, CreatePrDto, MergePrDto } from './github';
+export type { RunState, RunStatus, StartRunDto } from './run';
+export type { DetectedIde, OpenInIdeDto } from './ide';
