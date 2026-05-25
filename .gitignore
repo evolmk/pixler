@@ -6,3 +6,6 @@ dist/
 /.idea/
 .env
 .env.*
+
+# Claude Code runtime session logs
+.claude/logs/
