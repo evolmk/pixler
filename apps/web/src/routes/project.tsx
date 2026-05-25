@@ -1,8 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { ResizableSplit } from '@pixler/ui/components/resizable-split';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@pixler/ui/components/dialog';
 import { useSetting } from '../hooks/useSetting';
 import { useLayoutStore, type PaneLayout } from '../stores/layout';
+import { TopBar } from '../components/TopBar';
 
 function PanePlaceholder({ label, sub }: { label: string; sub: string }) {
   return (
@@ -31,6 +39,8 @@ export function ProjectShell() {
   const setOuter = useLayoutStore((s) => s.setOuter);
   const setInner = useLayoutStore((s) => s.setInner);
   const hydrate = useLayoutStore((s) => s.hydrate);
+  const settingsOpen = useLayoutStore((s) => s.settingsOpen);
+  const setSettingsOpen = useLayoutStore((s) => s.setSettingsOpen);
 
   const { value: persisted, set: persist } = useSetting<PaneLayout>('layout.paneSizes');
 
@@ -66,8 +76,9 @@ export function ProjectShell() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
-      <ResizableSplit sizes={panes.outer} onResize={handleOuter} className="h-full">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
+      <TopBar />
+      <ResizableSplit sizes={panes.outer} onResize={handleOuter} className="flex-1 min-h-0">
         <aside data-testid="sidebar" className="h-full border-r border-border">
           <PanePlaceholder
             label="Workspaces"
@@ -89,6 +100,18 @@ export function ProjectShell() {
           </section>
         </ResizableSplit>
       </ResizableSplit>
+
+      {/* Settings drawer stub — Sprint 4 replaces this with a real Vaul drawer */}
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+            <DialogDescription>
+              Full settings drawer ships in Sprint 4. Appearance, Linear, Git, and more.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

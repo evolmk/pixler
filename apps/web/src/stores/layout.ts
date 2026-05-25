@@ -21,20 +21,24 @@ interface LayoutState {
   panes: PaneLayout;
   fullBleed: FullBleedPane;
   bigTerminal: boolean;
+  settingsOpen: boolean;
   setOuter: (outer: [number, number]) => void;
   setInner: (inner: [number, number]) => void;
   hydrate: (panes: Partial<PaneLayout>) => void;
   setFullBleed: (pane: FullBleedPane) => void;
   toggleBigTerminal: () => void;
+  setSettingsOpen: (open: boolean) => void;
 }
 
 export const useLayoutStore = create<LayoutState>((set) => ({
   panes: DEFAULT_PANE_LAYOUT,
   fullBleed: null,
   bigTerminal: false,
+  settingsOpen: false,
   setOuter: (outer) => set((s) => ({ panes: { ...s.panes, outer } })),
   setInner: (inner) => set((s) => ({ panes: { ...s.panes, inner } })),
   hydrate: (panes) => set((s) => ({ panes: { ...s.panes, ...panes } })),
   setFullBleed: (fullBleed) => set({ fullBleed }),
   toggleBigTerminal: () => set((s) => ({ bigTerminal: !s.bigTerminal })),
+  setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
 }));

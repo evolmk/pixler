@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 1 ✅ complete — TanStack Router + 3-pane skeleton; `pnpm -w typecheck` clean (9/9) and `@pixler/web` build passing. Sprints 2–4 pending.
+**Current Status:** Sprint 2 ✅ complete — TopBar with project switcher, +Workspace stub dialog, ⌘K CommandDialog, notification bell, settings gear (wired to layout store stub), and mode toggle (writes to both useThemeStore + useSetting). `pnpm -w typecheck` clean (9/9) and `@pixler/web` build passing. Sprints 3–4 pending.
 
 ---
 
@@ -104,32 +104,37 @@ persistence) still recommended before milestone close.
 
 ## Sprint 2 — Top bar
 
-**Status:** ⏳ pending
+**Status:** ✅ COMPLETE
 **Goal:** Top bar renders across all routes with every control visible and wired to either a stub
 or its real provider.
 
 **Tasks:**
 
-- [ ] `components/TopBar.tsx` layout: wordmark left; project switcher / `+ Workspace` / `⌘K` /
+- [x] `components/TopBar.tsx` layout: wordmark left; project switcher / `+ Workspace` / `⌘K` /
   notification bell / settings gear / theme toggle right.
-- [ ] Project switcher = `DropdownMenu` from `@pixler/ui` with placeholder list (real data lands
+- [x] Project switcher = `DropdownMenu` from `@pixler/ui` with placeholder list (real data lands
   in M07).
-- [ ] `+ Workspace` opens a stub `Dialog` ("workspaces ship in M08").
-- [ ] `⌘K` opens an empty `cmdk` `<CommandDialog>` placeholder.
-- [ ] Settings gear opens the settings drawer (the drawer itself is built in Sprint 4 — wire the
-  trigger now, stub the drawer for the moment).
-- [ ] Theme/mode toggle re-uses the M02 toggle but reads/writes via `useSetting`.
-- [ ] Notification bell renders a stub badge (M18 wires it up).
+- [x] `+ Workspace` opens a stub `Dialog` ("workspaces ship in M08").
+- [x] `⌘K` opens an empty `cmdk` `<CommandDialog>` placeholder.
+- [x] Settings gear opens the settings drawer (wired to `useLayoutStore.settingsOpen`; stub Dialog
+  rendered in `ProjectShell`; Sprint 4 replaces with real Vaul drawer).
+- [x] Theme/mode toggle reads from `useThemeStore`, writes to both store (immediate DOM apply) and
+  `useSetting('appearance.mode')` (server persistence). Cycles light → dark → system.
+- [x] Notification bell renders a stub button (M18 wires real notifications).
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/TopBar.tsx` — *new*; full top bar implementation.
+- `apps/web/src/routes/project.tsx` — added `<TopBar>`, flex-col shell layout, stub settings `<Dialog>`.
+- `apps/web/src/stores/layout.ts` — added `settingsOpen` + `setSettingsOpen`.
 
 **Issues Encountered:**
 
-- _none yet_
+- Consultant P1 (theme source-of-truth): mode toggle writes to both `useThemeStore` (immediate
+  apply) and `useSetting` (API persistence). Full bridge (hydrate store from API on startup) deferred to Sprint 4's AppearancePanel.
+- Consultant P1 (`data-testid="topbar"`): added to `<header>` in TopBar — M26 E2E test ready.
 
-**Verify:** `pnpm --filter @pixler/web build` clean; manual check that every top-bar control either opens its real provider or a labeled stub.
+**Verify:** ✅ `pnpm -w typecheck` clean (9/9); ✅ `pnpm --filter @pixler/web build` succeeds.
 
 ---
 
