@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useParams } from '@tanstack/react-router';
 import { ResizableSplit } from '@pixler/ui/components/resizable-split';
 import {
   Dialog,
@@ -11,40 +10,27 @@ import {
 import { useSetting } from '../hooks/useSetting';
 import { useLayoutStore, type PaneLayout } from '../stores/layout';
 import { TopBar } from '../components/TopBar';
-
-function PanePlaceholder({ label, sub }: { label: string; sub: string }) {
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-1 p-6 text-center">
-      <p className="text-sm font-medium text-foreground">{label}</p>
-      <p className="text-xs text-muted-foreground">{sub}</p>
-    </div>
-  );
-}
+import { WorkspacesSidebar } from '../components/WorkspacesSidebar';
+import { CenterTabs } from '../components/CenterTabs';
+import { RightPane } from '../components/RightPane';
 
 /**
- * 3-pane shell rendered for `/p/$projectId` and `/p/$projectId/w/$workspaceId`.
- * Sprint 1 ships the hollow skeleton; TopBar (Sprint 2), real sidebar / tabs /
- * right pane (Sprint 3) and the settings drawer (Sprint 4) fill it in.
- *
- * Three panes via two nested `<ResizableSplit>`s (the wrapper takes exactly two
- * children): outer = sidebar | rest, inner = center | right.
+ * 3-pane shell for `/p/$projectId` and `/p/$projectId/w/$workspaceId`.
+ * Full-bleed states bypass the resizable splits — bigTerminal and per-pane
+ * expand chevrons each render only the relevant component.
  */
 export function ProjectShell() {
-  const { projectId, workspaceId } = useParams({ strict: false }) as {
-    projectId?: string;
-    workspaceId?: string;
-  };
-
   const panes = useLayoutStore((s) => s.panes);
   const setOuter = useLayoutStore((s) => s.setOuter);
   const setInner = useLayoutStore((s) => s.setInner);
   const hydrate = useLayoutStore((s) => s.hydrate);
+  const bigTerminal = useLayoutStore((s) => s.bigTerminal);
+  const fullBleed = useLayoutStore((s) => s.fullBleed);
   const settingsOpen = useLayoutStore((s) => s.settingsOpen);
   const setSettingsOpen = useLayoutStore((s) => s.setSettingsOpen);
 
   const { value: persisted, set: persist } = useSetting<PaneLayout>('layout.paneSizes');
 
-  // Hydrate the store once from the persisted setting.
   const hydrated = useRef(false);
   useEffect(() => {
     if (!hydrated.current && persisted?.outer && persisted?.inner) {
@@ -53,8 +39,6 @@ export function ProjectShell() {
     }
   }, [persisted, hydrate]);
 
-  // `onLayoutChange` fires on every pointer move — debounce the write-back so we
-  // don't hammer the settings API + socket invalidation on each drag frame.
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const schedulePersist = () => {
     clearTimeout(timer.current);
@@ -75,33 +59,42 @@ export function ProjectShell() {
     schedulePersist();
   };
 
-  return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
-      <TopBar />
-      <ResizableSplit sizes={panes.outer} onResize={handleOuter} className="flex-1 min-h-0">
+  // Full-bleed: bypass splits and show only the expanded pane.
+  const renderPanes = () => {
+    if (bigTerminal || fullBleed === 'right') {
+      return <RightPane />;
+    }
+    if (fullBleed === 'sidebar') {
+      return <WorkspacesSidebar />;
+    }
+    if (fullBleed === 'center') {
+      return <CenterTabs />;
+    }
+    return (
+      <ResizableSplit sizes={panes.outer} onResize={handleOuter} className="h-full">
         <aside data-testid="sidebar" className="h-full border-r border-border">
-          <PanePlaceholder
-            label="Workspaces"
-            sub={projectId ? `project: ${projectId}` : 'no project'}
-          />
+          <WorkspacesSidebar />
         </aside>
         <ResizableSplit sizes={panes.inner} onResize={handleInner} className="h-full">
           <main className="h-full">
-            <PanePlaceholder
-              label="Chat · Plan · Diff · Checks · PR"
-              sub="center tabs land in Sprint 3"
-            />
+            <CenterTabs />
           </main>
           <section className="h-full border-l border-border">
-            <PanePlaceholder
-              label="Chat / Terminal"
-              sub={workspaceId ? `workspace: ${workspaceId}` : 'no workspace selected'}
-            />
+            <RightPane />
           </section>
         </ResizableSplit>
       </ResizableSplit>
+    );
+  };
 
-      {/* Settings drawer stub — Sprint 4 replaces this with a real Vaul drawer */}
+  return (
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
+      <TopBar />
+      <div className="min-h-0 flex-1">
+        {renderPanes()}
+      </div>
+
+      {/* Settings drawer stub — Sprint 4 replaces with real Vaul drawer */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent>
           <DialogHeader>

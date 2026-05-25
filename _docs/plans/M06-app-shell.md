@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-24
-**Current Status:** Sprint 2 ✅ complete — TopBar with project switcher, +Workspace stub dialog, ⌘K CommandDialog, notification bell, settings gear (wired to layout store stub), and mode toggle (writes to both useThemeStore + useSetting). `pnpm -w typecheck` clean (9/9) and `@pixler/web` build passing. Sprints 3–4 pending.
+**Current Status:** Sprint 3 ✅ complete — WorkspacesSidebar (placeholder cards + BigTerminalToggle), CenterTabs (data-driven, 5 tabs + composer stub), RightPane (mode pill + Interrupt/Approve/Reject stubs), per-pane full-bleed expand/restore wired. `pnpm -w typecheck` clean (9/9). Sprint 4 pending.
 
 ---
 
@@ -140,32 +140,37 @@ or its real provider.
 
 ## Sprint 3 — Sidebar, center tabs, right pane
 
-**Status:** ⏳ pending
+**Status:** ✅ COMPLETE
 **Goal:** Each of the three panes shows the structural UI defined in SPEC §8.1, with stubbed
 content. Full-bleed (Big Terminal) toggle works.
 
 **Tasks:**
 
-- [ ] `components/WorkspacesSidebar.tsx` — vertical stack of workspace cards (placeholder data:
+- [x] `components/WorkspacesSidebar.tsx` — vertical stack of workspace cards (placeholder data:
   color dot, name, state badge, 3-dot overflow menu).
-- [ ] `components/BigTerminalToggle.tsx` at the bottom of the sidebar — toggles full-bleed mode
+- [x] `components/BigTerminalToggle.tsx` at the bottom of the sidebar — toggles full-bleed mode
   (center + left collapse).
-- [ ] `components/CenterTabs.tsx` — Radix `Tabs` with **Chat | Plan | Diff | Checks | PR**, each
+- [x] `components/CenterTabs.tsx` — Radix `Tabs` with **Chat | Plan | Diff | Checks | PR**, each
   rendering a stub `<EmptyState>` keyed to its owning milestone.
-- [ ] Composer placeholder at the bottom of the center pane (real composer in M16).
-- [ ] `components/RightPane.tsx` — mode-pill at top to switch between ChatMode / TerminalMode
+- [x] Composer placeholder at the bottom of the center pane (real composer in M16).
+- [x] `components/RightPane.tsx` — mode-pill at top to switch between ChatMode / TerminalMode
   stubs; persistent **Interrupt** + **Approve/Reject** buttons (disabled stubs).
-- [ ] Per-pane header chevron expands that pane to full-bleed; another chevron click restores.
+- [x] Per-pane header chevron (Maximize2/Minimize2) expands/restores via `fullBleed` layout store.
+  BigTerminalToggle uses `bigTerminal` store flag.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/WorkspacesSidebar.tsx` — *new*
+- `apps/web/src/components/BigTerminalToggle.tsx` — *new*
+- `apps/web/src/components/CenterTabs.tsx` — *new*; TABS config array (P2 consultant: data-driven)
+- `apps/web/src/components/RightPane.tsx` — *new*
+- `apps/web/src/routes/project.tsx` — replaced PanePlaceholder with real components; `renderPanes()` handles full-bleed logic
 
 **Issues Encountered:**
 
-- _none yet_
+- `GitDiff` does not exist in lucide-react 0.511; replaced with `GitCompare`.
 
-**Verify:** `pnpm --filter @pixler/web build` clean; manual check that all three panes render, tabs switch, Big Terminal expand/restore is clean.
+**Verify:** ✅ `pnpm -w typecheck` clean (9/9).
 
 ---
 

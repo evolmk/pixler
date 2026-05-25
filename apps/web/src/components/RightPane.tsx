@@ -1,0 +1,79 @@
+import { useState } from 'react';
+import { Maximize2, MessageSquare, Minimize2, StopCircle, Terminal, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { SegmentedControl } from '@pixler/ui/components/segmented-control';
+import { Button } from '@pixler/ui/components/button';
+import { EmptyState } from '@pixler/ui/components/empty-state';
+import type { SegmentedOption } from '@pixler/ui/components/segmented-control';
+import { useLayoutStore } from '../stores/layout';
+
+type RightPaneMode = 'chat' | 'terminal';
+
+const MODE_OPTIONS: SegmentedOption<RightPaneMode>[] = [
+  { value: 'chat', label: 'Chat' },
+  { value: 'terminal', label: 'Terminal' },
+];
+
+export function RightPane() {
+  const [mode, setMode] = useState<RightPaneMode>('chat');
+  const fullBleed = useLayoutStore((s) => s.fullBleed);
+  const setFullBleed = useLayoutStore((s) => s.setFullBleed);
+  const isExpanded = fullBleed === 'right';
+
+  return (
+    <div className="flex h-full flex-col bg-background">
+      {/* Header: mode pill + expand */}
+      <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border px-3">
+        <SegmentedControl
+          options={MODE_OPTIONS}
+          value={mode}
+          onChange={setMode}
+          className="h-7"
+        />
+        <span className="flex-1" />
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          onClick={() => setFullBleed(isExpanded ? null : 'right')}
+          aria-label={isExpanded ? 'Restore right pane' : 'Expand right pane full-bleed'}
+        >
+          {isExpanded ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
+        </Button>
+      </div>
+
+      {/* Pane content */}
+      <div className="flex flex-1 items-center justify-center overflow-auto p-4">
+        {mode === 'chat' ? (
+          <EmptyState
+            icon={MessageSquare}
+            title="Chat pane ships in M16"
+            body="Agent conversation will stream here during workspace runs."
+            className="max-w-xs border-none"
+          />
+        ) : (
+          <EmptyState
+            icon={Terminal}
+            title="Terminal ships in M09"
+            body="The PTY terminal will stream agent output here."
+            className="max-w-xs border-none"
+          />
+        )}
+      </div>
+
+      {/* Persistent action buttons */}
+      <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border p-3">
+        <Button variant="outline" size="sm" disabled className="gap-1.5 text-xs">
+          <StopCircle className="size-3.5" />
+          Interrupt
+        </Button>
+        <Button variant="outline" size="sm" disabled className="gap-1.5 text-xs">
+          <ThumbsDown className="size-3.5" />
+          Reject
+        </Button>
+        <Button size="sm" disabled className="gap-1.5 text-xs">
+          <ThumbsUp className="size-3.5" />
+          Approve
+        </Button>
+      </div>
+    </div>
+  );
+}
