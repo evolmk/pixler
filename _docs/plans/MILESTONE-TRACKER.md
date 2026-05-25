@@ -1,8 +1,8 @@
 # Milestone Tracker
 
-**Most Recent Plan ID:** M26
+**Most Recent Plan ID:** M27
 **Last Plan Completed:** M25-ship
-**Next Plan:** — (all milestones complete)
+**Next Plan:** M27-error-logging
 
 ---
 
@@ -47,6 +47,7 @@
 - [x] **M24** — Gestures + deep links _(Wave 11 / Track A)_
 - [x] **M25** — Ship _(Wave 12 — serial, last)_
 - [x] **M26** — Playwright E2E smoke suite _(Wave 11 / Track B)_
+- [-] **M27** — Error logging to ~/.config/pixler/logs/
 
 ---
 
