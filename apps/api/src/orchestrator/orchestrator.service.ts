@@ -116,8 +116,12 @@ export class OrchestratorService {
       context,
       (event: StepEvent) => {
         this.events.emitWorkspaceEvent(workspaceId, {
-          ...event,
           type: 'workflow.step',
+          stepEventType: event.type,
+          stepId: event.stepId,
+          label: event.label,
+          payload: event.payload,
+          error: event.error,
           workspaceId,
           timestamp: Date.now(),
         });

@@ -10,9 +10,12 @@ import {
 import { Button } from '@pixler/ui/components/button';
 import { Input } from '@pixler/ui/components/input';
 import { Label } from '@pixler/ui/components/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@pixler/ui/components/select';
 import { useCreateWorkspace } from '../hooks/useWorkspaces';
 import { useWorkspaceEvents } from '../hooks/useWorkspaceEvents';
+import { useWorkflows } from '../hooks/useWorkflows';
 import { useCallback, useRef } from 'react';
+import { slugify } from '@pixler/shared-types';
 import type { WorkspaceMode, WorkspaceEvent } from '@pixler/shared-types';
 
 interface NewWorkspaceDialogProps {
@@ -29,12 +32,14 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
   const [mode, setMode] = useState<WorkspaceMode>('chat');
   const [ticketId, setTicketId] = useState(prefillTicketId ?? '');
   const [customName, setCustomName] = useState('');
+  const [selectedWorkflow, setSelectedWorkflow] = useState('');
   const [error, setError] = useState('');
   const [setupLog, setSetupLog] = useState<string[]>([]);
   const [createdId, setCreatedId] = useState<string | null>(null);
 
   const create = useCreateWorkspace();
   const logRef = useRef<HTMLDivElement>(null);
+  const { data: workflows = [] } = useWorkflows();
 
   const handleEvent = useCallback((event: WorkspaceEvent) => {
     if (event.type === 'workspace.setup-log') {
@@ -51,11 +56,15 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
 
   useWorkspaceEvents(createdId, handleEvent);
 
+  const activeWorkflows = workflows.filter((wf) => !wf.archived);
+  const selectedWf = activeWorkflows.find((wf) => wf.name === selectedWorkflow);
+
   const reset = () => {
     setStep('form');
     setMode('chat');
     setTicketId('');
     setCustomName('');
+    setSelectedWorkflow('');
     setError('');
     setSetupLog([]);
     setCreatedId(null);
@@ -84,11 +93,12 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
     }
   };
 
-  const branchPreview = customName.trim()
-    ? `pixler/${customName.trim()}`
+  const slug = customName.trim()
+    ? slugify(customName.trim())
     : ticketId.trim()
-    ? `pixler/${ticketId.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
-    : 'pixler/<color-name>';
+    ? slugify(ticketId.trim())
+    : '';
+  const branchPreview = slug ? `pixler/${slug}` : 'pixler/<color-name>';
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -136,6 +146,38 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
               />
             </div>
 
+            {/* Workflow picker — shown when workflows exist */}
+            {activeWorkflows.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <Label>Workflow <span className="text-muted-foreground">(optional)</span></Label>
+                <Select value={selectedWorkflow} onValueChange={setSelectedWorkflow}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Auto-detect from ticket label" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Auto-detect from ticket label</SelectItem>
+                    {activeWorkflows.map((wf) => (
+                      <SelectItem key={wf.name} value={wf.name}>{wf.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedWf && (
+                  <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
+                    <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Steps</p>
+                    <ol className="flex flex-col gap-0.5">
+                      {selectedWf.steps.map((s, i) => (
+                        <li key={s.id} className="flex items-center gap-1.5 text-xs text-foreground">
+                          <span className="text-muted-foreground">{i + 1}.</span>
+                          <span>{s.label}</span>
+                          {s.model && <span className="ml-auto text-[10px] text-muted-foreground">{s.model}</span>}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Custom name */}
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="custom-name">Custom name <span className="text-muted-foreground">(optional)</span></Label>
@@ -150,7 +192,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
             {/* Preview */}
             <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
               <p>Branch: <span className="font-mono text-foreground">{branchPreview}</span></p>
-              <p className="mt-0.5">Worktree: <span className="font-mono text-foreground">../pixler-worktrees/{customName.trim() || ticketId.trim() || '<name>'}</span></p>
+              <p className="mt-0.5">Worktree: <span className="font-mono text-foreground">../pixler-worktrees/{slug || '<name>'}</span></p>
             </div>
 
             {error && <p className="text-xs text-destructive">{error}</p>}

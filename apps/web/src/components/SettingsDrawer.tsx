@@ -17,6 +17,7 @@ import {
   Palette,
   Terminal,
   UserCircle,
+  Workflow,
   Wrench,
 } from 'lucide-react';
 import {
@@ -48,6 +49,7 @@ import { NotificationsPanel } from './SettingsDrawer/NotificationsPanel';
 import { AccountPanel } from './SettingsDrawer/AccountPanel';
 import { StoragePanel } from './SettingsDrawer/StoragePanel';
 import { AboutPanel } from './SettingsDrawer/AboutPanel';
+import { WorkflowsPanel } from './SettingsDrawer/WorkflowsPanel';
 
 interface CategoryConfig {
   id: string;
@@ -64,6 +66,7 @@ const CATEGORIES: CategoryConfig[] = [
   { id: 'linear', label: 'Linear', icon: Link, milestone: 'M10' },
   { id: 'github', label: 'GitHub', icon: Github, milestone: 'M28' },
   { id: 'git', label: 'Git', icon: GitBranch, milestone: 'M12' },
+  { id: 'workflows', label: 'Workflows', icon: Workflow, milestone: 'M28' },
   { id: 'plans', label: 'Plans', icon: FileText },
   { id: 'appearance', label: 'Appearance', icon: Palette },
   { id: 'usage', label: 'Usage', icon: ActivitySquare },
@@ -136,6 +139,8 @@ export function SettingsDrawer() {
               <KeyboardPanel />
             ) : activeId === 'usage' ? (
               <UsagePanel />
+            ) : activeId === 'workflows' ? (
+              <WorkflowsPanel />
             ) : activeId === 'plans' ? (
               <PlansPanel />
             ) : activeId === 'notifications' ? (

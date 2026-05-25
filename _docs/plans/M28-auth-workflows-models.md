@@ -1,8 +1,8 @@
 # M28 — Auth, Workflow Engine & Model Picker
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-25
-**Current Status:** Sprint 6 (workflow backend integration) complete — starting Sprint 7 (workflow UI)
+**Current Status:** All 7 sprints complete — M28 done
 
 ---
 
@@ -319,25 +319,32 @@ apps/web/src/components/OnboardingDrawer.tsx  # extend steps 2 + 3
 
 ## Sprint 7 — Workflow UI + final wiring
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Build the Settings → Workflows panel (list, edit, duplicate, archive), the New Task modal workflow selection, and the in-execution workflow step indicator.
 
 **Tasks:**
 
-- [ ] Create `useWorkflows.ts` hook — queries for workflow list, single workflow read; mutations for save, duplicate, archive; cache invalidation
-- [ ] Create `SettingsDrawer/WorkflowsPanel.tsx` — lists all discovered workflows grouped by source (built-in / repo / user); shows name, step count, last modified; Edit opens YAML text editor (syntax highlighted via Shiki); Duplicate button; Archive button; "New Workflow" button (blank template or copy built-in)
-- [ ] Add Workflows category to `SettingsDrawer.tsx` CATEGORIES array
-- [ ] Extend New Workspace dialog (or New Task modal) — after issue is selected, show workflow auto-selection from label with dropdown override; show workflow preview (list of steps with model assignments)
-- [ ] Add workflow step indicator to the workspace's left sidebar or panel — highlights the active step during execution; shows completed/pending/skipped states
-- [ ] Integrate `approval` step pause into existing approval gate UI — when WorkflowRunner pauses at an approval step, surface the Approve/Edit/Cancel card in the workspace
+- [x] Create `useWorkflows.ts` hook — queries for workflow list, single workflow read; mutations for save, duplicate, archive; cache invalidation
+- [x] Create `SettingsDrawer/WorkflowsPanel.tsx` — lists all discovered workflows grouped by source (built-in / repo / user); shows name, step count, last modified; Edit opens YAML text editor (syntax highlighted via Shiki); Duplicate button; Archive button; "New Workflow" button (blank template or copy built-in)
+- [x] Add Workflows category to `SettingsDrawer.tsx` CATEGORIES array
+- [x] Extend New Workspace dialog (or New Task modal) — after issue is selected, show workflow auto-selection from label with dropdown override; show workflow preview (list of steps with model assignments)
+- [x] Add workflow step indicator to the workspace's left sidebar or panel — highlights the active step during execution; shows completed/pending/skipped states
+- [x] Integrate `approval` step pause into existing approval gate UI — when WorkflowRunner pauses at an approval step, surface the Approve/Edit/Cancel card in the workspace
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useWorkflows.ts` — new: useWorkflows, useWorkflow, useSaveWorkflow, useDuplicateWorkflow, useArchiveWorkflow
+- `apps/web/src/hooks/useWorkflowState.ts` — new: useWorkflowState (tracks live step status from workflow.step socket events)
+- `apps/web/src/components/SettingsDrawer/WorkflowsPanel.tsx` — new: list grouped by source, YAML editor, archive/duplicate/new buttons
+- `apps/web/src/components/SettingsDrawer.tsx` — added Workflows category (Workflow icon)
+- `apps/web/src/components/NewWorkspaceDialog.tsx` — added workflow picker with step preview
+- `apps/web/src/components/WorkflowStepIndicator.tsx` — new: step-by-step progress strip with status icons
+- `apps/web/src/components/ChatPane.tsx` — added WorkflowStepIndicator, isWfApproval gate detection
+- `apps/api/src/orchestrator/orchestrator.service.ts` — fixed step event emission to preserve stepEventType
 
 **Issues Encountered:**
 
-- _none yet_
+- Spread `...event` + overwrite `type` loses original StepEventType — fixed by explicitly naming all fields in the workspace event payload and adding `stepEventType` field.
 
 **Verify:** `pnpm -w typecheck && pnpm -w dev` — manually test: create workspace from Linear ticket with "feature" label → workflow auto-selects → steps execute in order → approval step pauses → approve → continues → PR opens
 

@@ -10,6 +10,7 @@ import {
   type AppendMessage,
 } from '@assistant-ui/react';
 import { ThumbsUp, ThumbsDown, Search, X } from 'lucide-react';
+import { WorkflowStepIndicator } from './WorkflowStepIndicator';
 import { Button } from '@pixler/ui/components/button';
 import { useMessages, useSendMessage, useClearMessages } from '../hooks/useMessages';
 import {
@@ -21,6 +22,7 @@ import {
   GATE_PHASES,
 } from '../hooks/useOrchestrator';
 import { Composer } from './Composer';
+import { useWorkflowState } from '../hooks/useWorkflowState';
 import type { Message } from '@pixler/shared-types';
 
 function toThreadMessage(msg: Message): ThreadMessageLike {
@@ -88,8 +90,11 @@ function ChatPaneInner({ workspaceId }: ChatPaneProps) {
     ? allMessages.filter((m) => m.content.toLowerCase().includes(searchQuery.toLowerCase()))
     : allMessages;
 
+  const { steps: wfSteps } = useWorkflowState(workspaceId);
+  const isWfApproval = wfSteps.some((s) => s.status === 'awaiting_approval');
+
   const isRunning = ACTIVE_PHASES.has(orchState?.phase ?? 'idle');
-  const isGate = GATE_PHASES.has(orchState?.phase ?? 'idle');
+  const isGate = GATE_PHASES.has(orchState?.phase ?? 'idle') || isWfApproval;
 
   const adapter: ExternalStoreAdapter<Message> = {
     messages,
@@ -162,6 +167,9 @@ function ChatPaneInner({ workspaceId }: ChatPaneProps) {
             </button>
           </div>
         )}
+
+        {/* Workflow step indicator */}
+        <WorkflowStepIndicator workspaceId={workspaceId} />
 
         {/* Messages */}
         <div
