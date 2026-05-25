@@ -170,13 +170,13 @@ env vars, streams output. Archive endpoint runs archive script, removes worktree
 
 ## Sprint 4 — Web UI: NewWorkspaceDialog, sidebar, settings panels
 
-**Status:** ⏳ pending
+**Status:** 🔄 in-progress
 **Goal:** All workspace-related UI lights up: dialog with mode picker + ticket field, sidebar
 with real cards, context menu, remove modal, Scripts and Files-to-copy panels in Project Settings.
 
 **Tasks:**
 
-- [ ] `NewWorkspaceDialog.tsx` — Chat/Terminal segmented control, optional ticket id, optional
+- [-] `NewWorkspaceDialog.tsx` — Chat/Terminal segmented control, optional ticket id, optional
   custom name, live branch + worktree path preview, "Create" runs API + shows setup log live.
 - [ ] `WorkspacesSidebar.tsx` lit up: color dot, state badge, 3-dot overflow with all actions.
 - [ ] `WorkspaceContextMenu.tsx` items: Rename / Pin / Archive / Remove / Open in IDE (stub) /

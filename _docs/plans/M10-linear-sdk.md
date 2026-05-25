@@ -94,13 +94,13 @@ state; secrets land in OS keychain when available.
 
 ## Sprint 2 — Tickets sync loop + state-map
 
-**Status:** ⏳ pending
+**Status:** 🔄 in-progress
 **Goal:** Tickets are pulled every `syncIntervalMs` per project, cached locally, and surfaced via
 `GET /api/linear/tickets`. State-name mapping drives transitions.
 
 **Tasks:**
 
-- [ ] `sync.scheduler.ts` — calls `issues({ filter: { assignee: { isMe: true }, state: { type:
+- [-] `sync.scheduler.ts` — calls `issues({ filter: { assignee: { isMe: true }, state: { type:
   { in: ['unstarted', 'started'] } } } })` per project; upsert into `linear_tickets`; emit
   `linear.synced`.
 - [ ] `GET /api/linear/tickets?projectId=…` from local cache.

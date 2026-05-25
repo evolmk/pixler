@@ -116,8 +116,11 @@ Don't trust the checkboxes blindly — verify against the code:
 
 ### 5. Do the work (per sprint)
 
-- Find the next pending sprint; flip its tasks to `[-]` as you start them.
-- Implement the sprint.
+- Find the next pending sprint.
+- **BEFORE implementing each task:** edit the plan file to flip it from `[ ]` to `[-]`. Do this
+  as the very first action for that task — not after, not at the end of the sprint.
+- Implement the task.
+- **IMMEDIATELY after completing each task:** edit the plan file to flip it from `[-]` to `[x]`.
 - **Verify** with the project's check (build / typecheck / tests) before marking anything `[x]`.
   Mark complete on a passing check, not on faith.
 - Keep these updated **in the file, as you go** (not at the end):

@@ -48,7 +48,9 @@ subcommand of `/agent-planning` — keep whichever you prefer.)
      default: move the file to `_docs/plans/done/`).
 
 6. **Execute the sprint:**
-   - Flip the sprint's tasks to `[-]` as you start each one, `[x]` as you finish.
+   - **BEFORE implementing each task:** edit the plan file to flip it from `[ ]` to `[-]`. Do
+     this as the very first action for that task — not after, not at the end of the sprint.
+   - **IMMEDIATELY after completing each task:** edit the plan file to flip it from `[-]` to `[x]`.
    - If the repo has best-practices docs relevant to the work, read them before significant code.
    - **Verify** with the project's check (build / typecheck / tests) before marking anything `[x]`.
    - Update the sprint's "Files Created/Modified" and "Issues Encountered" as you go.
