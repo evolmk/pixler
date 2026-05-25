@@ -99,26 +99,29 @@ node-pty.
 
 ## Sprint 2 — Agent runner + spawner + prompt templates
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** api can spawn the right agent CLI per phase, parse exit/output, emit events.
 
 **Tasks:**
 
-- [ ] `agent-runner.service.ts` — spawns via node-pty (reuses M09 infra); resolves command per
+- [x] `agent-runner.service.ts` — spawns via node-pty (reuses M09 infra); resolves command per
   phase per project per workspace.
-- [ ] `prompt-templates.service.ts` — interpolates ticket details, plan contents, prior
+- [x] `prompt-templates.service.ts` — interpolates ticket details, plan contents, prior
   reviewer critiques into phase-specific prompts.
-- [ ] Env injection: `PIXLER_API_PORT`, `PIXLER_WORKSPACE_ID/PATH/TICKET_ID/BRANCH`.
-- [ ] Output parser detects `APPROVED` / `REJECTED` markers (reviewer phase) + success markers.
-- [ ] Emit `agent.output`, `agent.state-changed`, `agent.error` events.
+- [x] Env injection: `PIXLER_API_PORT`, `PIXLER_WORKSPACE_ID/PATH/TICKET_ID/BRANCH`.
+- [x] Output parser detects `APPROVED` / `REJECTED` markers (reviewer phase) + success markers.
+- [x] Emit `agent.output`, `agent.state-changed`, `agent.error` events.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/orchestrator/agent-runner.service.ts` (new)
+- `apps/api/src/orchestrator/prompt-templates.service.ts` (new)
+- `packages/shared-types/src/events.ts` (agent.error, agent.gate, agent.paused, agent.done)
+- `apps/api/package.json` (@pixler/orchestrator workspace dep)
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm --filter @pixler/api test agent-runner` — mock pty, drive each phase, assert events.
 
