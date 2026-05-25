@@ -1,8 +1,8 @@
 # M18 — Checks tab + Activity feed (toasts + tab)
 
 **Status:** ⏳ IN_PROGRESS
-**Modified:** 2026-05-24
-**Current Status:** Not started — runnable after M07 + M08 + M12 + M13 + M14.
+**Modified:** 2026-05-25
+**Current Status:** Sprint 1 done by evolmk; Sprint 2 in progress (Checks tab UI).
 
 ---
 
@@ -59,27 +59,33 @@ apps/web/src/hooks/useNativeNotifications.ts
 
 ## Sprint 1 — ActivityModule + DB + listeners
 
-**Status:** ⏳ pending
+**Status:** ✅ complete (completed by evolmk instance)
 **Goal:** Backend records activities for every domain event and exposes a paginated read endpoint.
 
 **Tasks:**
 
-- [ ] `0008_activity.sql` migration.
-- [ ] `ActivityModule` + `ActivityService` + `ActivityController`.
-- [ ] `ActivityService.record({ scope, scopeId?, kind, title, body, severity })` → writes row +
+- [x] `0009_activity.sql` migration (renumbered; 0008 taken by messages).
+- [x] `ActivityModule` + `ActivityService` + `ActivityController`.
+- [x] `ActivityService.record({ scope, scopeId?, kind, title, body, severity })` → writes row +
   emits `activity.appended`.
-- [ ] `listeners.ts` — translates `plan.ready`, `approval.needed`, `agent.stuck`, `agent.error`,
+- [x] `listeners.ts` — translates `plan.ready`, `approval.needed`, `agent.stuck`, `agent.error`,
   `pr.opened`, `pr.checks.failed`/`passed`, `pr.merged`, `workspace.archived` into activities.
-- [ ] `GET /api/activities?scope=&scopeId=&unseenOnly=` paginated.
-- [ ] `POST /api/activities/mark-seen { ids }`.
+- [x] `GET /api/activities?scope=&scopeId=&unseenOnly=` paginated.
+- [x] `POST /api/activities/mark-seen { ids }`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/db/migrations/0009_activity.sql`
+- `packages/shared-types/src/activity.ts`
+- `apps/api/src/activity/activity.module.ts`
+- `apps/api/src/activity/activity.service.ts`
+- `apps/api/src/activity/activity.controller.ts`
+- `apps/api/src/activity/activity.listeners.ts`
+- `apps/api/src/app.module.ts`
 
 **Issues Encountered:**
 
-- _none yet_
+- Migration renumbered to 0009 (0008 taken by M16 messages).
 
 **Verify:** `pnpm --filter @pixler/api test activity` — trigger each event source, assert correct activity rows.
 
@@ -87,27 +93,33 @@ apps/web/src/hooks/useNativeNotifications.ts
 
 ## Sprint 2 — Checks tab UI
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Center pane Checks tab shows live status across all sources.
 
 **Tasks:**
 
-- [ ] `ChecksTab.tsx` collapsible cards: GitStatus, CiRuns, DeployPreviews, PrReviewComments,
+- [x] `ChecksTab.tsx` collapsible cards: GitStatus, CiRuns, DeployPreviews, PrReviewComments,
   PlanTodos, Tests (placeholder).
-- [ ] `GitStatusCard.tsx` — staged/unstaged counts, ahead/behind, "Open Diff".
-- [ ] `CiRunsCard.tsx` — from `gh pr checks`; auto-refreshes via Socket.io from M12.
-- [ ] `PrReviewCommentsCard.tsx` — `gh pr view --json reviews,comments`; expand to view.
-- [ ] `PlanTodosCard.tsx` — M14 plan tasks with checkboxes.
-- [ ] `DeployPreviewsCard.tsx` — placeholder (only shows when Vercel/Netlify configured).
-- [ ] Per-card refresh buttons.
+- [x] `GitStatusCard.tsx` — staged/unstaged counts, ahead/behind, "Open Diff" (done by evolmk).
+- [x] `CiRunsCard.tsx` — from `gh pr checks`; auto-refreshes via Socket.io from M12 (done by evolmk).
+- [x] `PrReviewCommentsCard.tsx` — `gh pr view --json reviews,comments`; expand to view (done by evolmk).
+- [x] `PlanTodosCard.tsx` — M14 plan tasks with checkboxes (done by evolmk).
+- [x] `DeployPreviewsCard.tsx` — placeholder (only shows when Vercel/Netlify configured).
+- [x] Per-card refresh buttons (in each card).
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/ChecksTab.tsx`
+- `apps/web/src/components/checks/GitStatusCard.tsx`
+- `apps/web/src/components/checks/CiRunsCard.tsx`
+- `apps/web/src/components/checks/PrReviewCommentsCard.tsx`
+- `apps/web/src/components/checks/PlanTodosCard.tsx`
+- `apps/web/src/components/checks/DeployPreviewsCard.tsx`
+- `apps/web/src/components/CenterTabs.tsx`
 
 **Issues Encountered:**
 
-- _none yet_
+- Most cards were built by evolmk.
 
 **Verify:** `pnpm --filter @pixler/web build` + manual: CI failure triggers red dot.
 

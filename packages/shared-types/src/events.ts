@@ -4,7 +4,8 @@ export type AppEvent =
   | { type: 'project.clone-progress'; projectId: string; pct: number; line: string; timestamp: number }
   | { type: 'project.clone-complete'; projectId: string; timestamp: number }
   | { type: 'project.clone-error'; projectId: string; error: string; timestamp: number }
-  | { type: 'project.team-config-diff'; projectId: string; diff: { key: string; teamValue: unknown; localValue: unknown }[]; timestamp: number };
+  | { type: 'project.team-config-diff'; projectId: string; diff: { key: string; teamValue: unknown; localValue: unknown }[]; timestamp: number }
+  | { type: 'activity.appended'; activityId: string; scope: string; scopeId: string | null; kind: string; severity: string; timestamp: number };
 
 export type WorkspaceEvent =
   | { type: 'workspace.created'; workspaceId: string; timestamp: number }
@@ -18,6 +19,7 @@ export type WorkspaceEvent =
   | { type: 'agent.done'; workspaceId: string; prUrl: string; timestamp: number }
   | { type: 'plan.big-plan-prompt'; workspaceId: string; taskCount: number; charCount: number; timestamp: number }
   | { type: 'checkpoint.taken'; workspaceId: string; checkpointId: string; label: string; timestamp: number }
-  | { type: 'checkpoint.rolled-back'; workspaceId: string; checkpointId: string; timestamp: number };
+  | { type: 'checkpoint.rolled-back'; workspaceId: string; checkpointId: string; timestamp: number }
+  | { type: 'activity.appended'; workspaceId: string; activityId: string; kind: string; severity: string; timestamp: number };
 
 export type SettingsEvent = { type: 'settings.changed'; key: string; scope: string; timestamp: number };
