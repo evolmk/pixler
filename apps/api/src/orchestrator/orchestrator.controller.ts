@@ -1,12 +1,14 @@
 import { Controller, Get, Post, Param, Body, Query, NotFoundException } from '@nestjs/common';
 import { OrchestratorService } from './orchestrator.service';
 import { PreflightService } from './preflight.service';
+import { TriggersService } from '../checkpoints/triggers.service';
 
 @Controller('api/workspaces/:workspaceId/orchestrator')
 export class OrchestratorController {
   constructor(
     private readonly orchestrator: OrchestratorService,
     private readonly preflight: PreflightService,
+    private readonly triggers: TriggersService,
   ) {}
 
   @Get('state')
@@ -60,6 +62,18 @@ export class OrchestratorController {
   @Post('stop')
   stop(@Param('workspaceId') workspaceId: string) {
     this.orchestrator.stop(workspaceId);
+    return { ok: true };
+  }
+
+  @Post('resolve-conflicts')
+  async resolveConflicts(@Param('workspaceId') workspaceId: string) {
+    await this.triggers.onResolveConflicts(workspaceId);
+    return { ok: true };
+  }
+
+  @Post('rebase')
+  async rebase(@Param('workspaceId') workspaceId: string) {
+    await this.triggers.onRebase(workspaceId);
     return { ok: true };
   }
 }

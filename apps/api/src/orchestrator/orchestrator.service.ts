@@ -7,6 +7,7 @@ import { EventsService } from '../events/events.service';
 import { AgentRunnerService } from './agent-runner.service';
 import { PromptTemplatesService } from './prompt-templates.service';
 import { LinearBridgeService } from './linear-bridge.service';
+import { TriggersService } from '../checkpoints/triggers.service';
 
 const AUTO_APPROVE_DELAY_MS = 800;
 
@@ -22,6 +23,7 @@ export class OrchestratorService {
     private readonly runner: AgentRunnerService,
     private readonly templates: PromptTemplatesService,
     private readonly linearBridge: LinearBridgeService,
+    private readonly triggers: TriggersService,
   ) {}
 
   getState(workspaceId: string): MachineContext | null {
@@ -135,6 +137,10 @@ export class OrchestratorService {
             void this.linearBridge.onWorkspaceStart(ctx.ticketId, ws.project_id);
           }
 
+          if (effect.type === 'RUN_EXECUTOR') {
+            void this.triggers.onBeforeExecution(workspaceId);
+          }
+
           const prompt = this.templates.build(phase, {
             workspaceId,
             ticketId: ctx.ticketId,
@@ -151,6 +157,7 @@ export class OrchestratorService {
               prompt,
               ticketId: ctx.ticketId,
               branch: ws.branch ?? undefined,
+              onData: phase === 'executing' ? (data) => void this.triggers.onAgentOutput(workspaceId, data) : undefined,
             });
           } catch (err) {
             const { context } = step(ctx, { type: 'ERROR', error: String(err) });

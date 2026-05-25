@@ -13,6 +13,7 @@ export interface AgentRunOpts {
   ticketId?: string;
   branch?: string;
   apiPort?: number;
+  onData?: (data: string) => void;
 }
 
 export interface AgentRunResult {
@@ -99,6 +100,7 @@ export class AgentRunnerService {
 
       ptyProcess.onData((data) => {
         outputBuffer += data;
+        opts.onData?.(data);
         this.events.emitWorkspaceEvent(workspaceId, {
           type: 'agent.output',
           workspaceId,

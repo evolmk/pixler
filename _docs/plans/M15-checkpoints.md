@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 in progress — DB migration, CheckpointsModule, takeSnapshot/rollback.
+**Current Status:** Sprint 2 complete — auto-triggers wired; Sprint 3 (web UI) pending.
 
 ---
 
@@ -84,21 +84,26 @@ apps/web/src/hooks/useCheckpoints.ts
 
 ## Sprint 2 — Auto-triggers wired into orchestrator
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Orchestrator takes checkpoints at the right machine-driven moments.
 
 **Tasks:**
 
-- [ ] Before EXECUTING is entered → checkpoint labeled `Before execution`.
-- [ ] During execution: watch agent output for batched file writes; > 5 files OR > 200 lines →
+- [x] Before EXECUTING is entered → checkpoint labeled `Before execution`.
+- [x] During execution: watch agent output for batched file writes; > 5 files OR > 200 lines →
   checkpoint labeled `Pre-batch (N files, M lines)` (count Edit/Write tool calls; fall back to
   time-bucketing).
-- [ ] On `/resolve-conflicts` or `/rebase` slash commands → labeled accordingly.
-- [ ] Hook implementation in `triggers.service.ts`; extend `orchestrator.service.ts` to invoke.
+- [x] On `/resolve-conflicts` or `/rebase` slash commands → labeled accordingly.
+- [x] Hook implementation in `triggers.service.ts`; extend `orchestrator.service.ts` to invoke.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/checkpoints/triggers.service.ts`
+- `apps/api/src/checkpoints/checkpoints.module.ts`
+- `apps/api/src/orchestrator/orchestrator.module.ts`
+- `apps/api/src/orchestrator/orchestrator.service.ts`
+- `apps/api/src/orchestrator/agent-runner.service.ts`
+- `apps/api/src/orchestrator/orchestrator.controller.ts`
 
 **Issues Encountered:**
 

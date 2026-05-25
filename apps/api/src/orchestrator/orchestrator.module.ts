@@ -10,9 +10,10 @@ import { EventsModule } from '../events/events.module';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { LinearModule } from '../linear/linear.module';
 import { UsageModule } from '../usage/usage.module';
+import { CheckpointsModule } from '../checkpoints/checkpoints.module';
 
 @Module({
-  imports: [SettingsModule, EventsModule, WorkspacesModule, LinearModule, UsageModule],
+  imports: [SettingsModule, EventsModule, WorkspacesModule, LinearModule, UsageModule, CheckpointsModule],
   controllers: [OrchestratorController],
   providers: [OrchestratorService, AgentRunnerService, PromptTemplatesService, LinearBridgeService, PreflightService],
   exports: [OrchestratorService, PreflightService],
