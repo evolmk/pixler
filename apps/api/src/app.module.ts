@@ -17,9 +17,10 @@ import { UsageModule } from './usage/usage.module';
 import { PlansModule } from './plans/plans.module';
 import { MessagesModule } from './messages/messages.module';
 import { CheckpointsModule } from './checkpoints/checkpoints.module';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
-  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule],
+  imports: [DatabaseModule, EventsModule, SettingsModule, ProjectsModule, WorkspacesModule, LinearModule, TerminalsModule, GithubModule, DiffModule, RunModule, IdeModule, OnboardingModule, OrchestratorModule, UsageModule, PlansModule, MessagesModule, CheckpointsModule, ActivityModule],
   controllers: [HealthController],
 })
 export class AppModule {}

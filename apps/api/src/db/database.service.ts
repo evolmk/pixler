@@ -60,7 +60,15 @@ export class DatabaseService implements OnModuleInit {
       this.db.exec(sql);
     }
     if (currentVersion < 7) {
-      const sql = readFileSync(join(migrationsDir, '0007_messages.sql'), 'utf-8');
+      const sql = readFileSync(join(migrationsDir, '0007_checkpoints.sql'), 'utf-8');
+      this.db.exec(sql);
+    }
+    if (currentVersion < 8) {
+      const sql = readFileSync(join(migrationsDir, '0008_messages.sql'), 'utf-8');
+      this.db.exec(sql);
+    }
+    if (currentVersion < 9) {
+      const sql = readFileSync(join(migrationsDir, '0009_activity.sql'), 'utf-8');
       this.db.exec(sql);
     }
   }
