@@ -16,7 +16,7 @@ async function createWorkspace(dto: CreateWorkspaceDto): Promise<Workspace> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? 'Failed to create workspace');
+    throw new Error(err?.error?.message ?? err?.message ?? 'Failed to create workspace');
   }
   return res.json();
 }

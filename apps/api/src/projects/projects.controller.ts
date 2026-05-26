@@ -6,11 +6,10 @@ import {
   Delete,
   Body,
   Param,
-  Query,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CloneService, type CloneDto } from './clone.service';
-import type { AddLocalProjectDto, PatchProjectDto, DeleteProjectMode } from '@pixler/shared-types';
+import type { AddLocalProjectDto, PatchProjectDto } from '@pixler/shared-types';
 
 @Controller('projects')
 export class ProjectsController {
@@ -40,11 +39,8 @@ export class ProjectsController {
   }
 
   @Delete(':id')
-  remove(
-    @Param('id') id: string,
-    @Query('mode') mode: DeleteProjectMode = 'remove',
-  ) {
-    return this.projects.remove(id, mode);
+  remove(@Param('id') id: string) {
+    return this.projects.remove(id);
   }
 
   @Post('clone')

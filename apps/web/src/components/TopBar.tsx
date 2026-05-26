@@ -24,6 +24,7 @@ import { usePaletteStore } from '../stores/palette';
 import { TokenStatusPill } from './TokenStatusPill';
 import { NewProjectDialog } from './NewProjectDialog';
 import { LinearStatusPill } from './LinearStatusPill';
+import { GithubStatusPill } from './GithubStatusPill';
 import { RunButton } from './RunButton';
 import { OpenAppButton } from './OpenAppButton';
 import { OpenInIdeMenu } from './OpenInIdeMenu';
@@ -156,6 +157,7 @@ export function TopBar() {
 
       <TokenStatusPill />
       <LinearStatusPill />
+      <GithubStatusPill />
 
       {workspaceId && (
         <>

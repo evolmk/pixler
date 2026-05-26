@@ -16,6 +16,63 @@ export class SystemService {
     throw new BadRequestException(`Folder picker not supported on platform: ${os}`);
   }
 
+  /**
+   * Opens the host's default terminal app and runs the given command.
+   * Used for interactive flows we can't drive inline — e.g. `gh auth login`.
+   */
+  async openTerminal(command: string): Promise<void> {
+    if (!command || !command.trim()) throw new BadRequestException('command is required');
+    const os = platform();
+    if (os === 'darwin') return this.openTerminalMac(command);
+    if (os === 'win32') return this.openTerminalWin(command);
+    if (os === 'linux') return this.openTerminalLinux(command);
+    throw new BadRequestException(`Terminal open not supported on platform: ${os}`);
+  }
+
+  private openTerminalMac(command: string): Promise<void> {
+    const escaped = command.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const script = `tell application "Terminal"
+  activate
+  do script "${escaped}"
+end tell`;
+    return new Promise((resolve, reject) => {
+      const child = spawn('osascript', ['-e', script], { stdio: 'ignore', detached: true });
+      child.on('error', reject);
+      child.on('spawn', () => { child.unref(); resolve(); });
+    });
+  }
+
+  private openTerminalWin(command: string): Promise<void> {
+    // Prefer Windows Terminal (`wt`); fall back to cmd.exe so the window stays open after exit.
+    const safe = command.replace(/"/g, '\\"');
+    const args = ['/c', 'start', 'wt.exe', '-d', '.', 'cmd.exe', '/k', safe];
+    return new Promise((resolve, reject) => {
+      const child = spawn('cmd.exe', args, { stdio: 'ignore', detached: true });
+      child.on('error', reject);
+      child.on('spawn', () => { child.unref(); resolve(); });
+    });
+  }
+
+  private openTerminalLinux(command: string): Promise<void> {
+    const safe = command.replace(/"/g, '\\"');
+    const candidates: Array<[string, string[]]> = [
+      ['x-terminal-emulator', ['-e', 'bash', '-lc', `${command}; exec bash`]],
+      ['gnome-terminal', ['--', 'bash', '-lc', `${command}; exec bash`]],
+      ['konsole', ['-e', 'bash', '-lc', `${command}; exec bash`]],
+      ['xterm', ['-e', `bash -lc "${safe}; exec bash"`]],
+    ];
+    return new Promise((resolve, reject) => {
+      const tryNext = (i: number) => {
+        if (i >= candidates.length) return reject(new Error('No terminal emulator found'));
+        const [cmd, args] = candidates[i]!;
+        const child = spawn(cmd, args, { stdio: 'ignore', detached: true });
+        child.once('error', () => tryNext(i + 1));
+        child.once('spawn', () => { child.unref(); resolve(); });
+      };
+      tryNext(0);
+    });
+  }
+
   private pickFolderMac(opts: { title?: string; defaultPath?: string }): Promise<string | null> {
     const title = (opts.title ?? 'Choose folder').replace(/"/g, '\\"');
     const defaultClause = opts.defaultPath

@@ -12,6 +12,48 @@ import {
   useRemoveGithubCredential,
 } from '../../hooks/useGithubAuth';
 
+function GhAuthLoginButton() {
+  const [state, setState] = useState<'idle' | 'opening' | 'error'>('idle');
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleClick() {
+    setState('opening');
+    setError(null);
+    try {
+      const res = await fetch('/api/system/open-terminal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: 'gh auth login' }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.message ?? `HTTP ${res.status}`);
+      }
+      setState('idle');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not open terminal');
+      setState('error');
+    }
+  }
+
+  return (
+    <div className="space-y-1">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => void handleClick()}
+        disabled={state === 'opening'}
+        className="gap-1.5"
+      >
+        {state === 'opening' ? <Loader2 className="size-3.5 animate-spin" /> : <Terminal className="size-3.5" />}
+        Run <code className="font-mono text-[11px]">gh auth login</code>
+      </Button>
+      {error && <p className="text-[11px] text-destructive">{error}</p>}
+    </div>
+  );
+}
+
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
@@ -102,7 +144,7 @@ export function GitHubPanel() {
         ) : (
           <div className="space-y-4">
             {/* gh CLI notice */}
-            <div className="rounded-md border border-border bg-muted/30 px-3 py-2 space-y-1">
+            <div className="rounded-md border border-border bg-muted/30 px-3 py-2 space-y-2">
               <div className="flex items-center gap-1.5">
                 <Terminal className="size-3.5 text-muted-foreground" />
                 <span className="text-xs font-medium">GitHub CLI</span>
@@ -112,6 +154,7 @@ export function GitHubPanel() {
                   ? `Detected: gh CLI logged in as ${status.username ?? 'unknown'}.`
                   : 'Run gh auth login in your terminal to use gh CLI authentication.'}
               </p>
+              <GhAuthLoginButton />
             </div>
 
             <div className="flex items-center gap-2">

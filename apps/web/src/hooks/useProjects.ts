@@ -15,7 +15,7 @@ async function addLocal(dto: AddLocalProjectDto): Promise<Project> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? 'Failed to add project');
+    throw new Error(err?.error?.message ?? err?.message ?? 'Failed to add project');
   }
   return res.json();
 }
@@ -28,7 +28,7 @@ async function cloneRepo(dto: { repo: string; name?: string }): Promise<{ projec
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? 'Failed to start clone');
+    throw new Error(err?.error?.message ?? err?.message ?? 'Failed to start clone');
   }
   return res.json();
 }
@@ -43,8 +43,8 @@ async function patchProject(id: string, dto: PatchProjectDto): Promise<Project> 
   return res.json();
 }
 
-async function removeProject(id: string, mode: 'remove' | 'delete'): Promise<void> {
-  const res = await fetch(`/api/projects/${id}?mode=${mode}`, { method: 'DELETE' });
+async function removeProject(id: string): Promise<void> {
+  const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('Failed to remove project');
 }
 
@@ -83,7 +83,7 @@ export function usePatchProject() {
 export function useRemoveProject() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, mode }: { id: string; mode: 'remove' | 'delete' }) => removeProject(id, mode),
+    mutationFn: ({ id }: { id: string }) => removeProject(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
   });
 }

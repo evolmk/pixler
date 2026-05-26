@@ -20,4 +20,3 @@ export interface PatchProjectDto {
   icon_path?: string | null;
 }
 
-export type DeleteProjectMode = 'remove' | 'delete';

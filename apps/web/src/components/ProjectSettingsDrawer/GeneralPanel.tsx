@@ -20,6 +20,7 @@ import { useProject } from '../../hooks/useProject';
 import { usePatchProject, useRemoveProject } from '../../hooks/useProjects';
 import { useLayoutStore } from '../../stores/layout';
 
+
 export function GeneralPanel() {
   const params = useParams({ strict: false }) as { projectId?: string };
   const { data: project, isLoading } = useProject(params.projectId);
@@ -29,7 +30,6 @@ export function GeneralPanel() {
 
   const [name, setName] = useState('');
   const [editing, setEditing] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState('');
 
   if (isLoading || !project) {
     return <p className="text-xs text-muted-foreground">Loading…</p>;
@@ -45,13 +45,7 @@ export function GeneralPanel() {
   };
 
   const handleRemove = async () => {
-    await remove.mutateAsync({ id: project.id, mode: 'remove' });
-    setOpen(false);
-  };
-
-  const handleDelete = async () => {
-    if (deleteConfirm !== 'DELETE') return;
-    await remove.mutateAsync({ id: project.id, mode: 'delete' });
+    await remove.mutateAsync({ id: project.id });
     setOpen(false);
   };
 
@@ -126,46 +120,6 @@ export function GeneralPanel() {
           </AlertDialog>
         </div>
 
-        {/* Delete */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-medium text-destructive">Delete project</p>
-            <p className="text-xs text-muted-foreground">Permanently deletes the repo from disk.</p>
-          </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm" className="gap-1.5 text-xs">
-                <Trash2 className="size-3" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete project and files?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This permanently deletes <strong>{project.name}</strong> and all its files from
-                  disk. Type <code>DELETE</code> to confirm.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <Input
-                value={deleteConfirm}
-                onChange={(e) => setDeleteConfirm(e.target.value)}
-                placeholder="Type DELETE to confirm"
-                className="mt-2"
-              />
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setDeleteConfirm('')}>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  disabled={deleteConfirm !== 'DELETE'}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Delete forever
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
 import { Button } from '@pixler/ui/components/button';
 import { Input } from '@pixler/ui/components/input';
 import { Label } from '@pixler/ui/components/label';
+import { FolderPicker } from './FolderPicker';
 import { CloneProgress } from './CloneProgress';
 import { useAddLocalProject, useCloneProject } from '../hooks/useProjects';
 
@@ -104,14 +105,12 @@ export function NewProjectDialog({ open, onOpenChange, onProjectAdded }: NewProj
         {step === 'local-form' && (
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="local-path">Repository path</Label>
-              <Input
-                id="local-path"
-                placeholder="/Users/you/projects/my-app"
+              <Label>Repository path</Label>
+              <FolderPicker
                 value={localPath}
-                onChange={(e) => setLocalPath(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddLocal()}
-                autoFocus
+                onChange={setLocalPath}
+                placeholder="/Users/you/projects/my-app"
+                title="Choose repository folder"
               />
             </div>
             {error && <p className="text-xs text-destructive">{error}</p>}

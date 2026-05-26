@@ -30,8 +30,17 @@ UI primitives (Button, Input, Dialog, …) live in `@pixler/ui` —
 ## API calls
 
 Backend is same-origin via Vite proxy at `/api/*`. Use relative URLs (`fetch('/api/foo')`).
-Errors: read `res.json()` for the message; the global Nest filter returns
-`{ statusCode, message, ... }`.
+
+**Error envelope:** the global Nest filter (`AllExceptionsFilter`) wraps every
+non-2xx as `{ error: { code: "HTTP_<status>", message: "..." } }`. When surfacing
+errors in a hook, read `err?.error?.message` — **not** top-level `err.message`:
+
+```ts
+if (!res.ok) {
+  const err = await res.json().catch(() => ({}));
+  throw new Error(err?.error?.message ?? 'Fallback');
+}
+```
 
 ## Socket.io
 

@@ -4,13 +4,13 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { execSync } from 'child_process';
-import { existsSync, rmSync, readdirSync } from 'fs';
+import { existsSync, readdirSync } from 'fs';
 import { join, basename } from 'path';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../db/database.service';
 import { EventsService } from '../events/events.service';
 import { PixlerJsonService } from './pixler-json.service';
-import type { Project, AddLocalProjectDto, PatchProjectDto, DeleteProjectMode } from '@pixler/shared-types';
+import type { Project, AddLocalProjectDto, PatchProjectDto } from '@pixler/shared-types';
 
 type DbProject = Omit<Project, 'cloned_by_pixler'> & { cloned_by_pixler: 0 | 1 };
 
@@ -104,15 +104,8 @@ export class ProjectsService {
     return this.findOne(id);
   }
 
-  remove(id: string, mode: DeleteProjectMode): { ok: boolean } {
-    const project = this.findOne(id);
-
-    if (mode === 'delete') {
-      if (!existsSync(project.path)) {
-        throw new BadRequestException(`Project path does not exist on disk`);
-      }
-      rmSync(project.path, { recursive: true, force: true });
-    }
+  remove(id: string): { ok: boolean } {
+    this.findOne(id);
 
     this.db.connection.prepare('DELETE FROM projects WHERE id = ?').run(id);
     this.db.connection

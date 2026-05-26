@@ -123,8 +123,8 @@ apps/web/src/hooks/useGithubStatus.ts
 - [x] `ProjectSettingsDrawer/GitPanel.tsx` — branch template, base branch, auto-merge toggle, merge strategy.
 - [x] Extend `ProjectSettingsDrawer/IntegrationsPanel.tsx` with GitHub section + re-auth hint.
 - [x] `PrStatusBadge.tsx` + `hooks/usePullRequest.ts` + `useChecks.ts` + `useGithubStatus.ts`.
-- [ ] Top-bar notification + Settings → Providers re-auth button that opens terminal pane running `gh auth login`. _(deferred: requires terminal integration not yet wired in the top bar)_
-- [ ] Pre-flight check before PR creation: modal with re-auth helper if not authed. _(deferred: PR creation UI is M16 scope)_
+- [x] Top-bar notification + Settings → GitHub re-auth button that opens host terminal running `gh auth login`. _(2026-05-26: shipped via `GithubStatusPill` + `POST /api/system/open-terminal` + `GhAuthLoginButton` in `GitHubPanel`. Amber pill in TopBar when not authed; click opens Settings → GitHub.)_
+- [ ] Pre-flight check before PR creation: modal with re-auth helper if not authed. _(deferred: no Create PR UI exists yet — `useCreatePr` hook is unused. Re-defer to whichever milestone first ships a PR-creation entry point. The orchestrator's "Open PR" workflow step also currently has no auth gating.)_
 
 **Files Created/Modified:**
 
