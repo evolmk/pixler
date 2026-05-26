@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { createMachine, step } from '@pixler/orchestrator';
 import { WorkflowRunner } from '@pixler/orchestrator/server';
 import type { MachineContext, SideEffect, WorkflowStep, WorkflowContext, StepEvent } from '@pixler/orchestrator';
@@ -11,14 +11,16 @@ import { LinearBridgeService } from './linear-bridge.service';
 import { LinearService } from '../linear/linear.service';
 import { TriggersService } from '../checkpoints/triggers.service';
 import { WorkflowsService } from '../workflows/workflows.service';
+import { WorkflowRunsService } from '../workflows/workflow-runs.service';
 
 const AUTO_APPROVE_DELAY_MS = 800;
 
 @Injectable()
-export class OrchestratorService {
+export class OrchestratorService implements OnModuleInit {
   private readonly logger = new Logger(OrchestratorService.name);
   private machines = new Map<string, MachineContext>();
   private workflowRunners = new Map<string, WorkflowRunner>();
+  private workflowRunIds = new Map<string, string>(); // workspaceId → runId
 
   constructor(
     private readonly workspaces: WorkspacesService,
@@ -30,7 +32,46 @@ export class OrchestratorService {
     private readonly linear: LinearService,
     private readonly triggers: TriggersService,
     private readonly workflowsService: WorkflowsService,
+    private readonly workflowRuns: WorkflowRunsService,
   ) {}
+
+  onModuleInit(): void {
+    this.rehydratePausedRuns();
+  }
+
+  private rehydratePausedRuns(): void {
+    try {
+      const paused = this.workflowRuns.findAllPaused();
+      for (const run of paused) {
+        const loader = this.workflowsService.getLoader();
+        const workflowDef = loader.loadByName(run.workflowName);
+        if (!workflowDef) continue;
+
+        const context = run.context as unknown as WorkflowContext;
+        const wfRunner = new WorkflowRunner(
+          workflowDef,
+          context,
+          (event: StepEvent) => this.emitStepEvent(run.workspaceId, event, run.id),
+          (wfStep: WorkflowStep, ctx: WorkflowContext) =>
+            this.executeWorkflowStep(run.workspaceId, wfStep, ctx),
+          { steps: workflowDef.steps.map((s, i) => ({
+              id: s.id,
+              label: s.label ?? s.id,
+              type: s.type,
+              status: i < run.currentStepIndex ? 'completed' : 'pending' as const,
+            })),
+            currentStepIndex: run.currentStepIndex,
+            context,
+          },
+        );
+        this.workflowRunners.set(run.workspaceId, wfRunner);
+        this.workflowRunIds.set(run.workspaceId, run.id);
+        this.logger.log(`[Workflow] Rehydrated paused run ${run.id} for workspace ${run.workspaceId}`);
+      }
+    } catch (err) {
+      this.logger.warn(`[Workflow] Boot rehydration failed: ${String(err)}`);
+    }
+  }
 
   getState(workspaceId: string): MachineContext | null {
     return this.machines.get(workspaceId) ?? null;
@@ -85,6 +126,36 @@ export class OrchestratorService {
     }
   }
 
+  private emitStepEvent(workspaceId: string, event: StepEvent, runId?: string): void {
+    this.events.emitWorkspaceEvent(workspaceId, {
+      type: 'workflow.step',
+      stepEventType: event.type,
+      stepId: event.stepId,
+      label: event.label,
+      payload: event.payload,
+      error: event.error,
+      workspaceId,
+      timestamp: Date.now(),
+    });
+
+    if (runId) {
+      const runner = this.workflowRunners.get(workspaceId);
+      if (runner) {
+        const state = runner.state;
+        const status = state.status === 'running' ? 'running' : state.status;
+        this.workflowRuns.updateStatus(runId, status, state.steps.findIndex((s) => s.id === event.stepId));
+        this.events.emitWorkspaceEvent(workspaceId, {
+          type: 'workflow.run-updated',
+          workspaceId,
+          runId,
+          status,
+          currentStepIndex: state.steps.findIndex((s) => s.id === event.stepId),
+          timestamp: Date.now(),
+        });
+      }
+    }
+  }
+
   private async runWorkflow(workspaceId: string, workflowDto: { name: string }, ticketId: string): Promise<void> {
     const ws = this.workspaces.findOne(workspaceId);
     const loader = this.workflowsService.getLoader();
@@ -111,30 +182,24 @@ export class OrchestratorService {
       steps: {},
     };
 
+    const runRecord = this.workflowRuns.create(workspaceId, workflowDto.name, context);
+
     const workflowRunner = new WorkflowRunner(
       workflowDef,
       context,
-      (event: StepEvent) => {
-        this.events.emitWorkspaceEvent(workspaceId, {
-          type: 'workflow.step',
-          stepEventType: event.type,
-          stepId: event.stepId,
-          label: event.label,
-          payload: event.payload,
-          error: event.error,
-          workspaceId,
-          timestamp: Date.now(),
-        });
-      },
+      (event: StepEvent) => this.emitStepEvent(workspaceId, event, runRecord.id),
       (wfStep: WorkflowStep, ctx: WorkflowContext) => this.executeWorkflowStep(workspaceId, wfStep, ctx),
     );
 
     this.workflowRunners.set(workspaceId, workflowRunner);
+    this.workflowRunIds.set(workspaceId, runRecord.id);
 
     try {
       void this.linearBridge.onWorkspaceStart(ticketId, ws.project_id);
       const finalState = await workflowRunner.run();
       this.workflowRunners.delete(workspaceId);
+      this.workflowRunIds.delete(workspaceId);
+      this.workflowRuns.updateStatus(runRecord.id, finalState.status);
 
       if (finalState.status === 'completed') {
         void this.linearBridge.onPrMerged(ticketId, ws.project_id);
@@ -154,6 +219,9 @@ export class OrchestratorService {
       }
     } catch (err) {
       this.workflowRunners.delete(workspaceId);
+      const runId = this.workflowRunIds.get(workspaceId);
+      this.workflowRunIds.delete(workspaceId);
+      if (runId) this.workflowRuns.updateStatus(runId, 'failed');
       this.events.emitWorkspaceEvent(workspaceId, {
         type: 'agent.error',
         workspaceId,
@@ -161,6 +229,10 @@ export class OrchestratorService {
         timestamp: Date.now(),
       });
     }
+  }
+
+  getWorkflowRunId(workspaceId: string): string | undefined {
+    return this.workflowRunIds.get(workspaceId);
   }
 
   private async executeWorkflowStep(

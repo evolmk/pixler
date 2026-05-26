@@ -1,4 +1,4 @@
-export type { AppEvent, WorkspaceEvent, SettingsEvent } from './events';
+export type { AppEvent, WorkspaceEvent, SettingsEvent, WorkflowEvent } from './events';
 export type { ApiError, Paginated, HealthResponse } from './dtos';
 export type { SettingScope, SettingDefinition } from './settings';
 export { settingsRegistry } from './settings';
@@ -21,4 +21,4 @@ export type { ActivityScope, ActivitySeverity, ActivityKind, Activity, RecordAct
 export type { CheckpointTrigger, Checkpoint, TakeCheckpointDto } from './checkpoints';
 export type { AuthMethod, AuthService, OAuthInitDto, ConnectGithubPATDto, DisconnectAuthDto } from './auth';
 export type { ModelVersion, ModelFamily, ProviderModels, ModelRegistryDto } from './models';
-export type { WorkflowStepDto, WorkflowDefDto, WorkflowStepStatusDto, WorkflowStatusDto, SaveWorkflowDto } from './workflows';
+export type { WorkflowStepDto, WorkflowDefDto, WorkflowStepStatusDto, WorkflowStatusDto, SaveWorkflowDto, WorkflowRunDto, WorkflowStepAttemptDto, RetryStepDto, AddContextDto } from './workflows';

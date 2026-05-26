@@ -24,3 +24,9 @@ export type WorkspaceEvent =
   | { type: 'activity.appended'; workspaceId: string; activityId: string; kind: string; severity: string; timestamp: number };
 
 export type SettingsEvent = { type: 'settings.changed'; key: string; scope: string; timestamp: number };
+
+export type WorkflowEvent =
+  | { type: 'workflow.step'; workspaceId: string; stepEventType: string; stepId: string; label?: string; payload?: unknown; error?: string; timestamp: number }
+  | { type: 'workflow.step-prompt'; workspaceId: string; stepId: string; stepLabel: string; prompt: string; timestamp: number }
+  | { type: 'workflow.step-advanced'; workspaceId: string; stepId: string; status: string; timestamp: number }
+  | { type: 'workflow.run-updated'; workspaceId: string; runId: string; status: string; currentStepIndex: number; timestamp: number };

@@ -11,7 +11,7 @@ export type StepType =
 
 export type OnError = 'fail' | 'skip' | 'retry';
 export type OnFindings = 'prompt_user' | 'auto_fix' | 'skip';
-export type StepStatus = 'pending' | 'running' | 'completed' | 'skipped' | 'failed' | 'awaiting_approval';
+export type StepStatus = 'pending' | 'running' | 'completed' | 'skipped' | 'failed' | 'awaiting_approval' | 'awaiting_run';
 
 export interface RetryConfig {
   max_attempts: number;

@@ -9,28 +9,45 @@ import type {
   StepExecutor,
 } from './workflow-types.js';
 
+export interface WorkflowRehydrateOptions {
+  steps: StepState[];
+  currentStepIndex: number;
+  context: WorkflowContext;
+}
+
 export class WorkflowRunner {
   private readonly steps: StepState[];
   private status: WorkflowRunState['status'] = 'running';
   private currentStepIndex = 0;
   private approvalResolve: ((approved: boolean) => void) | null = null;
+  private stepDoneResolve: ((outcome: 'done' | 'rejected' | 'cancelled') => void) | null = null;
 
   constructor(
     private readonly workflow: WorkflowDef,
     private readonly context: WorkflowContext,
     private readonly onEvent: (event: StepEvent) => void,
     private readonly executor: StepExecutor,
+    rehydrate?: WorkflowRehydrateOptions,
   ) {
-    this.steps = workflow.steps.map((s) => ({
-      id: s.id,
-      label: s.label ?? s.id,
-      type: s.type,
-      status: 'pending' as StepStatus,
-    }));
+    if (rehydrate) {
+      this.steps = rehydrate.steps;
+      this.currentStepIndex = rehydrate.currentStepIndex;
+      // Merge persisted context over constructor context
+      Object.assign(this.context, rehydrate.context);
+    } else {
+      this.steps = workflow.steps.map((s) => ({
+        id: s.id,
+        label: s.label ?? s.id,
+        type: s.type,
+        status: 'pending' as StepStatus,
+      }));
+    }
   }
 
   get state(): WorkflowRunState {
-    const current = this.steps.find((s) => s.status === 'running' || s.status === 'awaiting_approval');
+    const current = this.steps.find(
+      (s) => s.status === 'running' || s.status === 'awaiting_approval' || s.status === 'awaiting_run',
+    );
     return {
       workflowName: this.workflow.name,
       currentStepId: current?.id ?? null,
@@ -39,14 +56,40 @@ export class WorkflowRunner {
     };
   }
 
+  /**
+   * Reset the step at `index` and all subsequent steps back to `pending`,
+   * clearing their context. Used before retrying a step.
+   */
+  resetFrom(index: number): void {
+    for (let i = index; i < this.steps.length; i++) {
+      const state = this.steps[i];
+      if (!state) continue;
+      state.status = 'pending';
+      state.startedAt = undefined;
+      state.completedAt = undefined;
+      state.error = undefined;
+      const step = this.workflow.steps[i];
+      if (step) delete this.context.steps[step.id];
+    }
+    this.currentStepIndex = index;
+    this.status = 'running';
+  }
+
   async run(): Promise<WorkflowRunState> {
-    for (let i = 0; i < this.workflow.steps.length; i++) {
-      if (this.status === 'cancelled') break;
+    return this.runFrom(this.currentStepIndex);
+  }
+
+  async runFrom(startIndex: number): Promise<WorkflowRunState> {
+    for (let i = startIndex; i < this.workflow.steps.length; i++) {
+      if (this.status === 'cancelled' || this.status === 'paused') break;
 
       const step = this.workflow.steps[i];
       const state = this.steps[i];
       if (!step || !state) continue;
       this.currentStepIndex = i;
+
+      // Skip already-completed steps (rehydration resume)
+      if (state.status === 'completed' || state.status === 'skipped') continue;
 
       // Evaluate skip_if
       if (step.skip_if && this.evalSkipIf(step.skip_if)) {
@@ -126,6 +169,26 @@ export class WorkflowRunner {
     return this.state;
   }
 
+  /**
+   * Called by the executor for AI steps: blocks until resolveStep() is called.
+   * The step sets its own status to 'awaiting_run' before calling this.
+   */
+  waitForStepDone(): Promise<'done' | 'rejected' | 'cancelled'> {
+    return new Promise<'done' | 'rejected' | 'cancelled'>((res) => {
+      this.stepDoneResolve = res;
+    });
+  }
+
+  /**
+   * Called externally (endpoint) when the user marks a step done, rejected, or stops it.
+   */
+  resolveStep(outcome: 'done' | 'rejected' | 'cancelled'): void {
+    if (this.stepDoneResolve) {
+      this.stepDoneResolve(outcome);
+      this.stepDoneResolve = null;
+    }
+  }
+
   /** Called when user approves/rejects an approval step. */
   resolve(approved: boolean): void {
     if (this.approvalResolve) {
@@ -134,8 +197,15 @@ export class WorkflowRunner {
     }
   }
 
+  pause(): void {
+    this.status = 'paused';
+    this.resolveStep('cancelled');
+    this.resolve(false);
+  }
+
   cancel(): void {
     this.status = 'cancelled';
+    this.resolveStep('cancelled');
     this.resolve(false);
   }
 
@@ -147,7 +217,6 @@ export class WorkflowRunner {
 
   private evalSkipIf(expr: string): boolean {
     try {
-      // Support simple property access: $issue.field, $workflow.field
       const normalized = expr.trim();
       if (normalized.startsWith('$issue.')) {
         const field = normalized.slice('$issue.'.length);
