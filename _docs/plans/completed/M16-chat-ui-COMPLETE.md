@@ -64,12 +64,12 @@ and emitted.
 
 **Tasks:**
 
-- [ ] `0007_messages.sql` migration.
-- [ ] `MessagesModule` + `MessagesService` + `MessagesController`.
-- [ ] `GET /api/workspaces/:id/messages?cursor=&limit=`,
+- [x] `0007_messages.sql` migration.
+- [x] `MessagesModule` + `MessagesService` + `MessagesController`.
+- [x] `GET /api/workspaces/:id/messages?cursor=&limit=`,
   `POST /api/workspaces/:id/messages` (sends as stdin to agent PTY),
   `DELETE /api/workspaces/:id/messages` (with confirmation).
-- [ ] `pty-bridge.service.ts` — streaming parser handles ANSI stripping, fences, attachments;
+- [x] `pty-bridge.service.ts` — streaming parser handles ANSI stripping, fences, attachments;
   each chunk persisted + emitted as `message.appended` / `message.streaming`.
 
 **Files Created/Modified:**
@@ -91,11 +91,11 @@ and emitted.
 
 **Tasks:**
 
-- [ ] Add `@assistant-ui/react` + `shiki` to `apps/web/package.json`.
-- [ ] `ChatPane.tsx` — built on Thread / Message / ActionBar primitives; streaming auto-scroll;
+- [x] Add `@assistant-ui/react` + `shiki` to `apps/web/package.json`.
+- [x] `ChatPane.tsx` — built on Thread / Message / ActionBar primitives; streaming auto-scroll;
   markdown rendering; unread badge + jump-to-next-unread.
-- [ ] `lib/shiki.ts` — theme synced with active Pixler theme.
-- [ ] `hooks/useMessages.ts`.
+- [x] `lib/shiki.ts` — theme synced with active Pixler theme.
+- [x] `hooks/useMessages.ts`.
 
 **Files Created/Modified:**
 
@@ -117,17 +117,17 @@ commands, thinking/plan-mode toggles, Stop button, image preview.
 
 **Tasks:**
 
-- [ ] `Composer.tsx` with all controls wired.
-- [ ] `FileMentionPicker.tsx` — typeahead from `git ls-files`.
-- [ ] `SlashCommandPicker.tsx` — `/plan`, `/review`, `/test`, `/commit`, `/rebase`,
+- [x] `Composer.tsx` with all controls wired.
+- [x] `FileMentionPicker.tsx` — typeahead from `git ls-files`.
+- [x] `SlashCommandPicker.tsx` — `/plan`, `/review`, `/test`, `/commit`, `/rebase`,
   `/resolve-conflicts`; each maps to an orchestrator action or agent command.
-- [ ] `AttachmentPicker.tsx` — screenshots/logs/PDFs/.md to per-workspace `attachments/` dir.
-- [ ] Thinking-mode + plan-mode toggles drive `--thinking` / `--permission-mode plan` flags.
-- [ ] Stop button calls `POST /api/workspaces/:id/interrupt`.
-- [ ] Right-pane mode switch: Terminal ↔ Chat does NOT respawn agent (same PTY, different UI).
-- [ ] Approve / Reject buttons from M13 sit above composer when relevant.
-- [ ] Image attachments → click opens fullscreen image file tab.
-- [ ] Per-workspace message search.
+- [x] `AttachmentPicker.tsx` — screenshots/logs/PDFs/.md to per-workspace `attachments/` dir.
+- [x] Thinking-mode + plan-mode toggles drive `--thinking` / `--permission-mode plan` flags.
+- [x] Stop button calls `POST /api/workspaces/:id/interrupt`.
+- [x] Right-pane mode switch: Terminal ↔ Chat does NOT respawn agent (same PTY, different UI).
+- [x] Approve / Reject buttons from M13 sit above composer when relevant.
+- [x] Image attachments → click opens fullscreen image file tab.
+- [x] Per-workspace message search.
 
 **Files Created/Modified:**
 

@@ -138,25 +138,25 @@ advancement is manual for AI steps and automatic for bash.
 
 **Tasks:**
 
-- [ ] Refactor `OrchestratorService.executeWorkflowStep`: for AI steps
+- [x] Refactor `OrchestratorService.executeWorkflowStep`: for AI steps
       (planning/reviewing/executing/validating/`prompt`), build the prompt, emit a
       `workflow.step-prompt` event `{ stepId, prompt }`, set status `awaiting_run`, and **await the
       runner's `waitForStepDone()`** — do **not** call `AgentRunnerService.run`. Bash steps auto-run.
-- [ ] **Reviewing-step verdict:** with no stdout to parse (was agent-runner.service.ts:111-121),
+- [x] **Reviewing-step verdict:** with no stdout to parse (was agent-runner.service.ts:111-121),
       the human records the verdict — *Mark done* = approved; reuse the existing approve/reject
       controls (`OrchestratorService.approve/reject` already call `wfRunner.resolve`). Map
       reject→`resolveStep('rejected')` so the runner's review loop still works.
-- [ ] Terminal wiring: `POST /orchestrator/:workspaceId/step/:stepId/send-to-terminal` resolves the
+- [x] Terminal wiring: `POST /orchestrator/:workspaceId/step/:stepId/send-to-terminal` resolves the
       workspace's terminal via `TerminalsService.getForWorkspace`/`findOrCreate` and `write()`s the
       prompt. Pick a single target terminal (primary); if no interactive Claude session is active,
       return a flag so the UI can offer "Open terminal + start Claude" instead of blindly writing
       (raw `write()` to a shell prompt would execute the text as a command).
-- [ ] `POST /orchestrator/:workspaceId/step/done` → `resolveStep('done')`, persist + emit
+- [x] `POST /orchestrator/:workspaceId/step/done` → `resolveStep('done')`, persist + emit
       `workflow.step-advanced`; bash steps advance on PTY exit.
-- [ ] **Formalize events in `shared-types/events.ts`**: the existing `workflow.step` event is only
+- [x] **Formalize events in `shared-types/events.ts`**: the existing `workflow.step` event is only
       typed as a local interface in `useWorkflowState.ts` and is absent from the shared union — add
       it plus `workflow.step-prompt` and `workflow.step-advanced`.
-- [ ] Keep new endpoints under `orchestrator/:workspaceId/…` to match existing controller params.
+- [x] Keep new endpoints under `orchestrator/:workspaceId/…` to match existing controller params.
 
 **Files Created/Modified:**
 
@@ -181,21 +181,21 @@ appended text context, and optionally restore the pre-step checkpoint.
 
 **Tasks:**
 
-- [ ] **Per-step checkpoints:** today only the executing phase snapshots (`triggers.onBeforeExecution`,
+- [x] **Per-step checkpoints:** today only the executing phase snapshots (`triggers.onBeforeExecution`,
       trigger `before_execution`) and the `checkpoints` table has no step/run link. Take a snapshot
       before each **file-writing** AI step and record its id in `workflow_step_attempts.checkpoint_id`
       so retry can find the right pre-step state.
-- [ ] `POST /orchestrator/:workspaceId/stop-step`: interrupt the step's terminal agent
+- [x] `POST /orchestrator/:workspaceId/stop-step`: interrupt the step's terminal agent
       (`TerminalsService` Ctrl-C / `AgentRunnerService.interrupt`) but keep the run record
       **paused/resumable** — do not delete the runner/run; set status `paused`.
-- [ ] `POST /orchestrator/:workspaceId/retry-step` (body `RetryStepDto`: `stepId`, `addedContext?`,
+- [x] `POST /orchestrator/:workspaceId/retry-step` (body `RetryStepDto`: `stepId`, `addedContext?`,
       `restoreCheckpoint?`): `resetFrom(stepIndex)`, append a new attempt row with `addedContext`,
       re-emit the prompt with the context appended, resume forward.
-- [ ] Checkpoint restore: when `restoreCheckpoint` is true, call
+- [x] Checkpoint restore: when `restoreCheckpoint` is true, call
       `CheckpointsService.rollback(checkpoint_id)` for the step's recorded checkpoint **before**
       re-presenting. Use `git stash apply` (already the fallback at checkpoints.service.ts:111)
       rather than `pop`, so repeat retries of the same step still have a checkpoint to restore.
-- [ ] Persist added context per attempt; surface attempts in the run record.
+- [x] Persist added context per attempt; surface attempts in the run record.
 
 **Files Created/Modified:**
 
@@ -219,16 +219,16 @@ send-to-terminal, mark-done, stop, and retry-with-context.
 
 **Tasks:**
 
-- [ ] **Extend `useWorkflowState`** (do not rebuild): add `paused`/`awaiting_run` to its status
+- [x] **Extend `useWorkflowState`** (do not rebuild): add `paused`/`awaiting_run` to its status
       union + `STEP_EVENT_STATUS` map, and handle the new `workflow.step-prompt`/`step-advanced`
       events. Add mutation helpers (send-to-terminal, mark-done, stop, retry) hitting the new
       endpoints.
-- [ ] `WorkflowRunPanel` — ordered step list with status badges; current/failed step expanded;
+- [x] `WorkflowRunPanel` — ordered step list with status badges; current/failed step expanded;
       shows per-step attempt history (added context per attempt) from the run record.
-- [ ] `StepPromptAccordion` — 3-line prompt preview, expand toggle, copy icon, "Send to terminal"
+- [x] `StepPromptAccordion` — 3-line prompt preview, expand toggle, copy icon, "Send to terminal"
       button; when no active Claude session, show "Open terminal + start Claude" instead.
-- [ ] "Mark step done" on AI steps; auto-advance reflected for bash steps.
-- [ ] `RetryStepDialog` (pattern: existing `RollbackConfirmModal` from M15) — add-context textarea
+- [x] "Mark step done" on AI steps; auto-advance reflected for bash steps.
+- [x] `RetryStepDialog` (pattern: existing `RollbackConfirmModal` from M15) — add-context textarea
       + checkpoint choice with "Restore pre-step checkpoint (recommended)" default-selected, showing
       the checkpoint's label/time; per-step Retry + Stop controls.
 
