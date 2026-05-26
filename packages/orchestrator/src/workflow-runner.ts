@@ -147,6 +147,14 @@ export class WorkflowRunner {
       }
 
       if (lastError) {
+        // If we were paused externally, reset step to pending and exit cleanly.
+        if ((this.status as string) === 'paused') {
+          state.status = 'pending';
+          state.startedAt = undefined;
+          delete this.context.steps[step.id];
+          break;
+        }
+
         const onError = step.on_error ?? 'fail';
         if (onError === 'skip') {
           state.status = 'skipped';

@@ -104,14 +104,11 @@ export class CheckpointsService {
       try {
         execSync(`git checkout -- .`, { cwd: repoPath, stdio: 'pipe' });
         execSync(`git clean -fd`, { cwd: repoPath, stdio: 'pipe' });
-        execSync(`git stash pop ${cp.stashRef}`, { cwd: repoPath, stdio: 'pipe' });
+        // Use apply (not pop) so the stash persists for repeat retries of the same step.
+        execSync(`git stash apply ${cp.stashRef}`, { cwd: repoPath, stdio: 'pipe' });
       } catch (e) {
-        this.logger.warn(`[${cp.workspaceId}] stash pop failed: ${e}`);
-        try {
-          execSync(`git stash apply ${cp.stashRef}`, { cwd: repoPath, stdio: 'pipe' });
-        } catch {
-          throw new Error(`Failed to restore checkpoint ${checkpointId}`);
-        }
+        this.logger.warn(`[${cp.workspaceId}] stash apply failed: ${e}`);
+        throw new Error(`Failed to restore checkpoint ${checkpointId}`);
       }
     }
 

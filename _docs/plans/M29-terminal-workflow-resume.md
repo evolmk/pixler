@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS   <!-- ⏳ IN_PROGRESS | ✅ COMPLETE -->
 **Modified:** 2026-05-25
-**Current Status:** Sprint 2 complete — terminal-driven AI steps (emit prompt + await resolveStep), bash auto-run, send-to-terminal, mark-done, pause, step endpoints.
+**Current Status:** Sprint 3 complete — per-step checkpoints (stash apply), pauseStep, retryStep (resetFrom + checkpoint restore + append attempt), all typecheck clean.
 
 ---
 
@@ -175,7 +175,7 @@ advancement is manual for AI steps and automatic for bash.
 
 ## Sprint 3 — Stop, retry-any-step, add-context, checkpoint restore
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** The user can stop a running step (run stays resumable), retry any step with optional
 appended text context, and optionally restore the pre-step checkpoint.
 
@@ -199,13 +199,15 @@ appended text context, and optionally restore the pre-step checkpoint.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/checkpoints/checkpoints.service.ts` (stash pop → stash apply for idempotent retries)
+- `packages/orchestrator/src/workflow-runner.ts` (pause handling: reset step to pending when paused externally)
+- `apps/api/src/orchestrator/orchestrator.service.ts` (CheckpointsService injected; per-step checkpoint + attempt in runAiStepTerminalDriven; retryStep implemented; runWorkflow handles paused status)
 
 **Issues Encountered:**
 
-- _none yet_
+- TypeScript narrowed `this.status` inside runFrom loop; fixed with `(this.status as string) === 'paused'`
 
-**Verify:** `pnpm --filter @pixler/api typecheck && pnpm --filter @pixler/api test` — retry writes a new attempt row with the added context appended; restore invokes `rollback` against the step's recorded checkpoint; a second retry still finds the checkpoint (apply, not pop).
+**Verify:** `pnpm --filter @pixler/orchestrator build && pnpm --filter @pixler/api typecheck` — clean.
 
 ---
 

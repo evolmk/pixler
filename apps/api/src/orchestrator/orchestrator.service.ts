@@ -12,6 +12,7 @@ import { PromptTemplatesService } from './prompt-templates.service';
 import { LinearBridgeService } from './linear-bridge.service';
 import { LinearService } from '../linear/linear.service';
 import { TriggersService } from '../checkpoints/triggers.service';
+import { CheckpointsService } from '../checkpoints/checkpoints.service';
 import { WorkflowsService } from '../workflows/workflows.service';
 import { WorkflowRunsService } from '../workflows/workflow-runs.service';
 import { TerminalsService } from '../terminals/terminals.service';
@@ -37,6 +38,7 @@ export class OrchestratorService implements OnModuleInit {
     private readonly linearBridge: LinearBridgeService,
     private readonly linear: LinearService,
     private readonly triggers: TriggersService,
+    private readonly checkpoints: CheckpointsService,
     private readonly workflowsService: WorkflowsService,
     private readonly workflowRuns: WorkflowRunsService,
     private readonly terminals: TerminalsService,
@@ -204,9 +206,16 @@ export class OrchestratorService implements OnModuleInit {
     try {
       void this.linearBridge.onWorkspaceStart(ticketId, ws.project_id);
       const finalState = await workflowRunner.run();
+      this.workflowRuns.updateStatus(runRecord.id, finalState.status, workflowRunner.state.steps.findIndex((s) => s.status === 'pending' || s.status === 'awaiting_run'));
+
+      if (finalState.status === 'paused') {
+        // Keep runner + runId in memory so retryStep can resume
+        this.logger.log(`[Workflow] Run ${runRecord.id} paused at step ${workflowRunner.state.currentStepId}`);
+        return;
+      }
+
       this.workflowRunners.delete(workspaceId);
       this.workflowRunIds.delete(workspaceId);
-      this.workflowRuns.updateStatus(runRecord.id, finalState.status);
 
       if (finalState.status === 'completed') {
         void this.linearBridge.onPrMerged(ticketId, ws.project_id);
@@ -321,6 +330,26 @@ export class OrchestratorService implements OnModuleInit {
         to: phase,
         timestamp: Date.now(),
       });
+    }
+
+    // Take a per-step checkpoint before file-writing steps and record in attempt
+    let checkpointId: string | undefined;
+    if (phase === 'executing') {
+      try {
+        const cp = await this.checkpoints.takeSnapshot(workspaceId, {
+          trigger: 'before_execution',
+          label: `Before step: ${label}`,
+        });
+        checkpointId = cp.id;
+      } catch {
+        // non-fatal
+      }
+    }
+
+    // Record attempt in DB
+    const runId = this.workflowRunIds.get(workspaceId);
+    if (runId) {
+      this.workflowRuns.appendAttempt(runId, step.id, undefined, checkpointId);
     }
 
     // Store prompt so send-to-terminal can retrieve it
@@ -441,10 +470,86 @@ export class OrchestratorService implements OnModuleInit {
     }
   }
 
-  /** Retry a step — implemented in Sprint 3. Stub here to satisfy controller. */
-  async retryStep(_workspaceId: string, _dto: import('@pixler/shared-types').RetryStepDto): Promise<void> {
-    // Sprint 3 implementation
-    throw new Error('retryStep not yet implemented — see Sprint 3');
+  /** Retry any step: reset from that step, optionally restore checkpoint, resume. */
+  async retryStep(workspaceId: string, dto: import('@pixler/shared-types').RetryStepDto): Promise<void> {
+    const runId = this.workflowRunIds.get(workspaceId);
+    let wfRunner = this.workflowRunners.get(workspaceId);
+
+    if (!runId || !wfRunner) {
+      // Try to rehydrate from DB if runner was removed
+      const pausedRuns = this.workflowRuns.findPausedByWorkspace(workspaceId);
+      const run = pausedRuns[0];
+      if (!run) throw new Error('No paused run to retry');
+
+      const loader = this.workflowsService.getLoader();
+      const workflowDef = loader.loadByName(run.workflowName);
+      if (!workflowDef) throw new Error('Workflow definition not found');
+
+      const context = run.context as unknown as WorkflowContext;
+      wfRunner = new WorkflowRunner(
+        workflowDef,
+        context,
+        (event: StepEvent) => this.emitStepEvent(workspaceId, event, run.id),
+        (step: WorkflowStep, ctx: WorkflowContext) => this.executeWorkflowStep(workspaceId, step, ctx),
+        {
+          steps: workflowDef.steps.map((s, i) => ({
+            id: s.id,
+            label: s.label ?? s.id,
+            type: s.type,
+            status: i < run.currentStepIndex ? 'completed' : 'pending' as const,
+          })),
+          currentStepIndex: run.currentStepIndex,
+          context,
+        },
+      );
+      this.workflowRunners.set(workspaceId, wfRunner);
+      this.workflowRunIds.set(workspaceId, run.id);
+    }
+
+    // Find step index
+    const stepIndex = wfRunner.state.steps.findIndex((s) => s.id === dto.stepId);
+    if (stepIndex === -1) throw new Error(`Step '${dto.stepId}' not found`);
+
+    // Restore checkpoint if requested
+    if (dto.restoreCheckpoint) {
+      const lastAttempt = this.workflowRuns.findLastAttemptForStep(runId ?? '', dto.stepId);
+      if (lastAttempt?.checkpointId) {
+        await this.checkpoints.rollback(lastAttempt.checkpointId);
+      }
+    }
+
+    // Append a new attempt with the added context
+    const activeRunId = this.workflowRunIds.get(workspaceId);
+    if (activeRunId) {
+      this.workflowRuns.appendAttempt(activeRunId, dto.stepId, dto.addedContext);
+    }
+
+    // Reset runner from this step and resume
+    wfRunner.resetFrom(stepIndex);
+    this.workflowRuns.updateStatus(activeRunId ?? '', 'running', stepIndex);
+
+    // Run from the step index in the background (mirrors runWorkflow pattern)
+    void (async () => {
+      try {
+        const finalState = await wfRunner!.runFrom(stepIndex);
+        this.workflowRuns.updateStatus(activeRunId ?? '', finalState.status);
+
+        if (finalState.status === 'paused') return; // keep runner for further retries
+
+        this.workflowRunners.delete(workspaceId);
+        this.workflowRunIds.delete(workspaceId);
+
+        if (finalState.status === 'completed') {
+          this.events.emitWorkspaceEvent(workspaceId, { type: 'agent.done', workspaceId, prUrl: undefined, timestamp: Date.now() });
+        } else {
+          this.events.emitWorkspaceEvent(workspaceId, { type: 'agent.error', workspaceId, error: `Workflow ${finalState.status}`, timestamp: Date.now() });
+        }
+      } catch (err) {
+        this.workflowRunners.delete(workspaceId);
+        this.workflowRunIds.delete(workspaceId);
+        this.events.emitWorkspaceEvent(workspaceId, { type: 'agent.error', workspaceId, error: String(err), timestamp: Date.now() });
+      }
+    })();
   }
 
   /** Pause the current workflow step — keeps run record, allows resume. */
