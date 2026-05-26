@@ -14,5 +14,7 @@ dist/
 # Kept here as a reminder; actual path is outside the repo
 logs/
 
-# Playwright MCP output (screenshots, snapshots, console logs)
+# Playwright MCP output (screenshots, snapshots, console logs, generated tests)
+.temp/
 .test/
+/tmp/

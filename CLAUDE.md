@@ -61,6 +61,14 @@ Install the **latest stable/LTS**. Never alpha/beta/RC/canary/`@next` without
 explicit approval. **Never `@latest` in a committed config** (`.mcp.json`,
 `package.json`, etc.) — always pin to a real version.
 
+## Playwright / browser testing
+
+Whenever you use Playwright (via MCP or directly) — for screenshots, snapshots,
+traces, console logs, or generated test scripts — write **all artifacts to
+`.temp/`** at the repo root. Subfolders are fine (`.temp/screenshots/`,
+`.temp/traces/`, etc.). `.temp/` is gitignored; never commit anything from it
+and never write Playwright output elsewhere (no `tmp/`, no `test-results/`).
+
 ## Definition of Done
 
 Do not say a task is complete until:
