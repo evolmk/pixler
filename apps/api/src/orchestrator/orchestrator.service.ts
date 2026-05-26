@@ -1,4 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { exec as execCb } from 'child_process';
+import { promisify } from 'util';
 import { createMachine, step } from '@pixler/orchestrator';
 import { WorkflowRunner } from '@pixler/orchestrator/server';
 import type { MachineContext, SideEffect, WorkflowStep, WorkflowContext, StepEvent } from '@pixler/orchestrator';
@@ -12,6 +14,9 @@ import { LinearService } from '../linear/linear.service';
 import { TriggersService } from '../checkpoints/triggers.service';
 import { WorkflowsService } from '../workflows/workflows.service';
 import { WorkflowRunsService } from '../workflows/workflow-runs.service';
+import { TerminalsService } from '../terminals/terminals.service';
+
+const exec = promisify(execCb);
 
 const AUTO_APPROVE_DELAY_MS = 800;
 
@@ -21,6 +26,7 @@ export class OrchestratorService implements OnModuleInit {
   private machines = new Map<string, MachineContext>();
   private workflowRunners = new Map<string, WorkflowRunner>();
   private workflowRunIds = new Map<string, string>(); // workspaceId → runId
+  private workflowStepPrompts = new Map<string, { stepId: string; label: string; prompt: string }>(); // workspaceId → current step prompt
 
   constructor(
     private readonly workspaces: WorkspacesService,
@@ -33,6 +39,7 @@ export class OrchestratorService implements OnModuleInit {
     private readonly triggers: TriggersService,
     private readonly workflowsService: WorkflowsService,
     private readonly workflowRuns: WorkflowRunsService,
+    private readonly terminals: TerminalsService,
   ) {}
 
   onModuleInit(): void {
@@ -241,16 +248,8 @@ export class OrchestratorService implements OnModuleInit {
     ctx: WorkflowContext,
   ): Promise<unknown> {
     const ws = this.workspaces.findOne(workspaceId);
-    const phaseMap: Partial<Record<WorkflowStep['type'], 'planning' | 'reviewing' | 'executing' | 'validating'>> = {
-      'builtin:create_plan': 'planning',
-      'builtin:review_issue': 'reviewing',
-      'builtin:review_plan': 'reviewing',
-      'builtin:run_plan': 'executing',
-      'builtin:qa_review': 'validating',
-    };
 
-    const phase = phaseMap[step.type];
-
+    // Auto-run: open PR (non-AI, no user interaction needed)
     if (step.type === 'builtin:open_pr') {
       void this.linearBridge.onPrOpened(ctx.issue.id, ws.project_id);
       this.events.emitWorkspaceEvent(workspaceId, {
@@ -263,17 +262,58 @@ export class OrchestratorService implements OnModuleInit {
       return null;
     }
 
-    if (phase) {
-      if (phase === 'executing') void this.triggers.onBeforeExecution(workspaceId);
+    // Auto-run: bash step executes the command and resolves on exit
+    if (step.type === 'bash') {
+      return this.runBashStep(workspaceId, step, ws.worktree_path ?? process.cwd());
+    }
 
-      const prompt = step.prompt
-        ? step.prompt
-        : this.templates.build(phase, {
+    // Terminal-driven: all AI steps (builtin:* and prompt)
+    return this.runAiStepTerminalDriven(workspaceId, step, ctx, ws.worktree_path ?? process.cwd());
+  }
+
+  private async runBashStep(workspaceId: string, step: WorkflowStep, cwd: string): Promise<unknown> {
+    const command = step.prompt;
+    if (!command) return null;
+    this.logger.log(`[${workspaceId}] bash step: ${command.slice(0, 80)}`);
+    try {
+      const { stdout, stderr } = await exec(command, { cwd, timeout: 300_000 });
+      return { stdout: stdout.trim(), stderr: stderr.trim() };
+    } catch (err) {
+      throw new Error(`Bash step failed: ${String(err)}`);
+    }
+  }
+
+  private async runAiStepTerminalDriven(
+    workspaceId: string,
+    step: WorkflowStep,
+    ctx: WorkflowContext,
+    cwd: string,
+  ): Promise<unknown> {
+    const phaseMap: Partial<Record<WorkflowStep['type'], 'planning' | 'reviewing' | 'executing' | 'validating'>> = {
+      'builtin:create_plan': 'planning',
+      'builtin:review_issue': 'reviewing',
+      'builtin:review_plan': 'reviewing',
+      'builtin:run_plan': 'executing',
+      'builtin:qa_review': 'validating',
+    };
+    const phase = phaseMap[step.type];
+
+    // Snapshot before file-writing steps (executing phase)
+    if (phase === 'executing') void this.triggers.onBeforeExecution(workspaceId);
+
+    const prompt = step.prompt
+      ? step.prompt
+      : phase
+        ? this.templates.build(phase, {
             workspaceId,
             ticketId: ctx.issue.id,
             planPath: `docs/plans/${ctx.issue.id}.md`,
-          });
+          })
+        : (step.prompt ?? '');
 
+    const label = step.label ?? step.id;
+
+    if (phase) {
       this.events.emitWorkspaceEvent(workspaceId, {
         type: 'agent.state-changed',
         workspaceId,
@@ -281,31 +321,49 @@ export class OrchestratorService implements OnModuleInit {
         to: phase,
         timestamp: Date.now(),
       });
-
-      return this.runner.run({
-        workspaceId,
-        worktreePath: ws.worktree_path ?? process.cwd(),
-        phase,
-        prompt,
-        ticketId: ctx.issue.id,
-        branch: ws.branch ?? undefined,
-        onData: phase === 'executing' ? (data) => void this.triggers.onAgentOutput(workspaceId, data) : undefined,
-      });
     }
 
-    if (step.type === 'prompt' && step.prompt) {
-      return this.runner.run({
-        workspaceId,
-        worktreePath: ws.worktree_path ?? process.cwd(),
-        phase: 'executing',
-        prompt: step.prompt,
-        ticketId: ctx.issue.id,
-        branch: ws.branch ?? undefined,
-      });
+    // Store prompt so send-to-terminal can retrieve it
+    this.workflowStepPrompts.set(workspaceId, { stepId: step.id, label, prompt });
+
+    // Set step status to awaiting_run so UI shows it correctly
+    const wfRunner = this.workflowRunners.get(workspaceId);
+    wfRunner?.setStepStatus(step.id, 'awaiting_run');
+
+    // Emit the prompt event for the UI to display the accordion
+    this.events.emitWorkspaceEvent(workspaceId, {
+      type: 'workflow.step-prompt',
+      workspaceId,
+      stepId: step.id,
+      stepLabel: label,
+      prompt,
+      timestamp: Date.now(),
+    });
+
+    this.logger.log(`[${workspaceId}] AI step '${step.id}' awaiting terminal run`);
+
+    // Block until the user marks the step done (or stops/rejects it)
+    const outcome = await (wfRunner?.waitForStepDone() ?? Promise.resolve('done' as const));
+
+    this.workflowStepPrompts.delete(workspaceId);
+
+    if (outcome === 'rejected') {
+      throw new Error(`Step '${step.id}' was rejected`);
+    }
+    if (outcome === 'cancelled') {
+      throw new Error(`Step '${step.id}' was cancelled`);
     }
 
-    this.logger.warn(`[Workflow] Unsupported step type '${step.type}' — skipping`);
-    return null;
+    // Emit step-advanced so UI updates
+    this.events.emitWorkspaceEvent(workspaceId, {
+      type: 'workflow.step-advanced',
+      workspaceId,
+      stepId: step.id,
+      status: 'completed',
+      timestamp: Date.now(),
+    });
+
+    return { status: 'done', cwd };
   }
 
   approve(workspaceId: string): void {
@@ -367,6 +425,66 @@ export class OrchestratorService implements OnModuleInit {
     }
     this.runner.interrupt(workspaceId);
     this.machines.delete(workspaceId);
+  }
+
+  /** Mark the current AI step as done — advances the workflow. */
+  markStepDone(workspaceId: string): void {
+    const wfRunner = this.workflowRunners.get(workspaceId);
+    wfRunner?.resolveStep('done');
+    const runId = this.workflowRunIds.get(workspaceId);
+    if (runId) {
+      const promptInfo = this.workflowStepPrompts.get(workspaceId);
+      if (promptInfo) {
+        const existing = this.workflowRuns.findLastAttemptForStep(runId, promptInfo.stepId);
+        if (existing) this.workflowRuns.updateAttempt(existing.id, 'completed');
+      }
+    }
+  }
+
+  /** Retry a step — implemented in Sprint 3. Stub here to satisfy controller. */
+  async retryStep(_workspaceId: string, _dto: import('@pixler/shared-types').RetryStepDto): Promise<void> {
+    // Sprint 3 implementation
+    throw new Error('retryStep not yet implemented — see Sprint 3');
+  }
+
+  /** Pause the current workflow step — keeps run record, allows resume. */
+  pauseStep(workspaceId: string): void {
+    const wfRunner = this.workflowRunners.get(workspaceId);
+    if (wfRunner) {
+      wfRunner.pause();
+    }
+    const runId = this.workflowRunIds.get(workspaceId);
+    if (runId) this.workflowRuns.updateStatus(runId, 'paused');
+    // Don't delete runner — it stays paused in memory so UI can show it.
+    // The runner's status is now 'paused'; any further step-done calls are ignored.
+  }
+
+  /** Send the current step's prompt to the workspace terminal. */
+  sendStepToTerminal(workspaceId: string): { ok: boolean; noSession: boolean } {
+    const promptInfo = this.workflowStepPrompts.get(workspaceId);
+    if (!promptInfo) return { ok: false, noSession: false };
+
+    const terminalIds = this.terminals.getForWorkspace(workspaceId);
+    let targetId: string;
+    if (terminalIds.length > 0) {
+      targetId = terminalIds[0]!;
+    } else {
+      targetId = this.terminals.findOrCreate(workspaceId);
+    }
+
+    try {
+      // Write the prompt text followed by newline into the terminal.
+      // If no claude session is active the user will need to start one first.
+      this.terminals.write(targetId, promptInfo.prompt + '\n');
+      return { ok: true, noSession: false };
+    } catch {
+      return { ok: false, noSession: true };
+    }
+  }
+
+  /** Get the current step prompt for display in the UI. */
+  getCurrentStepPrompt(workspaceId: string): { stepId: string; label: string; prompt: string } | null {
+    return this.workflowStepPrompts.get(workspaceId) ?? null;
   }
 
   private applyAndDrive(workspaceId: string, ctx: MachineContext, events: Parameters<typeof step>[1][]): void {

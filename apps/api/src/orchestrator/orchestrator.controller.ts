@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Param, Body, Query, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, NotFoundException, BadRequestException } from '@nestjs/common';
 import { OrchestratorService } from './orchestrator.service';
 import { PreflightService } from './preflight.service';
 import { TriggersService } from '../checkpoints/triggers.service';
+import type { RetryStepDto } from '@pixler/shared-types';
 
 @Controller('workspaces/:workspaceId/orchestrator')
 export class OrchestratorController {
@@ -74,6 +75,45 @@ export class OrchestratorController {
   @Post('rebase')
   async rebase(@Param('workspaceId') workspaceId: string) {
     await this.triggers.onRebase(workspaceId);
+    return { ok: true };
+  }
+
+  // ── Workflow step controls ────────────────────────────────────────────────
+
+  @Get('step/current-prompt')
+  getCurrentPrompt(@Param('workspaceId') workspaceId: string) {
+    const prompt = this.orchestrator.getCurrentStepPrompt(workspaceId);
+    if (!prompt) throw new NotFoundException('No active step prompt');
+    return prompt;
+  }
+
+  @Post('step/done')
+  markStepDone(@Param('workspaceId') workspaceId: string) {
+    this.orchestrator.markStepDone(workspaceId);
+    return { ok: true };
+  }
+
+  @Post('step/pause')
+  pauseStep(@Param('workspaceId') workspaceId: string) {
+    this.orchestrator.pauseStep(workspaceId);
+    return { ok: true };
+  }
+
+  @Post('step/send-to-terminal')
+  sendToTerminal(@Param('workspaceId') workspaceId: string) {
+    const result = this.orchestrator.sendStepToTerminal(workspaceId);
+    if (!result.ok) {
+      throw new BadRequestException(result.noSession ? 'No terminal session available' : 'No active step prompt');
+    }
+    return { ok: true };
+  }
+
+  @Post('step/retry')
+  async retryStep(
+    @Param('workspaceId') workspaceId: string,
+    @Body() body: RetryStepDto,
+  ) {
+    await this.orchestrator.retryStep(workspaceId, body);
     return { ok: true };
   }
 }

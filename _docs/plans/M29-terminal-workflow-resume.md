@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS   <!-- ⏳ IN_PROGRESS | ✅ COMPLETE -->
 **Modified:** 2026-05-25
-**Current Status:** Sprint 1 complete — SQLite persistence, shared-types DTOs, WorkflowRunsService, WorkflowRunner rehydration + external step resolver, boot rehydration, OrchestratorService wired.
+**Current Status:** Sprint 2 complete — terminal-driven AI steps (emit prompt + await resolveStep), bash auto-run, send-to-terminal, mark-done, pause, step endpoints.
 
 ---
 
@@ -132,7 +132,7 @@ external resolver; paused runs rehydrate after an app restart.
 
 ## Sprint 2 — Terminal-driven step execution
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** AI steps present their prompt instead of auto-spawning Claude; bash steps auto-run; step
 advancement is manual for AI steps and automatic for bash.
 
@@ -160,13 +160,16 @@ advancement is manual for AI steps and automatic for bash.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `packages/orchestrator/src/workflow-runner.ts` (setStepStatus(), pause() updated)
+- `apps/api/src/orchestrator/orchestrator.module.ts` (TerminalsModule import added)
+- `apps/api/src/orchestrator/orchestrator.service.ts` (TerminalsService injected, runAiStepTerminalDriven, runBashStep, markStepDone, pauseStep, sendStepToTerminal, getCurrentStepPrompt, retryStep stub)
+- `apps/api/src/orchestrator/orchestrator.controller.ts` (step/done, step/pause, step/send-to-terminal, step/current-prompt, step/retry endpoints)
 
 **Issues Encountered:**
 
-- _none yet_
+- None
 
-**Verify:** `pnpm --filter @pixler/api typecheck && pnpm --filter @pixler/api test` — a feature workflow emits a `step-prompt` for `create_plan` and spawns no agent, the step stays `awaiting_run` until `/step/done`, and a `bash` step runs + auto-advances.
+**Verify:** `pnpm --filter @pixler/orchestrator build && pnpm --filter @pixler/api typecheck` — clean.
 
 ---
 

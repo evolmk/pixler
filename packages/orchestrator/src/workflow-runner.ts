@@ -169,6 +169,12 @@ export class WorkflowRunner {
     return this.state;
   }
 
+  /** Allow the executor to update a step's displayed status (e.g. awaiting_run). */
+  setStepStatus(stepId: string, status: StepStatus): void {
+    const state = this.steps.find((s) => s.id === stepId);
+    if (state) state.status = status;
+  }
+
   /**
    * Called by the executor for AI steps: blocks until resolveStep() is called.
    * The step sets its own status to 'awaiting_run' before calling this.
