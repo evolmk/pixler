@@ -17,6 +17,7 @@ function StepIcon({ status }: { status: WorkflowStepState['status'] }) {
     case 'skipped':
       return <MinusCircle className="size-3 text-muted-foreground" />;
     case 'awaiting_approval':
+    case 'awaiting_run':
       return <Clock className="size-3 text-yellow-500" />;
     default:
       return <Circle className="size-3 text-muted-foreground/40" />;
@@ -39,7 +40,7 @@ export function WorkflowStepIndicator({ workspaceId }: Props) {
               <span
                 className={[
                   'text-[11px]',
-                  step.status === 'running' || step.status === 'awaiting_approval'
+                  step.status === 'running' || step.status === 'awaiting_approval' || step.status === 'awaiting_run'
                     ? 'font-medium text-foreground'
                     : step.status === 'completed'
                     ? 'text-muted-foreground line-through'

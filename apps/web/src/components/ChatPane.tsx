@@ -11,6 +11,7 @@ import {
 } from '@assistant-ui/react';
 import { ThumbsUp, ThumbsDown, Search, X } from 'lucide-react';
 import { WorkflowStepIndicator } from './WorkflowStepIndicator';
+import { WorkflowRunPanel } from './WorkflowRunPanel';
 import { Button } from '@pixler/ui/components/button';
 import { useMessages, useSendMessage, useClearMessages } from '../hooks/useMessages';
 import {
@@ -170,6 +171,13 @@ function ChatPaneInner({ workspaceId }: ChatPaneProps) {
 
         {/* Workflow step indicator */}
         <WorkflowStepIndicator workspaceId={workspaceId} />
+
+        {/* Workflow run panel — prompt accordion + step controls */}
+        {wfSteps.some((s) => s.status === 'awaiting_run') && (
+          <div className="px-3 pt-2">
+            <WorkflowRunPanel workspaceId={workspaceId} />
+          </div>
+        )}
 
         {/* Messages */}
         <div
