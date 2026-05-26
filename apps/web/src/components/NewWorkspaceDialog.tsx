@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageSquare, Terminal } from 'lucide-react';
+import { MessageSquare, Terminal, GitBranch } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,7 @@ import {
 import { Button } from '@pixler/ui/components/button';
 import { Input } from '@pixler/ui/components/input';
 import { Label } from '@pixler/ui/components/label';
+import { Switch } from '@pixler/ui/components/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@pixler/ui/components/select';
 import { useCreateWorkspace } from '../hooks/useWorkspaces';
 import { useWorkspaceEvents } from '../hooks/useWorkspaceEvents';
@@ -33,6 +34,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
   const [ticketId, setTicketId] = useState(prefillTicketId ?? '');
   const [customName, setCustomName] = useState('');
   const [selectedWorkflow, setSelectedWorkflow] = useState('');
+  const [useWorktree, setUseWorktree] = useState(true);
   const [error, setError] = useState('');
   const [setupLog, setSetupLog] = useState<string[]>([]);
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -65,6 +67,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
     setTicketId('');
     setCustomName('');
     setSelectedWorkflow('');
+    setUseWorktree(true);
     setError('');
     setSetupLog([]);
     setCreatedId(null);
@@ -85,6 +88,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
         mode,
         ticketId: ticketId.trim() || undefined,
         name: customName.trim() || undefined,
+        useWorktree,
       });
       setCreatedId(ws.id);
     } catch (e) {
@@ -189,10 +193,34 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
               />
             </div>
 
+            {/* Worktree toggle */}
+            <div className="flex items-center justify-between rounded-md border border-border px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                <GitBranch className="size-4 text-muted-foreground" />
+                <div>
+                  <Label htmlFor="use-worktree" className="text-sm cursor-pointer">Use git worktree</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {useWorktree ? 'Isolated branch + directory outside repo' : 'Work directly in project root on current branch'}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="use-worktree"
+                checked={useWorktree}
+                onCheckedChange={setUseWorktree}
+              />
+            </div>
+
             {/* Preview */}
             <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-              <p>Branch: <span className="font-mono text-foreground">{branchPreview}</span></p>
-              <p className="mt-0.5">Worktree: <span className="font-mono text-foreground">../pixler-worktrees/{slug || '<name>'}</span></p>
+              {useWorktree ? (
+                <>
+                  <p>Branch: <span className="font-mono text-foreground">{branchPreview}</span></p>
+                  <p className="mt-0.5">Worktree: <span className="font-mono text-foreground">../pixler-worktrees/{slug || '<name>'}</span></p>
+                </>
+              ) : (
+                <p>Working directory: <span className="font-mono text-foreground">project root</span> (current branch)</p>
+              )}
             </div>
 
             {error && <p className="text-xs text-destructive">{error}</p>}

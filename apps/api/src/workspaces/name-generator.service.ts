@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../db/database.service';
-import { COLOR_NAMES } from '@pixler/shared-types';
+import { COLOR_NAMES, slugify } from '@pixler/shared-types';
 
 @Injectable()
 export class NameGeneratorService {
@@ -10,22 +10,14 @@ export class NameGeneratorService {
     const { ticketId, ticketLabel } = opts;
 
     if (ticketId) {
-      const slug = this.slugify(ticketId);
+      const slug = slugify(ticketId);
       const candidate = ticketLabel
-        ? `${this.slugify(ticketLabel)}-${slug}`
+        ? `${slugify(ticketLabel)}-${slug}`
         : slug;
       if (!this.isNameTaken(candidate)) return candidate;
     }
 
     return this.nextColorName();
-  }
-
-  private slugify(value: string): string {
-    return value
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 48);
   }
 
   private isNameTaken(name: string): boolean {

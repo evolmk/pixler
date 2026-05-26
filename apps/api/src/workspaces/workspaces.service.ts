@@ -11,6 +11,7 @@ import { FilesToCopyService } from './files-to-copy.service';
 import { PixlerJsonService } from '../projects/pixler-json.service';
 import { DeeplinkService } from '../deeplink/deeplink.service';
 import { TelemetryService } from '../telemetry/telemetry.service';
+import { slugify } from '@pixler/shared-types';
 import type { Workspace, CreateWorkspaceDto, PatchWorkspaceDto } from '@pixler/shared-types';
 
 type DbWorkspace = Omit<Workspace, 'pinned'> & { pinned: 0 | 1 };
@@ -48,7 +49,7 @@ export class WorkspacesService {
   }
 
   async create(dto: CreateWorkspaceDto): Promise<Workspace> {
-    const { projectId, ticketId, ticketSource, mode = 'chat' } = dto;
+    const { projectId, ticketId, ticketSource, mode = 'chat', useWorktree = true } = dto;
 
     const project = this.db.connection
       .prepare('SELECT id, path FROM projects WHERE id = ?')
@@ -56,11 +57,14 @@ export class WorkspacesService {
     if (!project) throw new NotFoundException(`Project ${projectId} not found`);
 
     const name = dto.name ?? this.nameGenerator.generate({ ticketId });
-    const branch = this.worktree.branchName({ workspaceName: name });
-    const worktreePath = this.worktree.worktreeDir({
-      repoPath: project.path,
-      workspaceName: name,
-    });
+    const slug = dto.name ? slugify(dto.name) : name;
+
+    // When useWorktree is false, work directly in the project root on the current branch.
+    const branch = useWorktree ? this.worktree.branchName({ workspaceName: slug }) : null;
+    const worktreePath = useWorktree
+      ? this.worktree.worktreeDir({ repoPath: project.path, workspaceName: slug })
+      : project.path;
+
     const port = await this.portAllocator.allocate();
     const isColorName = !ticketId && !dto.name;
     const id = randomUUID();
@@ -79,7 +83,9 @@ export class WorkspacesService {
         now, now,
       );
 
-    await this.worktree.create({ repoPath: project.path, worktreePath, branch });
+    if (useWorktree) {
+      await this.worktree.create({ repoPath: project.path, worktreePath, branch: branch! });
+    }
 
     this.db.connection
       .prepare(`UPDATE workspaces SET state = 'ready', updated_at = ? WHERE id = ?`)
@@ -87,9 +93,12 @@ export class WorkspacesService {
 
     const teamConfig = this.pixlerJson.load(project.path);
     const globs = teamConfig?.filesToCopy ?? [];
-    await this.filesToCopy.copy({ repoPath: project.path, worktreePath, globs });
+    if (useWorktree) {
+      await this.filesToCopy.copy({ repoPath: project.path, worktreePath, globs });
+    }
 
-    this.seedClaudeIgnore(worktreePath);
+    // Only seed .claudeignore in a dedicated worktree — don't write it to the project root.
+    if (useWorktree) this.seedClaudeIgnore(worktreePath);
 
     const workspace = this.findOne(id);
     const setupScript = teamConfig?.scripts?.setup;
@@ -132,7 +141,8 @@ export class WorkspacesService {
       await this.runScript(workspace, archiveScript);
     }
 
-    if (workspace.worktree_path) {
+    // Only remove if it's a dedicated worktree dir, not the project root itself.
+    if (workspace.worktree_path && workspace.worktree_path !== project?.path) {
       await this.worktree.remove(workspace.worktree_path);
     }
 

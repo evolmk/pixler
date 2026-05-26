@@ -1,0 +1,87 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]: Pixler
+    - button "Select project" [ref=e6] [cursor=pointer]:
+      - text: Select project
+      - img
+    - button "Add workspace" [ref=e7] [cursor=pointer]:
+      - img
+    - button "Open command palette" [ref=e8] [cursor=pointer]:
+      - img
+      - text: K
+    - button "Notifications" [ref=e9] [cursor=pointer]:
+      - img
+    - button "Help" [ref=e10] [cursor=pointer]:
+      - img
+    - button "Settings" [ref=e11] [cursor=pointer]:
+      - img
+    - 'button "Current mode: system. Click to cycle." [ref=e12] [cursor=pointer]':
+      - img
+    - generic [ref=e13]:
+      - heading "Command Palette" [level=2] [ref=e14]
+      - paragraph [ref=e15]: Search for a command to run...
+  - generic [ref=e17]:
+    - complementary [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e23]: Workspaces
+          - generic [ref=e24]:
+            - button "New workspace" [ref=e25] [cursor=pointer]:
+              - img
+            - button "Expand sidebar full-bleed" [ref=e26] [cursor=pointer]:
+              - img
+        - generic [ref=e28]:
+          - paragraph [ref=e29]: No workspaces yet
+          - button "+ Create your first workspace" [ref=e30] [cursor=pointer]
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - img [ref=e34]
+            - text: Tickets
+          - button "Sync Linear tickets" [disabled]:
+            - img
+        - button "Activity" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+          - img [ref=e42]
+          - generic [ref=e45]: Activity
+        - button "Expand terminal full-bleed" [ref=e47] [cursor=pointer]:
+          - img
+          - text: Big Terminal
+    - separator [ref=e48]
+    - generic [ref=e51]:
+      - main [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - tablist [ref=e57]:
+              - tab "Chat" [selected] [ref=e58] [cursor=pointer]
+              - tab "Plan" [ref=e59] [cursor=pointer]
+              - tab "Diff" [ref=e60] [cursor=pointer]
+              - tab "Checks" [ref=e61] [cursor=pointer]
+              - tab "PR" [ref=e62] [cursor=pointer]
+              - tab "Run" [ref=e63] [cursor=pointer]
+              - tab "Checkpoints" [ref=e64] [cursor=pointer]
+            - button "Expand center pane full-bleed" [ref=e65] [cursor=pointer]:
+              - img
+          - tabpanel "Chat" [ref=e66]:
+            - generic [ref=e69]:
+              - img [ref=e71]
+              - generic [ref=e73]:
+                - paragraph [ref=e74]: Chat ships in M16
+                - paragraph [ref=e75]: The AI conversation pane will appear here.
+          - generic [ref=e77]:
+            - generic [ref=e78]: Composer ships in M16…
+            - button "Send" [disabled]:
+              - img
+      - separator [ref=e79]
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - group [ref=e85]:
+            - radio "Chat" [checked] [ref=e86] [cursor=pointer]
+            - radio "Terminal" [ref=e87] [cursor=pointer]
+          - button "Expand right pane full-bleed" [ref=e88] [cursor=pointer]:
+            - img
+        - generic [ref=e91]:
+          - img [ref=e93]
+          - generic [ref=e95]:
+            - paragraph [ref=e96]: Select a workspace
+            - paragraph [ref=e97]: Open a workspace to view the agent conversation.
+  - region "Notifications alt+T"

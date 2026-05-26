@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@pixler/ui': path.resolve(__dirname, '../../packages/ui/src'),
+      '@pixler/shared-types': path.resolve(__dirname, '../../packages/shared-types/src'),
     },
   },
   server: {

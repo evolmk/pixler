@@ -1,82 +1,42 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { isAbsolute, join, resolve } from 'path';
 import { homedir } from 'os';
-import { load } from 'js-yaml';
 
-interface StorageProviderConfig {
-  id: string;
-  type: 'local' | 'google_drive' | 's3';
-  active: boolean;
-  path?: string;
-  folder_id?: string;
-  bucket?: string;
-  prefix?: string;
-  region?: string;
-}
+export const DEFAULT_PLAN_FOLDER = '_plans';
 
-interface StorageConfig {
-  providers: StorageProviderConfig[];
-}
-
+/**
+ * Plans are stored in a local folder. By default that's `_plans` in the repo root,
+ * but the folder is configurable per project via the `plans.fileDir` setting.
+ * A relative folder resolves against the repo root; an absolute (or `~`) folder is used as-is.
+ */
 @Injectable()
 export class StorageProviderService {
   private readonly logger = new Logger(StorageProviderService.name);
 
-  private get config(): StorageConfig | null {
-    const configPath = join(homedir(), '.config', 'pixler', 'storage.yaml');
-    if (!existsSync(configPath)) return null;
-    try {
-      return load(readFileSync(configPath, 'utf-8')) as StorageConfig;
-    } catch {
-      return null;
-    }
+  resolveFolder(repoRoot: string, folder: string = DEFAULT_PLAN_FOLDER): string {
+    if (folder.startsWith('~')) return resolve(homedir(), folder.slice(2));
+    if (isAbsolute(folder)) return folder;
+    return resolve(repoRoot, folder);
   }
 
-  private get activeProvider(): StorageProviderConfig | null {
-    return this.config?.providers.find((p) => p.active) ?? null;
-  }
-
-  getActivePath(): string {
-    const provider = this.activeProvider;
-    if (provider?.type === 'local' && provider.path) {
-      return provider.path.startsWith('~')
-        ? resolve(homedir(), provider.path.slice(2))
-        : provider.path;
-    }
-    // Default to ~/.config/pixler/plans
-    return join(homedir(), '.config', 'pixler', 'plans');
-  }
-
-  getActiveType(): string {
-    return this.activeProvider?.type ?? 'local';
-  }
-
-  writePlan(filename: string, content: string): string {
-    const basePath = this.getActivePath();
-    const type = this.getActiveType();
-
-    if (type === 'local') {
-      if (!existsSync(basePath)) mkdirSync(basePath, { recursive: true });
-      const filePath = join(basePath, filename);
-      writeFileSync(filePath, content, 'utf-8');
-      this.logger.log(`Plan written to ${filePath}`);
-      return filePath;
-    }
-
-    // Stub for future providers
-    this.logger.warn(`Storage provider '${type}' not yet implemented — falling back to local`);
-    if (!existsSync(basePath)) mkdirSync(basePath, { recursive: true });
-    const filePath = join(basePath, filename);
+  writePlan(repoRoot: string, filename: string, content: string, folder: string = DEFAULT_PLAN_FOLDER): string {
+    const dir = this.resolveFolder(repoRoot, folder);
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    const filePath = join(dir, filename);
     writeFileSync(filePath, content, 'utf-8');
+    this.logger.log(`Plan written to ${filePath}`);
     return filePath;
   }
 
-  getStorageInfo(): { type: string; path: string; configured: boolean } {
+  getStorageInfo(
+    repoRoot?: string,
+    folder: string = DEFAULT_PLAN_FOLDER,
+  ): { type: 'local'; folder: string; path: string } {
     return {
-      type: this.getActiveType(),
-      path: this.getActivePath(),
-      configured: !!this.activeProvider,
+      type: 'local',
+      folder,
+      path: repoRoot ? this.resolveFolder(repoRoot, folder) : folder,
     };
   }
 }

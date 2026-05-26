@@ -13,3 +13,6 @@ dist/
 # Pixler error logs (written to ~/.config/pixler/logs/ — not in repo)
 # Kept here as a reminder; actual path is outside the repo
 logs/
+
+# Playwright MCP output (screenshots, snapshots, console logs)
+.test/

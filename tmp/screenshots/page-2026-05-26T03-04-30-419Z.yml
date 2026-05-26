@@ -1,0 +1,113 @@
+- generic:
+  - generic:
+    - generic:
+      - banner:
+        - generic: Pixler
+        - button:
+          - text: lazar-ui
+          - img
+        - button:
+          - img
+        - button:
+          - text: 4%
+          - generic: / 4h 59m
+        - button:
+          - img
+          - text: K
+        - button:
+          - img
+        - button:
+          - img
+        - button:
+          - img
+        - button:
+          - img
+        - generic:
+          - heading [level=2]: Command Palette
+          - paragraph: Search for a command to run...
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - complementary:
+                - generic:
+                  - generic:
+                    - generic: Workspaces
+                    - generic:
+                      - button:
+                        - img
+                      - button:
+                        - img
+                  - generic:
+                    - generic:
+                      - paragraph: No workspaces yet
+                      - button: + Create your first workspace
+                  - generic:
+                    - button:
+                      - img
+                      - img
+                      - generic: Activity
+                  - generic:
+                    - button:
+                      - img
+                      - text: Big Terminal
+          - separator
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - main:
+                      - generic:
+                        - generic:
+                          - tablist:
+                            - tab [selected]: Chat
+                            - tab: Plan
+                            - tab: Diff
+                            - tab: Checks
+                            - tab: PR
+                            - tab: Run
+                            - tab: Checkpoints
+                          - button:
+                            - img
+                        - tabpanel:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - img
+                                - generic:
+                                  - paragraph: Chat ships in M16
+                                  - paragraph: The AI conversation pane will appear here.
+                        - generic:
+                          - generic:
+                            - generic: Composer ships in M16…
+                            - button [disabled]:
+                              - img
+                - separator
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - group:
+                            - radio [checked]: Chat
+                            - radio: Terminal
+                          - button:
+                            - img
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - img
+                              - generic:
+                                - paragraph: Select a workspace
+                                - paragraph: Open a workspace to view the agent conversation.
+      - region "Notifications alt+T"
+  - dialog "Add Workspace" [ref=e104]:
+    - generic [ref=e105]:
+      - heading "Add Workspace" [level=2] [ref=e106]
+      - paragraph [ref=e107]: Workspaces ship in M08. Check back soon.
+    - button "Close" [active] [ref=e108] [cursor=pointer]:
+      - img
+      - generic [ref=e109]: Close

@@ -16,8 +16,8 @@ export class WorkflowsController {
   }
 
   @Get('storage')
-  getStorage() {
-    return this.storage.getStorageInfo();
+  getStorage(@Query('repoDir') repoDir?: string, @Query('folder') folder?: string) {
+    return this.storage.getStorageInfo(repoDir, folder);
   }
 
   @Get(':name')

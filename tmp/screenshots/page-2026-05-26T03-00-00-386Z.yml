@@ -1,0 +1,6 @@
+- generic [ref=e4]:
+  - img [ref=e6]
+  - generic [ref=e8]:
+    - paragraph [ref=e9]: No projects yet
+    - paragraph [ref=e10]: Add a local repo or clone one from GitHub to get started.
+  - button "Create your first project" [ref=e12] [cursor=pointer]

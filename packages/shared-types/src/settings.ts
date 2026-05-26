@@ -21,7 +21,7 @@ export const settingsRegistry: SettingDefinition[] = [
   { key: 'linear.syncIntervalMs', type: 'number', default: 30000, scopes: ['global'], label: 'Sync Interval', description: 'Linear sync interval in ms' },
 
   { key: 'plans.defaultStorage', type: 'string', default: 'auto', scopes: ['global', 'project'], label: 'Plan Storage', description: 'Where to store plans (file, inline, attachment, auto)' },
-  { key: 'plans.fileDir', type: 'string', default: 'docs/plans', scopes: ['global', 'project'], label: 'Plans Directory', description: 'Relative path for plan files' },
+  { key: 'plans.fileDir', type: 'string', default: '_plans', scopes: ['global', 'project'], label: 'Plan Folder', description: 'Folder for plan files — relative to the repo root, or an absolute path' },
 
   { key: 'models.planner', type: 'string', default: 'claude', scopes: ['global', 'project'], label: 'Planner Model', description: 'CLI used for planning' },
   { key: 'models.reviewer', type: 'string', default: 'claude', scopes: ['global', 'project'], label: 'Reviewer Model', description: 'CLI used for review' },

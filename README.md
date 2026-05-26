@@ -63,7 +63,7 @@ Pixler will:
 Then create a workspace from any Linear ticket and watch it go.
 
 ### Prerequisites
-doews 
+
 You'll want these authenticated on your machine first:
 
 ```bash
@@ -73,6 +73,17 @@ codex --version           # optional — for peer review
 ```
 
 A Linear API token from <https://linear.app/settings/api> finishes the loop.
+
+### Development
+
+```bash
+turbo run dev      # starts api (port 7777) + web (port 5173) in parallel
+turbo run build    # production build
+pnpm -w lint       # lint entire monorepo
+pnpm -w typecheck  # TypeScript check all packages
+```
+
+> `pnpm -w dev` is a no-op — use `turbo run dev` instead.
 
 ---
 

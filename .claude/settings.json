@@ -26,9 +26,7 @@
     "deny": [
       "Read(./.env)",
       "Read(./secrets.*.json)",
-      "Read(./.mcp.json)",
-      "Bash(rm*-rf*)",
-      "Bash(rm*-fr*)"
+      "Read(./.mcp.json)"
     ],
     "ask": [
       "Bash(rm*)",

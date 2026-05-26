@@ -4,9 +4,12 @@ import { Label } from '@pixler/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@pixler/ui/components/select';
 import { Separator } from '@pixler/ui/components/separator';
 import { useSetting } from '../../hooks/useSetting';
+import { resolvePlanFolder } from '../../lib/resolvePlanFolder';
+import { FolderPicker } from '../FolderPicker';
 
 export function PlansPanel() {
   const { value: storageMode = 'auto', set: setStorageMode } = useSetting<string>('plans.storageMode');
+  const { value: planFolder = '_plans', set: setPlanFolder } = useSetting<string>('plans.fileDir');
 
   async function handleResetAllPrompts() {
     await fetch('/api/plans/reset-all-prompts', { method: 'DELETE' });
@@ -32,6 +35,23 @@ export function PlansPanel() {
           </Select>
           <p className="text-xs text-muted-foreground">
             Auto picks file/inline/attachment based on ticket complexity.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-sm">Plan folder</Label>
+          <FolderPicker
+            value={planFolder}
+            onChange={setPlanFolder}
+            placeholder="_plans"
+            title="Choose plan folder"
+            inputClassName="text-sm"
+          />
+          <p className="break-all font-mono text-xs text-muted-foreground">
+            {resolvePlanFolder(undefined, planFolder)}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Relative folders are created in each repo's root. Projects can override this.
           </p>
         </div>
       </section>

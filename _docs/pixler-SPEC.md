@@ -63,7 +63,7 @@ Pixler is working when:
 | Git                      | simple-git + native `git worktree`                 | Native git is faster and more reliable than libgit2                                                                                                  |
 | Linear (Pixler internal) | `@linear/sdk` (GraphQL)                            | For sync, status transitions, attachments                                                                                                            |
 | Linear (agent-facing)    | **Thin Pixler CLI wrapper** (default) + MCP option | CLI is ~98% cheaper in tokens than MCP, user can switch                                                                                              |
-| GitHub                   | `gh` CLI (shells out, uses existing auth)          | Zero schema cost, leverages user’s existing auth                                                                                                     |
+| GitHub                   | `gh` CLI / OAuth / PAT + `@octokit/rest`           | CLI default; OAuth and PAT use Octokit SDK. One method active at a time.                                                                             |
 | Mobile (v3+)             | Expo + React Native + Reanimated 3 + NativeWind    | Read-only companion                                                                                                                                  |
 | Repo layout              | Turborepo + pnpm workspaces, standalone            | Mirrors Lazar patterns                                                                                                                               |
 | Distribution             | npm package with `bin` entry                       | `npx pixler` boots server + opens browser                                                                                                            |
@@ -108,8 +108,10 @@ Markdown file at
 ### 3.3 Worktree
 
 Each workspace gets an isolated git worktree at
-`<repo>/../pixler-worktrees/<workspace-name>/`. Branch naming defaults to
-`pixler/<workspace-name>` (configurable per project).
+`<repo>/../pixler-worktrees/<slug>/`. Branch naming defaults to
+`pixler/<slug>` (configurable per project). The slug is the workspace
+name lowercased with non-alphanumeric runs replaced by hyphens (max 48 chars),
+ensuring valid git ref names and filesystem paths.
 
 ### 3.4 Setup script
 
@@ -193,6 +195,54 @@ The mode picker appears in the New Workspace dialog. Users can switch modes mid-
 
 A future v3 **Headless** mode will use
 `claude -p` (non-interactive Agent SDK), which on/after June 15, 2026 bills against a separate Agent SDK credit pool ($20/$100/$200 monthly depending on plan, metered at API rates after credit is exhausted). The mode picker shows a clear warning when Headless is selected.
+
+-----
+
+## 4A. Workflow engine
+
+The workflow engine replaces the hardcoded orchestrator state machine (§4.1) with a **YAML-driven, file-first system**. Each workflow type is a single YAML file describing the ordered stages an agent follows — which provider + model runs each stage, whether human approval is required, and where artifacts get stored.
+
+Full workflow engine spec: `_docs/spec-workflow-engine.md`
+
+### 4A.1 Key concepts
+
+- **File-first**: workflows live on disk (`~/.config/pixler/workflows/`, `<repo>/.pixler/workflows/`, and built-in defaults), version-controlled, shareable by copy-paste.
+- **Per-step model selection**: each step can override the workflow-level default provider + model. Expensive reasoning steps use Opus; cheap scaffolding steps use Haiku.
+- **Local plan storage**: plan files are written to a local folder (default `_plans` in the repo root), configurable per project via the **Plan folder** setting.
+- **Claude Code native**: every AI step spawns a Claude Code terminal session. No Agent SDK / API credits.
+- **Human gates are explicit**: `approval` steps in the YAML, not hardcoded in the state machine.
+
+### 4A.2 Built-in workflow presets
+
+| Preset | Steps | Use case |
+|--------|-------|----------|
+| **feature** | review_issue → create_plan → approve_plan → review_plan → implement → qa_review → open_pr | Full features with plan + review |
+| **bugfix** | review_issue → implement → qa_review → open_pr | Simple fixes, no plan step |
+| **quickfix** | review_issue → implement → open_pr | One-liner changes, no QA gate |
+
+Users can create custom workflow types via the in-app YAML editor (Settings → Workflows) or by dropping `.yaml` files into `~/.config/pixler/workflows/` or `<repo>/.pixler/workflows/`.
+
+### 4A.3 Workflow selection
+
+Workflows are auto-selected based on the issue's Linear label (case-insensitive match against the workflow's `name` field). The user can override before execution begins via a dropdown in the New Task modal.
+
+### 4A.4 Step types
+
+| Type | Description |
+|------|-------------|
+| `builtin:review_issue` | Fetch issue from Linear, display details, ask user to confirm |
+| `builtin:create_plan` | Generate implementation plan; save to the local plan folder |
+| `builtin:review_plan` | Second-model review pass; appends findings to plan file |
+| `builtin:run_plan` | Execute plan in Claude Code terminal session |
+| `builtin:qa_review` | Lint + typecheck + tests; Claude reviews diff for correctness |
+| `builtin:open_pr` | Create GitHub PR, link in Linear issue |
+| `approval` | Human gate — pause, display message, wait for Approve / Edit / Cancel |
+| `prompt` | Inline Claude prompt string (lightweight custom steps) |
+| `bash` | Shell script step (no AI involved) |
+
+### 4A.5 Relation to current orchestrator
+
+The existing `@pixler/orchestrator` state machine maps to this YAML model. The orchestrator package gains a `WorkflowRunner` class that interprets YAML. The hardcoded states remain as the fallback when no workflow file is found.
 
 -----
 
@@ -359,7 +409,27 @@ Linear is the source of truth for tickets. GitHub hosts code and PRs only.
 
 ### 6.2 Auth
 
-PAT auth in v1; OAuth in v2.
+Two methods, mutually exclusive — only one active at a time:
+
+| Method | How it works | When to use |
+|--------|-------------|-------------|
+| **PAT** | User pastes a `lin_api_…` token. Stored encrypted via `SecretStoreService`. | Quick setup, CI environments, no browser needed |
+| **OAuth** *(v2+)* | OAuth 2.0 PKCE flow. User clicks "Connect with Linear", redirects to Linear's consent screen, then back to `localhost:7777/auth/linear/callback`. Token stored encrypted. | Recommended — scoped permissions, refresh tokens, no manual PAT management |
+
+**Mutual exclusivity rules:**
+
+- Only one method can be **active** at a time (stored as `linear.authMethod: 'pat' | 'oauth'` in settings).
+- Switching methods requires disconnecting the active method first.
+- **Disconnect = deactivate, not delete.** Disconnecting sets the stored credential to inactive. The credential stays in `SecretStoreService` until the user explicitly removes it via the "Remove key" button next to the credential.
+- The UI shows all methods. The active method is highlighted; alternatives are greyed out with a "Disconnect current method to switch" hint.
+
+**OAuth implementation details:**
+
+- Pixler registers as a Linear OAuth application (public client, PKCE).
+- Redirect URI: `http://localhost:7777/auth/linear/callback`
+- Scopes: `read`, `write`, `issues:create`, `comments:create` (minimum for Pixler's sync + CLI needs).
+- Refresh token rotation: Pixler refreshes the access token automatically before expiry. Refresh failures surface a reconnect prompt in the UI.
+- NestJS route: `GET /auth/linear/callback` handles the code exchange.
 
 ### 6.3 Sync behavior
 
@@ -427,8 +497,28 @@ Each command’s
 
 ### 7.1 Auth
 
-Uses `gh` CLI from the user’s terminal environment. Pixler verifies via
-`gh auth status` and surfaces a re-auth helper if missing.
+Three methods, mutually exclusive — only one active at a time:
+
+| Method | How it works | When to use |
+|--------|-------------|-------------|
+| **gh CLI** *(default)* | Shells out to `gh` binary. Pixler verifies via `gh auth status`. | Default — leverages user’s existing auth, zero config |
+| **OAuth** | OAuth 2.0 PKCE flow. User clicks "Connect with GitHub", redirects to GitHub’s consent screen, then back to `localhost:7777/auth/github/callback`. Token stored encrypted. | When user wants Pixler-managed token without `gh` CLI dependency |
+| **PAT** | User pastes a fine-grained Personal Access Token. Stored encrypted via `SecretStoreService`. | CI environments, no browser, headless setups |
+
+**Mutual exclusivity rules (same as Linear):**
+
+- Only one method can be **active** at a time (stored as `github.authMethod: ‘cli’ | ‘oauth’ | ‘pat’` in settings).
+- Switching methods requires disconnecting the active method first.
+- **Disconnect = deactivate, not delete.** Credential stays in `SecretStoreService` until user explicitly clicks "Remove key".
+- UI shows all methods; active one highlighted, alternatives greyed out with disconnect hint.
+
+**OAuth implementation details:**
+
+- Pixler registers as a GitHub OAuth App (or GitHub App with user authorization).
+- Redirect URI: `http://localhost:7777/auth/github/callback`
+- Scopes: `repo`, `read:org`, `workflow` (minimum for PR creation, CI status, repo access).
+- NestJS route: `GET /auth/github/callback` handles the code exchange.
+- When OAuth or PAT is active, Pixler uses the `@octokit/rest` SDK instead of shelling out to `gh` for API calls. The `GhExecService` becomes a facade that routes through whichever method is active.
 
 ### 7.2 Repo onboarding
 
@@ -496,8 +586,9 @@ All panes resizable. Any pane can go full-bleed. Big Terminal mode goes full-ble
 
 Each color name subtly tints the workspace’s accent in the sidebar.
 
-Users can rename freely. Branch names follow the workspace name (
-`pixler/<workspace-name>`) unless overridden in project settings.
+Users can rename freely — the display name is preserved as-is, while the
+branch and worktree path use a slugified form (`pixler/<slug>`,
+`pixler-worktrees/<slug>`) to ensure valid git refs and filesystem paths.
 
 ### 8.4 Gesture and touch UX
 
@@ -634,10 +725,12 @@ Opened via the gear icon in the top bar. Icon-rail left, content right.
 | Category           | Contains                                                                                                                                                                                                            |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Account**        | Sign-in (future), privacy controls, telemetry opt-in (default on with prominent disclosure), crash reporting                                                                                                        |
-| **Models**         | Which Claude Code models appear in the picker, which Codex models, default model per role (planner/reviewer/executor), API key/env var management                                                                   |
+| **Models**         | Per-provider model picker (top 3 families × last 2 versions each, probed from installed CLIs). Default provider + model per workflow step role. Refresh button re-probes CLIs. See §10.8.                            |
 | **Providers**      | Path to `claude` binary, path to `codex`, path to `gemini`, path to `gh`. Auto-detect button. Re-auth shortcuts (helps user authenticate if missing).                                                               |
 | **Env**            | Environment variables passed to every agent process. Key-value editor with secret masking.                                                                                                                          |
-| **Linear**         | PAT, default workspace, default team, default project, sync interval, **status name mapping** (which Linear states = “Todo” / “In Progress” / “In Review” / “Done”)                                                 |
+| **Linear**         | Auth method (PAT or OAuth), connection status, disconnect/remove controls, default workspace, default team, default project, sync interval, **status name mapping** (which Linear states = “Todo” / “In Progress” / “In Review” / “Done”) |
+| **GitHub**         | Auth method (gh CLI, OAuth, or PAT), connection status, disconnect/remove controls. See §7.1.                                                                                                                       |
+| **Workflows**      | Workflow editor: list all discovered workflows (built-in / repo / user-global), YAML editor with syntax highlighting, duplicate/archive, "New Workflow" button. See §4A. (Plan folder is set in the Plans panel.)        |
 | **Git**            | Default branch naming template, commit message template, PR template, auto-merge behavior, automerge-on-green toggle, default base branch                                                                           |
 | **Plans**          | **Default storage method** (file/inline/attachment/**auto** — default), file directory, inline thresholds, attachment versioning                                                                                    |
 | **Appearance**     | Theme + mode (light/dark/system), density (compact/comfortable/spacious), font (UI + monospace), terminal theme sync, sidebar width default, animation level (full/reduced/off — respects OS prefer-reduced-motion) |
@@ -736,7 +829,46 @@ When a teammate clones a repo with `pixler.json`, Pixler shows a **diff view
 ** (theme, keyboard shortcuts, notification prefs) stay global and never get touched by repo config — only **workflow
 ** settings come from `pixler.json`.
 
-### 10.8 Agent instructions inheritance
+### 10.8 Model picker architecture
+
+The Models panel (global and per-project) lets users assign a **provider + specific model version** to each workflow step role.
+
+#### Model discovery
+
+Pixler probes installed CLIs at startup and on-demand (refresh button):
+
+- `claude` → parse available model families and versions from CLI output
+- `codex` → parse available models from CLI output
+- `gemini` → parse available models from CLI output
+
+Results are cached in SQLite (`model_registry` table) with a timestamp. The refresh button in the Models panel re-probes all detected CLIs and updates the cache. A Socket.io event (`models:updated`) pushes the refreshed list to the frontend.
+
+#### Display constraints
+
+Per provider, show only:
+
+- **Top 3 model families** (by capability tier — e.g., Opus, Sonnet, Haiku for Claude)
+- **Last 2 released versions** per family (e.g., Opus 4.7 and 4.6)
+
+If the CLI reports fewer than 3 families or fewer than 2 versions, show what's available.
+
+#### Picker UX
+
+Two-step selection per role:
+
+1. **Provider dropdown** — Claude / Codex / Gemini (only shows providers with a detected CLI binary)
+2. **Model dropdown** — filtered to the selected provider's available models (grouped by family, showing version)
+
+Example for a "feature" workflow's `create_plan` step:
+```
+Provider: [Claude ▾]    Model: [Opus 4.7 ▾]
+```
+
+#### Refresh button
+
+A single "Refresh models" button at the top of the Models panel. Shows a spinner while probing, then updates all dropdowns. If a previously selected model is no longer available, the dropdown shows a warning badge and falls back to the provider's default.
+
+### 10.9 Agent instructions inheritance
 
 Pixler reads existing agent-instruction files at workspace creation, in priority order:
 
@@ -747,7 +879,7 @@ Pixler reads existing agent-instruction files at workspace creation, in priority
 
 All applicable files are concatenated and passed to every agent in the workspace as a system-prompt prefix.
 
-### 10.9 Published JSON schema *(v2 / beta)*
+### 10.10 Published JSON schema *(v2 / beta)*
 
 When Pixler exits beta and has a public domain, ship a JSON schema at a stable URL (e.g.,
 `https://pixler.dev/schemas/config.json`) so editors autocomplete and validate
@@ -773,15 +905,21 @@ Designed to take under 90 seconds. Each step is a Vaul drawer panel sliding in f
 - **Git** — checks `git config user.name` and `user.email`; if missing, walks user through setting them
 - **Claude Code** — detects
   `claude` on PATH; shows version if found (“Claude Code 2.1.59 detected”); if missing, shows install command + copy button + “Re-check” button; detects subscription type (Pro/Max/API key) and surfaces which is active
-- **gh CLI** — checks `gh auth status`; if missing, walks user through `gh auth login`
+- **GitHub** — two options presented side by side:
+  - **gh CLI** *(recommended)* — checks `gh auth status`; if missing, walks user through `gh auth login`
+  - **Connect with GitHub** — OAuth button; redirects to GitHub consent, returns to callback
+  - **Paste PAT** — collapsible text field for fine-grained PAT
+  - Only one method can be active; selecting one deactivates the others
 - **(Optional)** Codex / Gemini for peer review with the same auto-detection pattern
 - Big “Re-check all” button
 - “Next →”
 
 #### Step 3 — Connect Linear
 
-- “Paste your Linear PAT” (link to Linear’s API token page)
-- PAT hidden after paste, validated immediately via `viewer` query
+- Two options presented side by side:
+  - **Connect with Linear** *(recommended)* — OAuth button; redirects to Linear consent screen, returns to `localhost:7777/auth/linear/callback`
+  - **Paste PAT** — text field for `lin_api_…` token (link to Linear’s API token page)
+- PAT/OAuth token validated immediately via `viewer` query
 - Shows: “Connected as [name] in [workspace]”
 - Pick default team from dropdown (auto-fills if user only has one)
 - “Skip if you’ll use GitHub Issues” link
@@ -900,13 +1038,13 @@ Each checkpoint is a labeled
 
 ### v1 (initial release)
 
-Workspaces, plan loop (file/inline/attachment), Linear+GitHub via CLI, Chat mode (assistant-ui), Terminal mode, Monaco diff viewer, run/open app, deep links, IDE launcher, all 8 themes, full settings UI, onboarding, checkpoints+rollback, CI status via polling, activity feed, token health panel, telemetry opt-out.
+Workspaces, plan loop (file/inline/attachment), Linear+GitHub via CLI, Chat mode (assistant-ui), Terminal mode, Monaco diff viewer, run/open app, deep links, IDE launcher, all 8 themes, full settings UI, onboarding, checkpoints+rollback, CI status via polling, activity feed, token health panel, telemetry opt-out. **Linear OAuth + PAT auth.** **GitHub OAuth + PAT + gh CLI auth.** **YAML-driven workflow engine** (feature/bugfix/quickfix presets, per-step model selection, custom workflows, in-app editor). **Provider + model picker** (top 3 families × 2 versions, CLI-probed, refresh button). **Local plan storage** (configurable folder, default `_plans` in repo root).
 
 ### v2
 
 Headless mode (Agent SDK with credit-pool billing),
 `.pixler/instructions.md` Pixler-only instruction layer, Pixler status bar above terminal with token usage, real-time CI via GitHub webhooks, HTML inline preview for static content, agent personalities, published JSON schema for
-`pixler.json`, Linear OAuth (replacing PAT-only).
+`pixler.json`.
 
 ### v3
 
@@ -949,7 +1087,7 @@ These need decisions before / during v1 implementation:
 |--------------------------|-------------------------------------------------------------------------------------------------------|
 | **Workspace**            | One ticket + one worktree + one branch + one agent. Pixler’s primary unit.                            |
 | **Plan file**            | `/docs/plans/<TICKET>.md` (or Linear inline/attachment). Source of truth for what the agent is doing. |
-| **Worktree**             | Isolated git working directory at `<repo>/../pixler-worktrees/<name>/`.                               |
+| **Worktree**             | Isolated git working directory at `<repo>/../pixler-worktrees/<slug>/`.                               |
 | **Setup script**         | Bash script that prepares a fresh workspace (deps, .env, etc.)                                        |
 | **Run script**           | Bash script that starts the workspace’s dev environment.                                              |
 | **Checkpoint**           | Auto-snapshot of working tree + workspace state for rollback.                                         |

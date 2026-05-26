@@ -15,7 +15,7 @@ Workflows are selected automatically when a user opens a task, based on the issu
 
 - **File-first**: workflows live in folders on disk, version-controlled, shareable by copy-paste.
 - **Per-step model selection**: expensive reasoning steps can use Opus; cheap scaffolding steps can use Haiku.
-- **Pluggable storage**: plan files go to local disk, S3, or Google Drive — configured once in a provider file.
+- **Local storage**: plan files are written to a local folder (default `_plans` in the repo root), configurable per project.
 - **Claude Code native**: no agent SDK / API credits. Every AI step spawns a Claude Code terminal session (`claude` CLI).
 - **Human gates are explicit**: `approval` steps in the YAML, not hardcoded in the state machine.
 
@@ -34,34 +34,17 @@ Files with the same `name` field shadow lower-priority files. Archiving a workfl
 
 ---
 
-## Storage provider file
+## Plan storage
 
-One file configures where plan `.md` files are written and linked.
+Plans are stored as `.md` files in a **local folder**. By default that's `_plans` in the repo root.
+The folder is configurable via the **Plan folder** setting (`plans.fileDir`) — globally and overridable
+per project.
 
-**`~/.config/pixler/storage.yaml`**
+- A **relative** folder (e.g. `_plans`, `docs/plans`) resolves against the repo root.
+- An **absolute** path (or one starting with `~`) is used as-is.
 
-```yaml
-# Exactly one provider must be active (active: true)
-providers:
-  - id: local
-    type: local
-    active: true
-    path: ~/Documents/pixler-plans       # absolute or ~ path
-
-  - id: gdrive
-    type: google_drive
-    active: false
-    folder_id: "1BxFoo…"                 # Google Drive folder ID
-
-  - id: s3
-    type: s3
-    active: false
-    bucket: my-pixler-plans
-    prefix: plans/
-    region: us-east-1
-```
-
-The active provider is used by the `save_plan` built-in step. Switching providers mid-project does not migrate existing files — only new plans are written to the new location.
+The Plans settings panel shows the full resolved path beneath the input as you type. Changing the
+folder does not migrate existing files — only new plans are written to the new location.
 
 ---
 
@@ -261,14 +244,13 @@ Accessible from **Settings → Workflows**.
 
 ---
 
-## Storage provider UI
+## Plan folder UI
 
-**Settings → Storage**
+**Settings → Plans** (global) and **Project Settings → Plans** (per project)
 
-- Lists configured providers with active indicator
-- "Set Active" button switches the active provider
-- Per-provider: test connection button, edit credentials
-- Providers: Local (folder picker), Google Drive (OAuth), S3 (key/secret/bucket fields)
+- "Plan folder" text input — default `_plans`
+- Full resolved absolute path shown beneath the input, updating as you type
+- Project value overrides the global default
 
 ---
 

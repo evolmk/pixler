@@ -26,6 +26,7 @@ export interface CreateWorkspaceDto {
   ticketId?: string;
   ticketSource?: TicketSource;
   mode?: WorkspaceMode;
+  useWorktree?: boolean; // default true; false = work directly in project root on current branch
 }
 
 export interface PatchWorkspaceDto {

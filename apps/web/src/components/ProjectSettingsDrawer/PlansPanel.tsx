@@ -6,14 +6,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@pixler/ui/components/slider';
 import { Separator } from '@pixler/ui/components/separator';
 import { useSetting } from '../../hooks/useSetting';
+import { useProject } from '../../hooks/useProject';
+import { resolvePlanFolder } from '../../lib/resolvePlanFolder';
+import { FolderPicker } from '../FolderPicker';
 
 export function PlansPanel() {
   const params = useParams({ strict: false }) as { projectId?: string };
   const projectId = params.projectId;
+  const { data: project } = useProject(projectId);
 
   const { value: storageMode = 'auto', set: setStorageMode } = useSetting<string>('plans.storageMode');
+  const { value: planFolder = '_plans', set: setPlanFolder } = useSetting<string>('plans.fileDir');
   const { value: inlineMaxTasks = 3, set: setInlineMaxTasks } = useSetting<number>('plans.inlineMaxTasks');
   const { value: inlineMaxChars = 500, set: setInlineMaxChars } = useSetting<number>('plans.inlineMaxApproachChars');
+
+  const resolvedPath = resolvePlanFolder(project?.path, planFolder);
 
   async function handleResetPrompts() {
     if (!projectId) return;
@@ -38,6 +45,19 @@ export function PlansPanel() {
               <SelectItem value="attachment">Attachment</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-sm">Plan folder</Label>
+          <FolderPicker
+            value={planFolder}
+            onChange={setPlanFolder}
+            placeholder="_plans"
+            title="Choose plan folder"
+            defaultPath={project?.path}
+            inputClassName="text-sm"
+          />
+          <p className="break-all font-mono text-xs text-muted-foreground">{resolvedPath}</p>
         </div>
       </section>
 

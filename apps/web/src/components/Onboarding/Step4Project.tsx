@@ -3,6 +3,7 @@ import { CheckCircle, FolderOpen, Github, SkipForward } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { Input } from '@pixler/ui/components/input';
 import { Label } from '@pixler/ui/components/label';
+import { FolderPicker } from '../FolderPicker';
 import { useAddLocalProject, useCloneProject } from '../../hooks/useProjects';
 
 type Mode = 'pick' | 'local' | 'clone' | 'done';
@@ -65,11 +66,12 @@ export function Step4Project({ onNext }: Props = {}) {
         </button>
         <div className="space-y-2">
           <Label className="text-xs">Project path</Label>
-          <Input
+          <FolderPicker
             value={localPath}
-            onChange={(e) => setLocalPath(e.target.value)}
+            onChange={setLocalPath}
             placeholder="/Users/you/my-project"
-            className="font-mono text-xs h-9"
+            title="Choose project folder"
+            inputClassName="h-9"
           />
         </div>
         <div className="space-y-2">
