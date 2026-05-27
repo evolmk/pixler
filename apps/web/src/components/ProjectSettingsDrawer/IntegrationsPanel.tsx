@@ -1,9 +1,12 @@
 import { useParams } from '@tanstack/react-router';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, X } from 'lucide-react';
 import { Label } from '@pixler/ui/components/label';
+import { Button } from '@pixler/ui/components/button';
 import { useLinearStatus, useLinearTeams, useLinearProjects } from '../../hooks/useLinear';
 import { useGithubStatus } from '../../hooks/useGithubStatus';
 import { useSetting } from '../../hooks/useSetting';
+import { useProjectLinearLink } from '../../hooks/useProjectLinearLink';
+import { LinearProjectPicker } from '../LinearProjectPicker';
 
 type AgentMode = 'cli' | 'mcp' | 'both';
 
@@ -25,7 +28,6 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 export function IntegrationsPanel() {
   const params = useParams({ strict: false }) as { projectId?: string };
   const projectId = params.projectId;
-  void projectId;
 
   const { data: ghStatus } = useGithubStatus();
   const { data: status } = useLinearStatus();
@@ -35,8 +37,19 @@ export function IntegrationsPanel() {
   const { value: projectLinearTeamKey = '' } = useSetting<string>('linear.team');
   const { value: agentMode = 'cli', set: setAgentMode } = useSetting<AgentMode>('linear.agentMode');
 
+  const {
+    teamKey: linkTeamKey,
+    teamId: linkTeamId,
+    projectId: linkedProjectId,
+    setTeam: setLinkTeam,
+    setProject: setLinkProject,
+    clear: clearLink,
+  } = useProjectLinearLink(projectId);
+
   const activeTeam = teams.find((t) => t.key === (projectLinearTeamKey || teamKey));
   const { data: linearProjects = [] } = useLinearProjects(activeTeam?.id);
+  const { data: linkProjects = [] } = useLinearProjects(linkTeamId);
+  const linkedProject = linkProjects.find((p) => p.id === linkedProjectId);
 
   const showTokenWarning = agentMode === 'mcp' || agentMode === 'both';
 
@@ -111,17 +124,51 @@ export function IntegrationsPanel() {
         </div>
       </Section>
 
+      <Section label="Linear project">
+        {linkedProjectId && linkedProject ? (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border px-2.5 py-1.5">
+              <span className="truncate text-sm">{linkedProject.name}</span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={clearLink}
+                className="shrink-0 text-muted-foreground hover:text-destructive"
+                aria-label="Unlink project"
+              >
+                <X className="size-3.5" />
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Issues from this project will appear in the New Workspace picker.
+            </p>
+            <LinearProjectPicker
+              selectedTeamKey={linkTeamKey}
+              selectedProjectId={linkedProjectId}
+              onSelect={(teamKey, projId) => { setLinkTeam(teamKey); setLinkProject(projId); }}
+            />
+            <p className="text-[10px] text-muted-foreground">Change project</p>
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            <LinearProjectPicker
+              selectedTeamKey={linkTeamKey}
+              selectedProjectId={linkedProjectId}
+              onSelect={(teamKey, projId) => { setLinkTeam(teamKey); setLinkProject(projId); }}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              Link a Linear project to enable issue picker in New Workspace.
+            </p>
+          </div>
+        )}
+      </Section>
+
       {linearProjects.length > 0 && (
-        <Section label="Linear projects">
+        <Section label="Available projects">
           <p className="text-xs text-muted-foreground">
-            {linearProjects.length} project{linearProjects.length !== 1 ? 's' : ''} available in{' '}
+            {linearProjects.length} project{linearProjects.length !== 1 ? 's' : ''} in{' '}
             {activeTeam?.name ?? 'selected team'}.
           </p>
-          <ul className="space-y-0.5 text-xs text-muted-foreground">
-            {linearProjects.map((p) => (
-              <li key={p.id}>{p.name}</li>
-            ))}
-          </ul>
         </Section>
       )}
       </>)}

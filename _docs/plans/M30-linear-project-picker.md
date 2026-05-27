@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-26
-**Current Status:** Sprint 1 complete — OAuth error toast+inline, disconnect verified, both drawers widened to sm:max-w-4xl with icon+label nav. Starting Sprint 2.
+**Current Status:** Sprints 1+2 complete. Starting Sprint 3 (issue picker + API routes).
 
 ---
 
@@ -165,7 +165,7 @@ confirm badge clears.
 
 ## Sprint 2 — Per-project Linear project link (settings-based) + Integrations panel
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Persist a per-project Linear project link as a `useSetting` value (no schema change),
 add a `LinearProjectPicker` component, and extend the existing per-project `IntegrationsPanel`
 with a "Linear project" sub-section + Change / Unlink actions.
@@ -179,15 +179,15 @@ with a "Linear project" sub-section + Change / Unlink actions.
 
 **Tasks:**
 
-- [ ] Add `useProjectLinearLink()` hook in
+- [x] Add `useProjectLinearLink()` hook in
   `apps/web/src/hooks/useProjectLinearLink.ts`: wraps `useSetting<string>('linear.team')` +
   `useSetting<string>('linear.projectId')`, exposes `{ teamId, teamKey, projectId, setTeam,
   setProject, clear }`. Settings are project-scoped because `useSetting` already scopes by
   project route.
-- [ ] New `LinearProjectPicker.tsx` (`apps/web/src/components/`): cmdk combobox; if no team is
+- [x] New `LinearProjectPicker.tsx` (`apps/web/src/components/`): cmdk combobox; if no team is
   selected, first prompts for team (reuses `useLinearTeams`); once team is chosen, lists
   projects via `useLinearProjects(teamId)`. On select, calls `setTeam` + `setProject`.
-- [ ] Extend `IntegrationsPanel.tsx`: under the existing "Linear team" section, add a
+- [x] Extend `IntegrationsPanel.tsx`: under the existing "Linear team" section, add a
   "Linear project" sub-section showing the linked project's name (resolved live from
   `useLinearProjects(teamId)` so renames reflect on refetch — don't cache name client-side).
   Add "Change project" (re-opens `LinearProjectPicker`) and "Unlink" (calls `clear()`) actions.
@@ -196,11 +196,13 @@ with a "Linear project" sub-section + Change / Unlink actions.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useProjectLinearLink.ts` — new hook, project-scoped settings via `scope=project`
+- `apps/web/src/components/LinearProjectPicker.tsx` — new cmdk combobox (team → project flow)
+- `apps/web/src/components/ProjectSettingsDrawer/IntegrationsPanel.tsx` — "Linear project" section with picker + Unlink
 
 **Issues Encountered:**
 
-- _none yet_
+- `useSetting` is global-only; used project-scoped API directly in `useProjectLinearLink` so each Pixler project stores its own `linear.team` + `linear.projectId`.
 
 **Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser in `lazar-ui`: open Project Settings →
 Integrations, pick a Linear team, pick a project, reload — confirm both survive (settings
