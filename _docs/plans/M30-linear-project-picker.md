@@ -2,22 +2,28 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-26
-**Current Status:** Plan authored; awaiting execution.
+**Current Status:** Plan authored + consultant-reviewed + revised (P0/P1 findings addressed); awaiting execution.
 
 ---
 
 ## Goal
 
 Replace the free-text "Ticket ID" input in `NewWorkspaceDialog` with a searchable picker fed by a
-**per-project Linear project link**. Surface OAuth configuration errors clearly (currently the
-"Connect with Linear" button silently 401s when `PIXLER_LINEAR_CLIENT_ID` is missing). Add
-disconnect affordances for both the global Linear credential (in Settings) and the per-project
-Linear project link (in Project Settings). Widen both Settings drawers so the new picker and
-project list have room to breathe.
+**per-project Linear project link** stored as a project setting (`linear.projectId`, reusing the
+existing `useSetting` pattern alongside the established `linear.team`). Surface OAuth
+configuration errors clearly (currently the "Connect with Linear" button silently 401s when
+`PIXLER_LINEAR_CLIENT_ID` is missing) via `toast.error` from `@pixler/ui/components/sonner`. Add
+disconnect affordances for the global Linear credential (Settings) and for the per-project Linear
+team/project link (Project Settings → Integrations, extending the existing `IntegrationsPanel`).
+Widen both Settings drawers to `sm:max-w-4xl` and expand their nav rails from icon-only (`w-14`)
+to icon + label (`w-44`). Also fix the `NewWorkspaceDialog` "Waiting for setup script…" race
+discovered in the original audit (Sprint 4).
 
-The link is set during project creation (optional, skippable) and editable from Project Settings.
-The picker also offers an inline "Create new Linear issue…" action that calls a new POST endpoint
-wrapping Linear's `issueCreate` mutation.
+The link is set during project creation (optional, skippable) and editable from Project Settings
+→ Integrations. The picker offers an inline "Create new Linear issue…" action that extends
+`LinearMutationsService` (the service already wraps `client.createIssue`) plus a new controller
+route. The picker reuses the existing `GET /linear/projects?teamId=` and `useLinearProjects(teamId)`
+hook — those already ship.
 
 ## Depends on
 
@@ -28,88 +34,113 @@ wrapping Linear's `issueCreate` mutation.
 
 ## Acceptance
 
-- Clicking "Connect with Linear" with `PIXLER_LINEAR_CLIENT_ID` unset shows a toast with the
-  exact missing env var name and a link to docs/README; the button is no longer silently broken.
-- `NewProjectDialog` shows a "Link Linear project" step *after* the project is created, with
-  a project picker if Linear is connected and a "Connect Linear" CTA + "Skip" if not. Skipping
-  works and creates the project without a link.
+- Clicking "Connect with Linear" with `PIXLER_LINEAR_CLIENT_ID` unset shows a `toast.error`
+  (via `@pixler/ui/components/sonner`) naming the missing env var and linking to docs; the
+  button is no longer silently broken.
+- `NewProjectDialog` adds a `'link-linear'` step *after* project creation, before `'done'`. If
+  Linear is connected, it shows a `LinearProjectPicker` (team selector + project list). If not
+  connected, it shows a "Connect Linear" CTA. Both paths offer a "Skip — link later" button.
 - `NewWorkspaceDialog`'s Ticket ID field is replaced by:
-  - a cmdk-style combobox listing issues from the project's linked Linear project (title +
-    identifier), **if** a Linear project is linked;
-  - a top-of-list "Create new issue…" action that opens a small create-issue dialog and, on
-    success, selects the new issue;
-  - a fallback free-text input + inline "Link Linear project" CTA when no project is linked.
-- `SettingsDrawer` → Linear panel shows a "Disconnect" button per stored credential (oauth/pat)
-  when connected, which clears the credential and updates the badge.
-- `ProjectSettingsDrawer` gains a "Linear project" section showing the linked project (name +
-  identifier) with "Change project" and "Unlink" actions.
-- Both Settings drawers widened from `sm:max-w-[480px]` to `sm:max-w-4xl` and the nav column
-  expanded to fit text labels alongside icons (or kept icon-only — designer's call, see notes).
+  - a cmdk-style combobox listing issues from the project's linked Linear project (identifier +
+    title + state badge + assignee), **if** `linear.projectId` is set on the project;
+  - a sticky top-of-list "Create new issue…" action that opens `CreateLinearIssueDialog` and,
+    on success, selects the new issue and populates `ticketId` with the new issue's
+    **`identifier`** (e.g. `ENG-101`), not its GraphQL id;
+  - a fallback free-text input + inline "Link Linear project →" CTA (opens Project Settings →
+    Integrations) when no `linear.projectId` is set.
+- `SettingsDrawer` → Linear panel: "Disconnect" + per-credential "Remove key" buttons are
+  visible/working when `storedMethods` includes `oauth` or `pat`. (Most of this is already
+  wired — verify and patch gaps.)
+- `IntegrationsPanel.tsx` (existing per-project Integrations panel) gains a "Linear project"
+  sub-section under the existing team selector, showing the linked project (name) with
+  "Change project" (re-opens picker) and "Unlink" (clears `linear.projectId`).
+- Both Settings drawers widened from `sm:max-w-[480px]` to `sm:max-w-4xl`. Nav rail grows from
+  `w-14` (icon-only + tooltip) to `w-44` (icon + label), tooltips removed.
+- The `NewWorkspaceDialog` "Waiting for setup script…" race is fixed: the dialog closes within
+  ~1s when the workspace reaches `ready` even if the state-changed event fires before the
+  subscription registers (Sprint 4).
 - `pnpm -w typecheck` and `pnpm -w lint` clean.
-- Manual browser walk-through (golden path) passes: create project → link Linear project → new
-  workspace → pick issue from list → workspace created with the ticket ID populated.
+- Manual browser walk-through in `lazar-ui` passes: project linked → new workspace → pick issue
+  from list → workspace created with the ticket identifier populated. **OAuth handshake is
+  user-driven** — agent stops and asks per `CLAUDE.md`.
 
 ## Out of scope
 
-- Shipping real Linear OAuth credentials (env vars stay user-supplied; the fix is the error UX, not
-  the credentials themselves).
+- Shipping real Linear OAuth credentials (env vars stay user-supplied; the fix is the error UX,
+  not the credentials themselves).
 - A new workflow step type for issue creation (`linear.create-issue`) — issue creation lives only
   in the picker for this milestone.
-- Background polling/auto-sync of Linear issues — picker fetches on demand.
+- Background polling/auto-sync of Linear issues — picker fetches on demand with server-side
+  search.
 - Editing existing Linear issues from Pixler (state, labels, comments — those endpoints exist
   already; this milestone only reads + creates).
 - Changes to the global `OnboardingShell` 5-step wizard. Per-project linking happens in
   `NewProjectDialog`, not in `OnboardingShell`.
-- Multi-team or multi-Linear-org support per project (one Linear project per Pixler project).
+- Multi-team or multi-Linear-org support per project (one team + one project per Pixler
+  project).
+- Schema migration for Linear link — using per-project settings (`useSetting`) instead, no new
+  SQLite columns.
+- Agent-facing Linear issue creation. SPEC §64–65 requires that path to go through the
+  `pixler-linear` CLI for token cost reasons; this milestone only adds the user-facing SDK path.
 
 ## Files (expected surface)
 
 ```
-apps/api/src/db/migrations/<NN>_add_linear_project_id.sql          (new)
-apps/api/src/projects/projects.repository.ts                       (modify)
-apps/api/src/projects/projects.controller.ts                       (modify)
-apps/api/src/projects/dto/                                         (modify or add)
-apps/api/src/linear/linear.controller.ts                           (modify)
-apps/api/src/linear/linear.service.ts                              (modify)
+apps/api/src/linear/linear.controller.ts                           (modify — add GET /issues, POST /issues)
+apps/api/src/linear/linear.service.ts                              (modify — listIssues({teamId, projectId, q, limit, after}))
+apps/api/src/linear/linear-mutations.service.ts                    (modify — extend createIssue to accept title+description)
 
-packages/shared-types/src/project.ts                               (modify)
-packages/shared-types/src/linear.ts                                (modify)
+packages/shared-types/src/linear.ts                                (modify — LinearIssueSummaryDto, CreateLinearIssueDto)
 
-apps/web/src/hooks/useLinear.ts                                    (modify)
-apps/web/src/hooks/useProjects.ts                                  (modify)
-apps/web/src/components/NewProjectDialog.tsx                       (modify)
-apps/web/src/components/NewWorkspaceDialog.tsx                     (modify)
-apps/web/src/components/LinearIssuePicker.tsx                      (new)
-apps/web/src/components/LinearProjectPicker.tsx                    (new)
-apps/web/src/components/CreateLinearIssueDialog.tsx                (new)
-apps/web/src/components/SettingsDrawer.tsx                         (modify — width)
-apps/web/src/components/ProjectSettingsDrawer.tsx                  (modify — width + Linear section)
-apps/web/src/components/SettingsDrawer/LinearPanel.tsx             (modify — error toast, disconnect)
-apps/web/src/components/SettingsDrawer/ProjectLinearPanel.tsx      (new)
+apps/web/src/hooks/useLinear.ts                                    (modify — useLinearIssues, useCreateLinearIssue, OAuth-url error surface)
+apps/web/src/hooks/useProjectLinearLink.ts                         (new — wraps useSetting('linear.team') + useSetting('linear.projectId'))
+apps/web/src/hooks/useWorkspaceEvents.ts                           (modify — Sprint 4: replay or refetch on subscribe)
+apps/web/src/components/NewProjectDialog.tsx                       (modify — add 'link-linear' step)
+apps/web/src/components/NewWorkspaceDialog.tsx                     (modify — picker, fallback, race fix)
+apps/web/src/components/LinearIssuePicker.tsx                      (new — cmdk over useLinearIssues, debounced search)
+apps/web/src/components/LinearProjectPicker.tsx                    (new — team select + cmdk over useLinearProjects)
+apps/web/src/components/CreateLinearIssueDialog.tsx                (new — title + description form)
+apps/web/src/components/SettingsDrawer.tsx                         (modify — sm:max-w-4xl, nav w-44 + label)
+apps/web/src/components/ProjectSettingsDrawer.tsx                  (modify — sm:max-w-4xl, nav w-44 + label)
+apps/web/src/components/SettingsDrawer/LinearPanel.tsx             (modify — OAuth error toast)
+apps/web/src/components/SettingsDrawer/IntegrationsPanel.tsx       (modify — Linear project sub-section + Unlink)
+apps/web/src/components/Onboarding/Step3Linear.tsx                 (modify — mirror OAuth error toast)
 ```
 
+**Not touched** (intentionally — already exist, reuse):
+- `GET /linear/projects` (linear.controller.ts:38) + `useLinearProjects(teamId)` (useLinear.ts) — already shipping.
+- `LinearService.fetchTicket(identifier)` for workflow-time ticket resolution — keeps the free-text fallback workable.
+- `PatchProjectDto` / `projects.repository.ts` — no project schema changes.
+
 ---
 
-## Sprint 1 — Surface OAuth errors + Linear disconnect in Settings
+## Sprint 1 — Surface OAuth errors + verify Linear disconnect + widen Settings drawers
 
 **Status:** ⏳ pending
-**Goal:** Make the existing "Connect with Linear" button non-broken: show a clear toast when
-OAuth is unconfigured, and add a working "Disconnect" affordance per stored credential. No new
-endpoints, no schema changes — pure UI/UX fix on top of the existing API.
+**Goal:** Make the existing "Connect with Linear" button non-broken via a sonner toast, verify
+the already-wired Disconnect affordances render correctly per `storedMethods`, and grow both
+Settings drawers from `sm:max-w-[480px]` / `w-14` icon-only nav → `sm:max-w-4xl` / `w-44` icon +
+label nav. No API changes, no schema changes.
 
 **Tasks:**
 
-- [ ] Update `useLinearOAuthUrl` to read `err.error.message` from the 401 response and surface it
-  via the existing notifications system (per `apps/web/CLAUDE.md` error-envelope rule).
-- [ ] In `LinearPanel.tsx`, render the mutation's error state inline beneath the OAuth button —
-  call out `PIXLER_LINEAR_CLIENT_ID` by name and link to `_docs/pixler-SPEC.md#linear` (or repo
-  README) for setup. Keep PAT path as the working fallback.
-- [ ] Confirm `removeCredential.mutateAsync('oauth')` / `('pat')` wiring renders a Disconnect
-  button per `storedMethods`; add it (or fix it) so connected users can disconnect from Settings.
-- [ ] Mirror the OAuth-error toast in `Onboarding/Step3Linear.tsx` so the onboarding wizard fails
-  loudly the same way.
-- [ ] Widen both drawers: `SettingsDrawer.tsx` and `ProjectSettingsDrawer.tsx` `DrawerContent`
-  className `sm:max-w-[480px]` → `sm:max-w-4xl`. Sanity-check the nav column at the new width.
+- [ ] Update `useLinearOAuthUrl` (`apps/web/src/hooks/useLinear.ts:109`) to parse the error
+  envelope per `apps/web/CLAUDE.md` (`err?.error?.message`) and call
+  `toast.error(message, { description: '…' })` from `@pixler/ui/components/sonner` on failure.
+  Include `PIXLER_LINEAR_CLIENT_ID` in the toast body so the user knows the env var to set.
+- [ ] In `LinearPanel.tsx`, also render an inline error beneath the OAuth button when
+  `oauthUrl.error` is set, with a link to setup docs. Toast + inline so the user can't miss it.
+- [ ] Mirror the same `toast.error` + inline render in `Onboarding/Step3Linear.tsx`.
+- [ ] Audit `LinearPanel.tsx` Disconnect wiring: `useDisconnectLinear` (line 38) and
+  `useRemoveLinearCredential` (line 39) already exist and render at lines 86 + 122. Verify both
+  render correctly when `storedMethods` is non-empty, fix gaps if any. (Goal of this task is
+  verification — no new mechanism if the wiring already works.)
+- [ ] `SettingsDrawer.tsx`: `DrawerContent` className `sm:max-w-[480px]` → `sm:max-w-4xl`;
+  nav className `w-14` → `w-44`; drop the `Tooltip` wrappers and render each `cat.label` next to
+  the icon (`<cat.icon /> <span>{cat.label}</span>`). Buttons grow from `size="icon-sm"` to the
+  default size; verify all 17 categories fit at the new width.
+- [ ] `ProjectSettingsDrawer.tsx`: same treatment (`sm:max-w-4xl`, `w-44`, label next to icon,
+  remove tooltips).
 
 **Files Created/Modified:**
 
@@ -119,38 +150,45 @@ endpoints, no schema changes — pure UI/UX fix on top of the existing API.
 
 - _none yet_
 
-**Verify:** `pnpm -w typecheck && pnpm -w lint`, then in a browser: open Settings → Linear, click
-"Connect with Linear" — confirm an inline error mentioning `PIXLER_LINEAR_CLIENT_ID` appears.
-With a PAT connected, click Disconnect and confirm the badge clears.
+**Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser (in `lazar-ui` per `CLAUDE.md`): open
+Settings → Linear, click "Connect with Linear" — confirm both the sonner toast and inline error
+mention `PIXLER_LINEAR_CLIENT_ID`. **Do not drive OAuth past the button click** (CLAUDE.md
+requires the user to handle the handshake manually). Verify the wider drawers + icon+label nav
+look correct, all categories accessible. With a PAT connected (user pastes it), click Disconnect,
+confirm badge clears.
 
 ---
 
-## Sprint 2 — Per-project Linear link: schema, API, project settings
+## Sprint 2 — Per-project Linear project link (settings-based) + Integrations panel
 
 **Status:** ⏳ pending
-**Goal:** Persist a per-project Linear project link, expose read/write endpoints, and add a
-"Linear project" section to `ProjectSettingsDrawer` with Change/Unlink actions. Adds a new
-`GET /linear/projects` endpoint so the picker has data.
+**Goal:** Persist a per-project Linear project link as a `useSetting` value (no schema change),
+add a `LinearProjectPicker` component, and extend the existing per-project `IntegrationsPanel`
+with a "Linear project" sub-section + Change / Unlink actions.
+
+**Reuse decisions (locked in):**
+- `GET /linear/projects?teamId=…` and `useLinearProjects(teamId)` **already ship** — do not
+  duplicate.
+- Per-project Linear team already uses `useSetting<string>('linear.team')` (see
+  `IntegrationsPanel.tsx:34`). The new `linear.projectId` value reuses the same pattern.
+- Do **not** add a parallel `ProjectLinearPanel` — extend `IntegrationsPanel.tsx`.
 
 **Tasks:**
 
-- [ ] Add SQLite migration adding `linear_project_id TEXT NULL` and `linear_project_name TEXT NULL`
-  to `projects` table.
-- [ ] Update `projects.repository.ts` to read/write the two new columns; add a `setLinearProject`
-  / `clearLinearProject` method pair.
-- [ ] Add `PATCH /projects/:id/linear-project` accepting `{ linearProjectId, linearProjectName } |
-  null`. Reuse the existing auth guard.
-- [ ] Add `GET /linear/projects` returning `{ id, name, key, teamKey }[]` from the Linear SDK.
-  Guard with 401 when Linear is not connected; return the same error-envelope shape.
-- [ ] Mirror new Project shape in `packages/shared-types/src/project.ts`; add `LinearProject`
-  DTO in `packages/shared-types/src/linear.ts`.
-- [ ] New TanStack Query hooks: `useLinearProjects()`, `useSetProjectLinearLink()`,
-  `useClearProjectLinearLink()` in `useLinear.ts` / `useProjects.ts`.
-- [ ] New `LinearProjectPicker.tsx` (cmdk combobox over `useLinearProjects()`).
-- [ ] New `SettingsDrawer/ProjectLinearPanel.tsx` showing the current link (name + identifier),
-  with "Change project" (opens picker) and "Unlink" actions. Show a "Connect Linear" CTA when
-  the credential is missing entirely.
-- [ ] Register the new panel in `ProjectSettingsDrawer.tsx` nav.
+- [ ] Add `useProjectLinearLink()` hook in
+  `apps/web/src/hooks/useProjectLinearLink.ts`: wraps `useSetting<string>('linear.team')` +
+  `useSetting<string>('linear.projectId')`, exposes `{ teamId, teamKey, projectId, setTeam,
+  setProject, clear }`. Settings are project-scoped because `useSetting` already scopes by
+  project route.
+- [ ] New `LinearProjectPicker.tsx` (`apps/web/src/components/`): cmdk combobox; if no team is
+  selected, first prompts for team (reuses `useLinearTeams`); once team is chosen, lists
+  projects via `useLinearProjects(teamId)`. On select, calls `setTeam` + `setProject`.
+- [ ] Extend `IntegrationsPanel.tsx`: under the existing "Linear team" section, add a
+  "Linear project" sub-section showing the linked project's name (resolved live from
+  `useLinearProjects(teamId)` so renames reflect on refetch — don't cache name client-side).
+  Add "Change project" (re-opens `LinearProjectPicker`) and "Unlink" (calls `clear()`) actions.
+  When `!status.connected`, the existing "Connect your Linear account in Settings → Linear"
+  notice already handles that path — no change needed.
 
 **Files Created/Modified:**
 
@@ -160,38 +198,61 @@ With a PAT connected, click Disconnect and confirm the badge clears.
 
 - _none yet_
 
-**Verify:** `pnpm -w typecheck && pnpm --filter @pixler/api test` (covering the new repository
-method + controller route). In browser: open Project Settings → Linear project, link a project,
-verify it survives reload; click Unlink and verify it clears.
+**Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser in `lazar-ui`: open Project Settings →
+Integrations, pick a Linear team, pick a project, reload — confirm both survive (settings
+persist). Click Unlink — confirm `linear.projectId` clears but `linear.team` stays. Re-link to a
+different project, confirm the displayed name updates.
 
 ---
 
-## Sprint 3 — Issue picker + create-issue in NewWorkspaceDialog
+## Sprint 3 — Issue picker + create-issue in NewWorkspaceDialog + NewProjectDialog link step
 
 **Status:** ⏳ pending
-**Goal:** Replace the free-text Ticket ID input with a searchable issue picker fed by the linked
-Linear project, with an inline "Create new issue…" action. Also gate workspace creation gracefully
-when no project is linked.
+**Goal:** Replace the free-text Ticket ID input with a searchable, paginated issue picker fed
+by the linked Linear project, with an inline "Create new issue…" action. Add a `'link-linear'`
+step to `NewProjectDialog`. Gate workspace creation gracefully when no project is linked.
+
+**Reuse decisions (locked in):**
+- Issue creation extends `LinearMutationsService.createIssue` (already wraps `client.createIssue`
+  at line 70) — do not add a parallel service.
+- `LinearService.fetchTicket(identifier)` already supports identifier-based lookup — keeps the
+  free-text fallback working through workflow execution (`builtin:review_issue`, SPEC §4A.4).
+- Workspace `ticketId` field stores the Linear **identifier** (`ENG-101`), not the GraphQL id.
 
 **Tasks:**
 
-- [ ] Add `GET /linear/issues?projectId=…` returning `{ id, identifier, title, state }[]` for
-  issues in the given Linear project. Server-side pagination/limit if Linear API requires it.
-- [ ] Add `POST /linear/issues` accepting `{ projectId, title, description? }` wrapping Linear's
-  `issueCreate` mutation; return the created issue.
-- [ ] New TanStack hooks: `useLinearIssues(linearProjectId)`,
-  `useCreateLinearIssue(linearProjectId)`.
-- [ ] New `LinearIssuePicker.tsx` (cmdk over `useLinearIssues`) with a sticky top-of-list "Create
-  new issue…" row.
-- [ ] New `CreateLinearIssueDialog.tsx` — small form (title required, description optional);
-  on submit, calls `useCreateLinearIssue`, then selects the new issue via callback.
-- [ ] Modify `NewWorkspaceDialog.tsx`: when `project.linearProjectId` is set, render
-  `LinearIssuePicker` in place of the Ticket ID `<Input>`; when not set, render the existing
-  free-text input plus an inline "Link Linear project →" CTA that opens `ProjectSettingsDrawer`.
-- [ ] Modify `NewProjectDialog.tsx` to add an **optional** step after project creation: "Link a
-  Linear project?" with `LinearProjectPicker` and a "Skip — link later" button. If Linear is not
-  connected, show "Connect Linear" CTA + "Skip" instead of the picker.
-- [ ] Light unit tests around the new hooks' error envelopes.
+- [ ] Add `LinearService.listIssues({ teamId, projectId, q?, limit?, after? })` returning
+  `{ nodes: LinearIssueSummaryDto[], cursor: string | null }`. Uses
+  `client.issues({ filter: { project: { id: { eq } }, ...(q ? { search: q } : {}) }, first: limit ?? 50, after })`.
+- [ ] Add `GET /linear/issues?teamId=&projectId=&q=&limit=&after=` route in
+  `linear.controller.ts` calling the new service method. 401 when Linear not connected (matches
+  existing pattern in `teams()` / `projects()`).
+- [ ] Extend `LinearMutationsService.createIssue` to accept `{ teamId, title, description?,
+  parentId? }`; return the created issue summary (id, identifier, title, state).
+- [ ] Add `POST /linear/issues` route accepting `CreateLinearIssueDto { teamId, projectId,
+  title, description? }`, calling the extended mutation service (with `projectId` passed via
+  `client.createIssue({ teamId, title, projectId, description })`). Return the new issue.
+- [ ] Add DTOs to `packages/shared-types/src/linear.ts`: `LinearIssueSummaryDto`
+  (`{ id, identifier, title, state, stateType, assigneeName? }`) and `CreateLinearIssueDto`.
+- [ ] Add TanStack hooks in `useLinear.ts`: `useLinearIssues({ teamId, projectId, q })` with
+  debounced query key (debounce `q` ~250ms); `useCreateLinearIssue()` returning the created
+  issue.
+- [ ] New `LinearIssuePicker.tsx` (`apps/web/src/components/`): cmdk over `useLinearIssues`,
+  debounced search input, sticky top-of-list "Create new issue…" row, each issue row shows
+  identifier + title + state badge + assignee name. Calls `onSelect(identifier)` with the
+  user-facing identifier.
+- [ ] New `CreateLinearIssueDialog.tsx`: small form (title required, description optional). On
+  submit, calls `useCreateLinearIssue`, then invokes `onCreated(issue)` so the picker auto-
+  selects the new issue.
+- [ ] Modify `NewWorkspaceDialog.tsx`: read `useProjectLinearLink()`. If `projectId` set,
+  render `LinearIssuePicker` in place of the free-text Ticket ID `<Input>`. If not set, keep
+  the existing input plus an inline "Link Linear project →" link that calls
+  `setProjectSettingsOpen(true)`. **Always** allow free-text Ticket ID as a fallback — workflows
+  using `builtin:review_issue` resolve via `LinearService.fetchTicket(identifier)` either way.
+- [ ] Modify `NewProjectDialog.tsx`: add a `'link-linear'` step between project creation and
+  `'done'`. Renders `LinearProjectPicker` if Linear is connected, "Connect Linear" CTA + "Skip"
+  if not. The Skip button finishes onboarding without setting `linear.projectId`.
+- [ ] Light unit tests for `useLinearIssues` and `useCreateLinearIssue` error envelopes.
 
 **Files Created/Modified:**
 
@@ -201,10 +262,57 @@ when no project is linked.
 
 - _none yet_
 
-**Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser golden path: create new project → link
-Linear project in the post-create step → open New Workspace → pick issue from list → confirm the
-workspace is created with the picked ticket identifier. Edge case: create an issue via "Create
-new issue…" and verify it's auto-selected.
+**Verify:** `pnpm -w typecheck && pnpm -w lint && pnpm --filter @pixler/api test`. Browser
+golden path in `lazar-ui`: create a fresh project → at `link-linear` step pick the Linear
+project (user drives any required OAuth manually) → open New Workspace → type to search → pick
+issue from list → confirm workspace is created with the **identifier** (`ENG-101`) populated.
+Edge cases: (a) "Create new issue…" inline creation auto-selects the new issue; (b) project
+without `linear.projectId` falls back to free-text input and the "Link Linear project →" link
+opens Project Settings.
+
+---
+
+## Sprint 4 — Fix NewWorkspaceDialog "Waiting for setup script…" race
+
+**Status:** ⏳ pending
+**Goal:** The dialog reaches the `'creating'` step, shows "Waiting for setup script…", and never
+dismisses — even though the workspace reaches `ready` (visible in the sidebar). Root cause
+identified in the original audit: `useWorkspaceEvents(createdId, handleEvent)` in
+`NewWorkspaceDialog.tsx:48-61` only subscribes *after* `setCreatedId(ws.id)` runs, which is
+after `mutateAsync` resolves. The backend emits `workspace.state-changed → ready` during the
+POST (worktree creation is fast), so the dialog misses the event. Plus the empty-log placeholder
+"Waiting for setup script…" is shown unconditionally when `setupLog.length === 0`, regardless of
+actual state.
+
+**Tasks:**
+
+- [ ] In `NewWorkspaceDialog.tsx`, after `setCreatedId(ws.id)`, also refetch the workspace state
+  once via the workspaces query cache (or fetch directly). If the workspace is already `ready`
+  or `error`, close the dialog immediately — don't wait for an event.
+- [ ] Alternatively (or additionally), use the response from `create.mutateAsync` itself: the
+  POST returns the created workspace; if its initial state is already `ready`, skip the
+  `'creating'` step entirely and close.
+- [ ] Update the empty-log placeholder text: if the workspace is `ready` (per the refetch), show
+  "Workspace ready — closing…" with a 1s timer; only show "Waiting for setup script…" if state
+  is `creating`/`pending`.
+- [ ] Verify the `workspace.state-changed` event handler still works for the non-race case
+  (slow setup script).
+- [ ] Optional: instrument `useWorkspaceEvents.ts` with a one-shot replay of the last known
+  state when the subscription registers, so future dialogs don't hit the same race. Skip if it
+  expands scope unreasonably.
+
+**Files Created/Modified:**
+
+- _none yet_
+
+**Issues Encountered:**
+
+- _none yet_
+
+**Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser in `lazar-ui`: New Workspace → Create —
+confirm the dialog closes within ~1s of the workspace appearing in the sidebar. Also test the
+slow path by adding a `setup` script that sleeps 5s in `pixler.json` (revert after) — confirm the
+dialog stays open and streams setup logs until ready.
 
 ---
 
@@ -342,4 +450,10 @@ settings, option to disconnect linear project, and repick another project
 ### Changelog
 
 - 2026-05-26: Initial consultant review.
+- 2026-05-26: Plan body revised to address P0/P1 findings. Sprint 2 reframed (settings-based
+  link, no migration, reuse `GET /linear/projects` + `useLinearProjects`, extend
+  `IntegrationsPanel` instead of new panel). Sprint 3 reframed (extend
+  `LinearMutationsService`, identifier-not-id ticket field, server-side search). Sprint 1 names
+  `sonner.toast.error` + drawer nav `w-44` icon+label. Sprint 4 added for the
+  `NewWorkspaceDialog` race. OAuth-handshake-by-user note added to every Verify section.
 

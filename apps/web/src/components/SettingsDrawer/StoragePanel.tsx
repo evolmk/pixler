@@ -41,7 +41,7 @@ const ACTION_DESCRIPTIONS: Partial<Record<NonNullable<ConfirmAction>, string>> =
 
 export function StoragePanel() {
   const [confirming, setConfirming] = useState<ConfirmAction>(null);
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState<{ action: NonNullable<ConfirmAction>; message: string } | null>(null);
 
   const runAction = async (action: NonNullable<ConfirmAction>) => {
     const endpoints: Record<NonNullable<ConfirmAction>, string> = {
@@ -52,9 +52,9 @@ export function StoragePanel() {
     };
     try {
       const res = await fetch(endpoints[action], { method: 'POST' });
-      setResult(res.ok ? `${ACTION_LABELS[action]} — done.` : `Failed (${res.status}).`);
+      setResult({ action, message: res.ok ? `${ACTION_LABELS[action]} — done.` : `Failed (${res.status}).` });
     } catch {
-      setResult('Request failed.');
+      setResult({ action, message: 'Request failed.' });
     }
     setConfirming(null);
   };
@@ -68,7 +68,7 @@ export function StoragePanel() {
       </Section>
 
       <Section label="Destructive Actions">
-        {result && <p className="text-xs text-muted-foreground">{result}</p>}
+        {result && result.action !== 'factory-reset' && <p className="text-xs text-muted-foreground">{result.message}</p>}
         <div className="space-y-2">
           {(['prompts', 'settings', 'database'] as const).map((action) => (
             confirming === action ? (
@@ -102,8 +102,8 @@ export function StoragePanel() {
 
       <Section label="Factory Reset">
         <p className="text-xs text-muted-foreground">{ACTION_DESCRIPTIONS['factory-reset']}</p>
-        {result && confirming === null && (
-          <p className="text-xs text-muted-foreground">{result}</p>
+        {result?.action === 'factory-reset' && confirming === null && (
+          <p className="text-xs text-muted-foreground">{result.message}</p>
         )}
         {confirming === 'factory-reset' ? (
           <div className="rounded-md border border-destructive/60 bg-destructive/5 p-3 space-y-3">

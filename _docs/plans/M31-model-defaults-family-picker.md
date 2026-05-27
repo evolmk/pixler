@@ -195,3 +195,66 @@ version), or Claude > Sonnet.
 (e.g. claude:opus). Graceful legacy resolution, no DB migration. Single latest id per family. Edit both
 panels in place.]
 ```
+
+---
+
+## Consultant Review (2026-05-26)
+
+### Risks & gaps
+
+- **[P0]** The **project** panel has a three-state inherit model the plan doesn't account for:
+  `GLOBAL_DEFAULT = '__global__'` and empty string both mean "inherit from global"
+  (`ProjectSettingsDrawer/ModelsPanel.tsx:18,32,50,69-83`). Sprint 2's normalizer (legacy id →
+  family; bare provider → first family; unknown → warn) must NOT treat `''`/`__global__` as an
+  unknown provider. Sprint 3 must keep the "Global default" option and the `!isGlobal` guard on
+  the family dropdown + warning. Missing this either breaks inherit or fires a false warning on
+  every inheriting project role.
+- **[P1]** `useSetting` is hardcoded to global scope — `fetchSettings` hits `?scope=global` and
+  `patchSetting` sends `scope: 'global'` (`apps/web/src/hooks/useSetting.ts:6,14`). The project
+  `ModelsPanel` uses this same hook for `models.*`, so project-scoped overrides appear to read/write
+  the **global** scope, contradicting `registry.ts` (`scopes: ['global','project']`) and SPEC §10.8's
+  per-project overrides. Almost certainly **pre-existing**, but Sprint 3 edits this exact surface —
+  verify during execution and log it. Fixing project scoping is likely **out of M31's scope**, but
+  shipping the family picker on top of a broken scope silently makes the project panel a no-op.
+- **[P1]** The plan defines when the warning *fires* (unknown provider) but not what the picker
+  **shows/selects** in that state. SPEC §10.8 says "falls back to the provider's default." Define
+  the fallback display (see Reuse below) so two implementers don't diverge.
+- **[P1]** Acceptance criterion "no warning for a legacy stored value (`claude-opus-4-7` / bare
+  `claude`)" is **not testable through the UI** once the version picker is gone — there's no way to
+  pick a version to create the stale state. Add a task noting how to seed it (PATCH `/api/settings`
+  with a legacy value, or write the sqlite row directly) so the edge case can actually be exercised.
+
+### Spec compliance
+
+- **[P1]** Sprint 4 tasks cite hard line numbers (728, 758, 341). Those shift the moment §10.8 is
+  rewritten in the same pass. Re-anchor to sections: §10.8 (Model picker architecture), the §9
+  settings-table "Models" rows (global + project), and the workflow-YAML example (`planner:
+  claude-sonnet-4-7`). Content of the tasks is correct; just the addressing is fragile.
+- _(positive)_ The §10.8 rewrite and the family-vs-version layering note are the right spec changes
+  and correctly keep workflow-step version pinning intact.
+
+### Reuse opportunities
+
+- **[P1]** `firstAvailableModel` (`useModels.ts:64`) is **imported but never called** in the global
+  panel (`SettingsDrawer/ModelsPanel.tsx:7`). Sprint 2 changes its return shape — rather than leave
+  a dead import (lint break), wire it into the unavailable-provider fallback so the picker defaults
+  to the first available `provider:family`. That simultaneously satisfies SPEC §10.8's "falls back
+  to the provider's default" and resolves the P1 gap above.
+- **[P2]** Confirm `.versions[0]` consumers survive the length-1 collapse before Sprint 1 —
+  `handleProviderChange` reads `families[0]?.versions[0]?.id` in both panels; that's safe, but grep
+  `\.versions` repo-wide to be sure nothing expects ≥2 entries (e.g. usage display).
+
+### Enhancements
+
+- **[P1]** Add the nav-label files to the plan's file surface: `SettingsDrawer.tsx:63`
+  (`label: 'Models'` → `'Model Defaults'`) and `ProjectSettingsDrawer.tsx:39`. Recommend the
+  **project** tab stays `'Models'` — it's an *override* panel ("Agent role overrides" /
+  "Overrides the global defaults"), so labeling it "Model Defaults" would mislead. The rename is a
+  global-panel concept only.
+- **[P2]** Cheap data hygiene without a migration: when a panel saves a role setting, write the
+  normalized `provider:family` form. Over time legacy version-id/bare-provider rows self-heal on
+  next edit — no DB migration, satisfies the "graceful resolution, no migration" decision.
+
+### Changelog
+
+- 2026-05-26: Initial consultant review
