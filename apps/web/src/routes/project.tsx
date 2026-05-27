@@ -17,9 +17,9 @@ import { useNativeNotifications } from '../hooks/useNativeNotifications';
 import { useDeepLink } from '../hooks/useDeepLink';
 
 /**
- * 3-pane shell for `/p/$projectId` and `/p/$projectId/w/$workspaceId`.
- * Full-bleed states bypass the resizable splits — bigTerminal and per-pane
- * expand chevrons each render only the relevant component.
+ * 3-pane shell. Used by `/` (when a current project is set) and `/w/$workspaceId`.
+ * The current project comes from `useCurrentProject()` (localStorage-backed),
+ * not from URL params. Full-bleed states bypass the resizable splits.
  */
 export function ProjectShell() {
   usePaletteActions();

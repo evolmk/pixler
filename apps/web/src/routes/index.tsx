@@ -1,23 +1,29 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import { FolderPlus } from 'lucide-react';
 import { EmptyState } from '@pixler/ui/components/empty-state';
 import { Button } from '@pixler/ui/components/button';
 import { NewProjectDialog } from '../components/NewProjectDialog';
 import { useProjects } from '../hooks/useProjects';
+import { useCurrentProject } from '../hooks/useCurrentProject';
+import { ProjectShell } from './project';
 
-export function HomeRoute() {
+/**
+ * `/` — renders ProjectShell when a current project is set (via localStorage-
+ * backed store), otherwise shows the picker / onboarding. Auto-selects the
+ * first project on mount if nothing is stored.
+ */
+export function RootRoute() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const navigate = useNavigate();
   const { data: projects, isLoading } = useProjects();
+  const { projectId, setProjectId } = useCurrentProject();
 
   useEffect(() => {
-    if (!isLoading && projects && projects.length > 0) {
-      void navigate({ to: '/p/$projectId', params: { projectId: projects[0].id } });
-    }
-  }, [isLoading, projects, navigate]);
+    if (isLoading || !projects) return;
+    if (!projectId && projects.length > 0) setProjectId(projects[0].id);
+  }, [isLoading, projects, projectId, setProjectId]);
 
-  if (isLoading || (projects && projects.length > 0)) return null;
+  if (isLoading) return null;
+  if (projectId) return <ProjectShell />;
 
   return (
     <div className="grid h-screen w-screen place-items-center bg-background p-6 text-foreground">
@@ -35,7 +41,7 @@ export function HomeRoute() {
       <NewProjectDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onProjectAdded={(id) => navigate({ to: '/p/$projectId', params: { projectId: id } })}
+        onProjectAdded={(id) => setProjectId(id)}
       />
     </div>
   );

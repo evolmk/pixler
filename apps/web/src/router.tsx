@@ -4,34 +4,24 @@ import {
   createRouter,
   Outlet,
 } from '@tanstack/react-router';
-import { HomeRoute } from './routes/index';
-import { ProjectShell } from './routes/project';
+import { RootRoute } from './routes/index';
+import { WorkspaceRoute } from './routes/workspace';
 
 const rootRoute = createRootRoute({ component: () => <Outlet /> });
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: HomeRoute,
-});
-
-const projectRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/p/$projectId',
-  component: ProjectShell,
+  component: RootRoute,
 });
 
 const workspaceRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/p/$projectId/w/$workspaceId',
-  component: ProjectShell,
+  path: '/w/$workspaceId',
+  component: WorkspaceRoute,
 });
 
-const routeTree = rootRoute.addChildren([
-  indexRoute,
-  projectRoute,
-  workspaceRoute,
-]);
+const routeTree = rootRoute.addChildren([indexRoute, workspaceRoute]);
 
 export const router = createRouter({ routeTree });
 

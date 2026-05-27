@@ -8,6 +8,15 @@ async function fetchWorkspaces(projectId: string): Promise<Workspace[]> {
   return res.json();
 }
 
+async function fetchWorkspace(id: string): Promise<Workspace> {
+  const res = await fetch(`/api/workspaces/${id}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message ?? `Workspace ${id} not found`);
+  }
+  return res.json();
+}
+
 async function createWorkspace(dto: CreateWorkspaceDto): Promise<Workspace> {
   const res = await fetch('/api/workspaces', {
     method: 'POST',
@@ -52,6 +61,14 @@ export function useWorkspaces(projectId?: string) {
     queryKey: ['workspaces', projectId],
     queryFn: () => fetchWorkspaces(projectId!),
     enabled: !!projectId,
+  });
+}
+
+export function useWorkspace(id?: string) {
+  return useQuery({
+    queryKey: ['workspace', id],
+    queryFn: () => fetchWorkspace(id!),
+    enabled: !!id,
   });
 }
 
