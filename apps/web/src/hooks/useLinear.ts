@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@pixler/ui/components/sonner';
 import { socket } from '../lib/socket';
-import type { LinearStatusDto, LinearTeamDto, LinearProjectDto } from '@pixler/shared-types';
+import type { LinearStatusDto, LinearTeamDto, LinearProjectDto, LinearIssuePageDto, LinearIssueSummaryDto, CreateLinearIssueDto } from '@pixler/shared-types';
 
 async function fetchStatus(): Promise<LinearStatusDto> {
   const res = await fetch('/api/linear/status');
@@ -128,6 +128,61 @@ export function useLinearOAuthUrl() {
           ? msg
           : `${msg} — set PIXLER_LINEAR_CLIENT_ID to enable OAuth`,
       });
+    },
+  });
+}
+
+async function fetchIssues(
+  teamId: string,
+  projectId: string,
+  q: string,
+): Promise<LinearIssuePageDto> {
+  const params = new URLSearchParams({ teamId, projectId });
+  if (q) params.set('q', q);
+  const res = await fetch(`/api/linear/issues?${params.toString()}`);
+  if (!res.ok) return { nodes: [], cursor: null };
+  return res.json();
+}
+
+export function useLinearIssues(opts: {
+  teamId: string | undefined;
+  projectId: string | undefined;
+  q?: string;
+}) {
+  const { teamId, projectId, q = '' } = opts;
+  const [debouncedQ, setDebouncedQ] = useState(q);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQ(q), 250);
+    return () => clearTimeout(id);
+  }, [q]);
+
+  return useQuery({
+    queryKey: ['linear', 'issues', teamId, projectId, debouncedQ],
+    queryFn: () => fetchIssues(teamId!, projectId!, debouncedQ),
+    enabled: !!teamId && !!projectId,
+    staleTime: 30_000,
+  });
+}
+
+export function useCreateLinearIssue() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (dto: CreateLinearIssueDto): Promise<LinearIssueSummaryDto> => {
+      const res = await fetch('/api/linear/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const msg: string = (body as { error?: { message?: string } })?.error?.message ?? 'Failed to create issue';
+        throw new Error(msg);
+      }
+      return res.json() as Promise<LinearIssueSummaryDto>;
+    },
+    onSuccess: (_, vars) => {
+      void qc.invalidateQueries({ queryKey: ['linear', 'issues', vars.teamId, vars.projectId] });
     },
   });
 }

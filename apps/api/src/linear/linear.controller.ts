@@ -3,7 +3,7 @@ import { LinearService } from './linear.service';
 import { SyncScheduler } from './sync.scheduler';
 import { StateMapService } from './state-map.service';
 import { LinearMutationsService } from './linear-mutations.service';
-import type { ConnectLinearDto } from '@pixler/shared-types';
+import type { ConnectLinearDto, CreateLinearIssueDto } from '@pixler/shared-types';
 
 @Controller('linear')
 export class LinearController {
@@ -37,6 +37,28 @@ export class LinearController {
   @Get('projects')
   projects(@Query('teamId') teamId: string) {
     return this.linear.projects(teamId);
+  }
+
+  @Get('issues')
+  issues(
+    @Query('teamId') teamId: string,
+    @Query('projectId') projectId: string,
+    @Query('q') q?: string,
+    @Query('limit') limit?: string,
+    @Query('after') after?: string,
+  ) {
+    return this.linear.listIssues({
+      teamId,
+      projectId,
+      q,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      after,
+    });
+  }
+
+  @Post('issues')
+  createIssue(@Body() dto: CreateLinearIssueDto) {
+    return this.mutations.createIssue(dto);
   }
 
   @Get('tickets')

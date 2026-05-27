@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FolderOpen, Github } from 'lucide-react';
+import { FolderOpen, Github, Link } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,13 @@ import { Input } from '@pixler/ui/components/input';
 import { Label } from '@pixler/ui/components/label';
 import { FolderPicker } from './FolderPicker';
 import { CloneProgress } from './CloneProgress';
+import { LinearProjectPicker } from './LinearProjectPicker';
 import { useAddLocalProject, useCloneProject } from '../hooks/useProjects';
+import { useProjectLinearLink } from '../hooks/useProjectLinearLink';
+import { useLinearStatus } from '../hooks/useLinear';
+import { useLayoutStore } from '../stores/layout';
 
-type Step = 'pick' | 'local-form' | 'clone-form' | 'cloning' | 'done';
+type Step = 'pick' | 'local-form' | 'clone-form' | 'cloning' | 'link-linear' | 'done';
 
 interface NewProjectDialogProps {
   open: boolean;
@@ -27,16 +31,21 @@ export function NewProjectDialog({ open, onOpenChange, onProjectAdded }: NewProj
   const [localPath, setLocalPath] = useState('');
   const [cloneRepo, setCloneRepo] = useState('');
   const [cloneProjectId, setCloneProjectId] = useState('');
+  const [createdProjectId, setCreatedProjectId] = useState<string | undefined>(undefined);
   const [error, setError] = useState('');
 
   const addLocal = useAddLocalProject();
   const startClone = useCloneProject();
+  const { data: linearStatus } = useLinearStatus();
+  const { setTeam: setLinkTeam, setProject: setLinkProject } = useProjectLinearLink(createdProjectId);
+  const setSettingsOpen = useLayoutStore((s) => s.setSettingsOpen);
 
   const reset = () => {
     setStep('pick');
     setLocalPath('');
     setCloneRepo('');
     setCloneProjectId('');
+    setCreatedProjectId(undefined);
     setError('');
   };
 
@@ -49,8 +58,9 @@ export function NewProjectDialog({ open, onOpenChange, onProjectAdded }: NewProj
     setError('');
     try {
       const project = await addLocal.mutateAsync({ path: localPath.trim() });
+      setCreatedProjectId(project.id);
       onProjectAdded?.(project.id);
-      handleOpenChange(false);
+      setStep('link-linear');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to add project';
       if (msg.toLowerCase().includes('already exists')) {
@@ -77,6 +87,7 @@ export function NewProjectDialog({ open, onOpenChange, onProjectAdded }: NewProj
     'local-form': 'Open local repo',
     'clone-form': 'Clone from GitHub',
     cloning: 'Cloning…',
+    'link-linear': 'Link Linear project',
     done: 'Done',
   };
 
@@ -164,14 +175,60 @@ export function NewProjectDialog({ open, onOpenChange, onProjectAdded }: NewProj
           <CloneProgress
             projectId={cloneProjectId}
             onComplete={() => {
+              setCreatedProjectId(cloneProjectId);
               onProjectAdded?.(cloneProjectId);
-              handleOpenChange(false);
+              setStep('link-linear');
             }}
             onError={(e) => {
               setError(e);
               setStep('clone-form');
             }}
           />
+        )}
+
+        {step === 'link-linear' && (
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-muted-foreground">
+              Link a Linear project to enable the issue picker when creating workspaces. You can change this later in Project Settings → Integrations.
+            </p>
+            {linearStatus?.connected ? (
+              <div className="space-y-2">
+                <Label className="text-xs">Select Linear project</Label>
+                <LinearProjectPicker
+                  onSelect={(teamKey, projId) => {
+                    setLinkTeam(teamKey);
+                    setLinkProject(projId);
+                    handleOpenChange(false);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="rounded-md border border-border bg-muted/40 p-4 space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <Link className="size-4 text-muted-foreground" />
+                  <span>Linear not connected</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Connect your Linear account first, then link a project.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    handleOpenChange(false);
+                    setSettingsOpen(true);
+                  }}
+                >
+                  Connect Linear in Settings →
+                </Button>
+              </div>
+            )}
+            <div className="flex justify-end">
+              <Button variant="ghost" size="sm" onClick={() => handleOpenChange(false)}>
+                Skip — link later
+              </Button>
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>

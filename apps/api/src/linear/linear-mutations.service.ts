@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { LinearService } from './linear.service';
+import type { LinearIssueSummaryDto } from '@pixler/shared-types';
 
 @Injectable()
 export class LinearMutationsService {
@@ -93,6 +94,39 @@ export class LinearMutationsService {
     }
 
     return { labelId: label.id };
+  }
+
+  async createIssue(opts: {
+    teamId: string;
+    title: string;
+    description?: string;
+    projectId?: string;
+    parentId?: string;
+  }): Promise<LinearIssueSummaryDto> {
+    const client = await this.linear.getClient();
+    if (!client) throw new UnauthorizedException('Linear not connected');
+
+    const payload = await client.createIssue({
+      teamId: opts.teamId,
+      title: opts.title,
+      ...(opts.description ? { description: opts.description } : {}),
+      ...(opts.projectId ? { projectId: opts.projectId } : {}),
+      ...(opts.parentId ? { parentId: opts.parentId } : {}),
+    });
+    if (!payload.issueId) throw new Error('Failed to create issue');
+
+    const created = await client.issue(payload.issueId);
+    const state = await created.state;
+    const assignee = await created.assignee;
+
+    return {
+      id: created.id,
+      identifier: created.identifier,
+      title: created.title,
+      state: state?.name ?? 'Unknown',
+      stateType: state?.type ?? 'unstarted',
+      assigneeName: assignee?.name ?? null,
+    };
   }
 
   async completeSubissue(id: string): Promise<void> {

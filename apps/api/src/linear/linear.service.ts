@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { LinearClient } from '@linear/sdk';
 import { SecretStoreService } from './secret-store.service';
-import type { LinearStatusDto, LinearTeamDto, LinearProjectDto, LinearTicketDto } from '@pixler/shared-types';
+import type { LinearStatusDto, LinearTeamDto, LinearProjectDto, LinearTicketDto, LinearIssueSummaryDto, LinearIssuePageDto } from '@pixler/shared-types';
 
 const PAT_KEY = 'linear.pat';
 const OAUTH_TOKEN_KEY = 'linear.oauth.accessToken';
@@ -167,5 +167,57 @@ export class LinearService {
     const team = await client.team(teamId);
     const result = await team.projects();
     return result.nodes.map((p) => ({ id: p.id, name: p.name, slug: p.slugId }));
+  }
+
+  async listIssues(opts: {
+    teamId: string;
+    projectId: string;
+    q?: string;
+    limit?: number;
+    after?: string;
+  }): Promise<LinearIssuePageDto> {
+    const client = await this.getClient();
+    if (!client) throw new UnauthorizedException('Linear not connected');
+
+    const filter: Record<string, unknown> = {
+      team: { id: { eq: opts.teamId } },
+      project: { id: { eq: opts.projectId } },
+    };
+    if (opts.q) filter['searchableContent'] = { contains: opts.q };
+
+    const result = await (client.issues as (args: Record<string, unknown>) => Promise<{
+      nodes: Array<{
+        id: string;
+        identifier: string;
+        title: string;
+        state: Promise<{ name: string; type: string } | undefined> | undefined;
+        assignee: Promise<{ name: string } | undefined> | undefined;
+      }>;
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+    }>)({
+      filter,
+      first: opts.limit ?? 50,
+      ...(opts.after ? { after: opts.after } : {}),
+    });
+
+    const nodes: LinearIssueSummaryDto[] = await Promise.all(
+      result.nodes.map(async (issue) => {
+        const state = await issue.state;
+        const assignee = await issue.assignee;
+        return {
+          id: issue.id,
+          identifier: issue.identifier,
+          title: issue.title,
+          state: state?.name ?? 'Unknown',
+          stateType: state?.type ?? 'unstarted',
+          assigneeName: assignee?.name ?? null,
+        };
+      }),
+    );
+
+    return {
+      nodes,
+      cursor: result.pageInfo.hasNextPage ? (result.pageInfo.endCursor ?? null) : null,
+    };
   }
 }

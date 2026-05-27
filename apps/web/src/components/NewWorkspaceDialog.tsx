@@ -15,6 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateWorkspace } from '../hooks/useWorkspaces';
 import { useWorkspaceEvents } from '../hooks/useWorkspaceEvents';
 import { useWorkflows } from '../hooks/useWorkflows';
+import { useProjectLinearLink } from '../hooks/useProjectLinearLink';
+import { useLayoutStore } from '../stores/layout';
+import { LinearIssuePicker } from './LinearIssuePicker';
 import { useCallback, useRef } from 'react';
 import { slugify } from '@pixler/shared-types';
 import type { WorkspaceMode, WorkspaceEvent } from '@pixler/shared-types';
@@ -44,6 +47,8 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
   const create = useCreateWorkspace();
   const logRef = useRef<HTMLDivElement>(null);
   const { data: workflows = [] } = useWorkflows();
+  const { teamId: linearTeamId, projectId: linkedLinearProjectId } = useProjectLinearLink(projectId);
+  const setProjectSettingsOpen = useLayoutStore((s) => s.setProjectSettingsOpen);
 
   const handleEvent = useCallback((event: WorkspaceEvent) => {
     if (event.type === 'workspace.setup-log') {
@@ -141,15 +146,33 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
               </div>
             </div>
 
-            {/* Ticket ID */}
+            {/* Ticket ID — issue picker if Linear project linked, fallback free-text */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="ticket-id">Ticket ID <span className="text-muted-foreground">(optional)</span></Label>
-              <Input
-                id="ticket-id"
-                placeholder="ENG-101"
-                value={ticketId}
-                onChange={(e) => setTicketId(e.target.value)}
-              />
+              <Label>Ticket ID <span className="text-muted-foreground">(optional)</span></Label>
+              {linearTeamId && linkedLinearProjectId ? (
+                <LinearIssuePicker
+                  teamId={linearTeamId}
+                  projectId={linkedLinearProjectId}
+                  selectedIdentifier={ticketId || undefined}
+                  onSelect={setTicketId}
+                />
+              ) : (
+                <>
+                  <Input
+                    id="ticket-id"
+                    placeholder="ENG-101"
+                    value={ticketId}
+                    onChange={(e) => setTicketId(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="self-start text-[11px] text-primary hover:underline"
+                    onClick={() => { handleOpenChange(false); setProjectSettingsOpen(true); }}
+                  >
+                    Link Linear project →
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Workflow picker — shown when workflows exist */}

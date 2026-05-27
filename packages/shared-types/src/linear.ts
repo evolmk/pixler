@@ -40,6 +40,27 @@ export interface ConnectLinearDto {
   pat: string;
 }
 
+export interface LinearIssueSummaryDto {
+  id: string;
+  identifier: string;
+  title: string;
+  state: string;
+  stateType: string;
+  assigneeName: string | null;
+}
+
+export interface CreateLinearIssueDto {
+  teamId: string;
+  projectId?: string;
+  title: string;
+  description?: string;
+}
+
+export interface LinearIssuePageDto {
+  nodes: LinearIssueSummaryDto[];
+  cursor: string | null;
+}
+
 export interface LinearTicketDto {
   id: string;
   identifier: string;
