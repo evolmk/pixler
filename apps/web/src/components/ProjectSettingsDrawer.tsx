@@ -9,12 +9,6 @@ import {
 } from '@pixler/ui/components/drawer';
 import { Button } from '@pixler/ui/components/button';
 import { EmptyState } from '@pixler/ui/components/empty-state';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@pixler/ui/components/tooltip';
 import { ScrollArea } from '@pixler/ui/components/scroll-area';
 import { useLayoutStore } from '../stores/layout';
 import { GeneralPanel } from './ProjectSettingsDrawer/GeneralPanel';
@@ -55,26 +49,21 @@ export function ProjectSettingsDrawer() {
 
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
-      <DrawerContent className="flex-row p-0 sm:max-w-[480px]">
-        <TooltipProvider delayDuration={300}>
-          <nav className="flex w-14 shrink-0 flex-col gap-0.5 border-r border-border px-2 py-3">
-            {CATEGORIES.map((cat) => (
-              <Tooltip key={cat.id}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={activeId === cat.id ? 'secondary' : 'ghost'}
-                    size="icon-sm"
-                    onClick={() => setActiveId(cat.id)}
-                    aria-label={cat.label}
-                  >
-                    <cat.icon />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">{cat.label}</TooltipContent>
-              </Tooltip>
-            ))}
-          </nav>
-        </TooltipProvider>
+      <DrawerContent className="flex-row p-0 sm:max-w-4xl">
+        <nav className="flex w-44 shrink-0 flex-col gap-0.5 border-r border-border px-2 py-3">
+          {CATEGORIES.map((cat) => (
+            <Button
+              key={cat.id}
+              variant={activeId === cat.id ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveId(cat.id)}
+              className="justify-start gap-2"
+            >
+              <cat.icon className="size-4 shrink-0" />
+              <span className="truncate text-xs">{cat.label}</span>
+            </Button>
+          ))}
+        </nav>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <DrawerHeader className="border-b border-border">

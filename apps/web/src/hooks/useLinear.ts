@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from '@pixler/ui/components/sonner';
 import { socket } from '../lib/socket';
 import type { LinearStatusDto, LinearTeamDto, LinearProjectDto } from '@pixler/shared-types';
 
@@ -110,11 +111,23 @@ export function useLinearOAuthUrl() {
   return useMutation({
     mutationFn: async () => {
       const res = await fetch('/api/auth/linear/url');
-      if (!res.ok) throw new Error('Failed to get Linear OAuth URL');
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const msg: string = (body as { error?: { message?: string } })?.error?.message ?? 'Failed to get Linear OAuth URL';
+        throw new Error(msg);
+      }
       return res.json() as Promise<{ url: string; state: string }>;
     },
     onSuccess: ({ url }) => {
       window.open(url, '_blank', 'noopener,noreferrer');
+    },
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : 'Failed to get Linear OAuth URL';
+      toast.error('Linear OAuth unavailable', {
+        description: msg.includes('PIXLER_LINEAR_CLIENT_ID')
+          ? msg
+          : `${msg} — set PIXLER_LINEAR_CLIENT_ID to enable OAuth`,
+      });
     },
   });
 }

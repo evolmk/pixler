@@ -128,6 +128,12 @@ export function LinearPanel() {
                   </Button>
                 )}
               </div>
+              {oauthUrl.error && (
+                <p className="text-xs text-destructive">
+                  {oauthUrl.error instanceof Error ? oauthUrl.error.message : 'OAuth unavailable'}.{' '}
+                  Set <code className="font-mono">PIXLER_LINEAR_CLIENT_ID</code> to enable.
+                </p>
+              )}
             </div>
 
             <div className="flex items-center gap-2">

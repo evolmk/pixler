@@ -2,7 +2,7 @@
 
 **Status:** ⏳ IN_PROGRESS
 **Modified:** 2026-05-26
-**Current Status:** Plan authored + consultant-reviewed + revised (P0/P1 findings addressed); awaiting execution.
+**Current Status:** Sprint 1 complete — OAuth error toast+inline, disconnect verified, both drawers widened to sm:max-w-4xl with icon+label nav. Starting Sprint 2.
 
 ---
 
@@ -116,7 +116,7 @@ apps/web/src/components/Onboarding/Step3Linear.tsx                 (modify — m
 
 ## Sprint 1 — Surface OAuth errors + verify Linear disconnect + widen Settings drawers
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** Make the existing "Connect with Linear" button non-broken via a sonner toast, verify
 the already-wired Disconnect affordances render correctly per `storedMethods`, and grow both
 Settings drawers from `sm:max-w-[480px]` / `w-14` icon-only nav → `sm:max-w-4xl` / `w-44` icon +
@@ -124,31 +124,35 @@ label nav. No API changes, no schema changes.
 
 **Tasks:**
 
-- [ ] Update `useLinearOAuthUrl` (`apps/web/src/hooks/useLinear.ts:109`) to parse the error
+- [x] Update `useLinearOAuthUrl` (`apps/web/src/hooks/useLinear.ts:109`) to parse the error
   envelope per `apps/web/CLAUDE.md` (`err?.error?.message`) and call
   `toast.error(message, { description: '…' })` from `@pixler/ui/components/sonner` on failure.
   Include `PIXLER_LINEAR_CLIENT_ID` in the toast body so the user knows the env var to set.
-- [ ] In `LinearPanel.tsx`, also render an inline error beneath the OAuth button when
+- [x] In `LinearPanel.tsx`, also render an inline error beneath the OAuth button when
   `oauthUrl.error` is set, with a link to setup docs. Toast + inline so the user can't miss it.
-- [ ] Mirror the same `toast.error` + inline render in `Onboarding/Step3Linear.tsx`.
-- [ ] Audit `LinearPanel.tsx` Disconnect wiring: `useDisconnectLinear` (line 38) and
+- [x] Mirror the same `toast.error` + inline render in `Onboarding/Step3Linear.tsx`.
+- [x] Audit `LinearPanel.tsx` Disconnect wiring: `useDisconnectLinear` (line 38) and
   `useRemoveLinearCredential` (line 39) already exist and render at lines 86 + 122. Verify both
   render correctly when `storedMethods` is non-empty, fix gaps if any. (Goal of this task is
   verification — no new mechanism if the wiring already works.)
-- [ ] `SettingsDrawer.tsx`: `DrawerContent` className `sm:max-w-[480px]` → `sm:max-w-4xl`;
+- [x] `SettingsDrawer.tsx`: `DrawerContent` className `sm:max-w-[480px]` → `sm:max-w-4xl`;
   nav className `w-14` → `w-44`; drop the `Tooltip` wrappers and render each `cat.label` next to
   the icon (`<cat.icon /> <span>{cat.label}</span>`). Buttons grow from `size="icon-sm"` to the
   default size; verify all 17 categories fit at the new width.
-- [ ] `ProjectSettingsDrawer.tsx`: same treatment (`sm:max-w-4xl`, `w-44`, label next to icon,
+- [x] `ProjectSettingsDrawer.tsx`: same treatment (`sm:max-w-4xl`, `w-44`, label next to icon,
   remove tooltips).
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useLinear.ts` — `useLinearOAuthUrl`: parse error envelope, `onError` → `toast.error` naming `PIXLER_LINEAR_CLIENT_ID`
+- `apps/web/src/components/SettingsDrawer/LinearPanel.tsx` — inline error block under OAuth button
+- `apps/web/src/components/Onboarding/Step3Linear.tsx` — same inline error block
+- `apps/web/src/components/SettingsDrawer.tsx` — `sm:max-w-4xl`, `w-44` nav, icon+label, tooltips removed
+- `apps/web/src/components/ProjectSettingsDrawer.tsx` — same drawer/nav changes
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser (in `lazar-ui` per `CLAUDE.md`): open
 Settings → Linear, click "Connect with Linear" — confirm both the sonner toast and inline error
