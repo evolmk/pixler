@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M31
-**Last Plan Completed:** M30-linear-project-picker
-**Next Plan:** M31-model-defaults-family-picker
+**Last Plan Completed:** M31-model-defaults-family-picker
+**Next Plan:** —
 
 ---
 
@@ -59,5 +59,5 @@ there.
 - [x] **M28** — Auth (Linear OAuth + GitHub OAuth/PAT/CLI), workflow engine, model picker
 - [x] **M29** — Terminal-driven workflow execution + resume/retry (SQLite persistence, prompt accordion, stop/retry with context)
 - [x] **M30** — Linear project linking & issue picker (settings-based per-project link, searchable issue picker + create via extended `LinearMutationsService`, OAuth error toast, wider Settings w/ icon+label nav, fixes `NewWorkspaceDialog` "Waiting for setup script…" race)
-- [ ] **M31** — Model Defaults: family-level picker (drop version selection, store provider:family, fix false "no longer available" warning, update spec §10.8)
+- [x] **M31** — Model Defaults: family-level picker (drop version selection, store provider:family, fix false "no longer available" warning, update spec §10.8)
 
