@@ -725,7 +725,7 @@ Opened via the gear icon in the top bar. Icon-rail left, content right.
 | Category           | Contains                                                                                                                                                                                                            |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Account**        | Sign-in (future), privacy controls, telemetry opt-in (default on with prominent disclosure), crash reporting                                                                                                        |
-| **Models**         | Per-provider model picker (top 3 families × last 2 versions each, probed from installed CLIs). Default provider + model per workflow step role. Refresh button re-probes CLIs. See §10.8.                            |
+| **Model Defaults** | Per-provider model family picker (top 3 families, probed from installed CLIs). Default `provider:family` per workflow step role (e.g. `claude:opus`). Refresh button re-probes CLIs. See §10.8.                     |
 | **Providers**      | Path to `claude` binary, path to `codex`, path to `gemini`, path to `gh`. Auto-detect button. Re-auth shortcuts (helps user authenticate if missing).                                                               |
 | **Env**            | Environment variables passed to every agent process. Key-value editor with secret masking.                                                                                                                          |
 | **Linear**         | Auth method (PAT or OAuth), connection status, disconnect/remove controls, default workspace, default team, default project, sync interval, **status name mapping** (which Linear states = “Todo” / “In Progress” / “In Review” / “Done”) |
@@ -755,7 +755,7 @@ Opened via the gear icon next to the project name in the project switcher.
 | **Integrations**   | Linear: CLI / MCP / Both (default CLI). GitHub: confirm `gh` auth status. Per-project Linear team/project filter, status mapping override, label filters.                         |
 | **Git**            | Branch template override, base branch, PR template override, auto-merge toggle, merge strategy (squash/merge/rebase)                                                              |
 | **Plans**          | Storage method override, plan directory, inline thresholds, **“Reset prompts”** button (clears “don’t ask again” flags for this project)                                          |
-| **Models**         | Override which models are used for planner/reviewer/executor in this repo                                                                                                         |
+| **Models**         | Override the global model family defaults for planner/reviewer/executor in this repo. Select "Global default" per role to inherit from global settings.                            |
 | **MCP** *(v3)*     | MCP servers available to agents in this repo                                                                                                                                      |
 | **Workspaces**     | Max parallel agents, worktree directory override, **remove-confirmation silence window** preference                                                                               |
 | **Theme override** | Per-project theme + mode override                                                                                                                                                 |
@@ -831,42 +831,41 @@ When a teammate clones a repo with `pixler.json`, Pixler shows a **diff view
 
 ### 10.8 Model picker architecture
 
-The Models panel (global and per-project) lets users assign a **provider + specific model version** to each workflow step role.
+The **Model Defaults** panel (global) and the **Models** override panel (per-project) let users assign a **provider + model family** to each workflow step role. The stored value is `provider:family` (e.g. `claude:opus`), which always resolves to the latest known version of that family. This eliminates stale-version warnings and removes the need to hand-maintain a version list.
+
+> **Layering note:** Role defaults are family-level (`provider:family`). Per-step workflow config (the workflow YAML `planner: claude-sonnet-4-7`) may still pin a specific version id — the two are intentionally different granularities. Role defaults act only as a fallback when a workflow step does not specify a model.
 
 #### Model discovery
 
 Pixler probes installed CLIs at startup and on-demand (refresh button):
 
-- `claude` → parse available model families and versions from CLI output
+- `claude` → parse available model families from CLI output
 - `codex` → parse available models from CLI output
 - `gemini` → parse available models from CLI output
 
-Results are cached in SQLite (`model_registry` table) with a timestamp. The refresh button in the Models panel re-probes all detected CLIs and updates the cache. A Socket.io event (`models:updated`) pushes the refreshed list to the frontend.
+Results are cached in SQLite (`model_registry` table) with a timestamp. The refresh button in the Model Defaults panel re-probes all detected CLIs and updates the cache. A Socket.io event (`models:updated`) pushes the refreshed list to the frontend.
 
 #### Display constraints
 
-Per provider, show only:
-
-- **Top 3 model families** (by capability tier — e.g., Opus, Sonnet, Haiku for Claude)
-- **Last 2 released versions** per family (e.g., Opus 4.7 and 4.6)
-
-If the CLI reports fewer than 3 families or fewer than 2 versions, show what's available.
+Per provider, show the **top 3 model families** by capability tier (e.g., Opus, Sonnet, Haiku for Claude). Each family resolves to one canonical latest version id — no version dropdown. If the CLI reports fewer than 3 families, show what's available.
 
 #### Picker UX
 
 Two-step selection per role:
 
 1. **Provider dropdown** — Claude / Codex / Gemini (only shows providers with a detected CLI binary)
-2. **Model dropdown** — filtered to the selected provider's available models (grouped by family, showing version)
+2. **Family dropdown** — filtered to the selected provider's available families (e.g., Opus, Sonnet, Haiku)
 
-Example for a "feature" workflow's `create_plan` step:
+Example for the Planner role default:
 ```
-Provider: [Claude ▾]    Model: [Opus 4.7 ▾]
+Provider: [Claude ▾]    Family: [Opus ▾]
 ```
+
+The per-project override panel adds a "Global default" option at the top of the Provider dropdown. Selecting it persists an empty value, which inherits from the global setting.
 
 #### Refresh button
 
-A single "Refresh models" button at the top of the Models panel. Shows a spinner while probing, then updates all dropdowns. If a previously selected model is no longer available, the dropdown shows a warning badge and falls back to the provider's default.
+A single "Refresh models" button at the top of the panel. Shows a spinner while probing, then updates all dropdowns. If a previously selected provider's CLI is no longer detected, the picker shows a warning and falls back to the first available `provider:family`.
 
 ### 10.9 Agent instructions inheritance
 
@@ -1038,7 +1037,7 @@ Each checkpoint is a labeled
 
 ### v1 (initial release)
 
-Workspaces, plan loop (file/inline/attachment), Linear+GitHub via CLI, Chat mode (assistant-ui), Terminal mode, Monaco diff viewer, run/open app, deep links, IDE launcher, all 8 themes, full settings UI, onboarding, checkpoints+rollback, CI status via polling, activity feed, token health panel, telemetry opt-out. **Linear OAuth + PAT auth.** **GitHub OAuth + PAT + gh CLI auth.** **YAML-driven workflow engine** (feature/bugfix/quickfix presets, per-step model selection, custom workflows, in-app editor). **Provider + model picker** (top 3 families × 2 versions, CLI-probed, refresh button). **Local plan storage** (configurable folder, default `_plans` in repo root).
+Workspaces, plan loop (file/inline/attachment), Linear+GitHub via CLI, Chat mode (assistant-ui), Terminal mode, Monaco diff viewer, run/open app, deep links, IDE launcher, all 8 themes, full settings UI, onboarding, checkpoints+rollback, CI status via polling, activity feed, token health panel, telemetry opt-out. **Linear OAuth + PAT auth.** **GitHub OAuth + PAT + gh CLI auth.** **YAML-driven workflow engine** (feature/bugfix/quickfix presets, per-step model selection, custom workflows, in-app editor). **Provider + family picker** (top 3 families per provider, CLI-probed, refresh button; stores `provider:family` e.g. `claude:opus`). **Local plan storage** (configurable folder, default `_plans` in repo root).
 
 ### v2
 

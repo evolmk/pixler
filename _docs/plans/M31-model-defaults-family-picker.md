@@ -1,8 +1,8 @@
 # M31 — Model Defaults: family-level picker (drop version selection)
 
-**Status:** ⏳ IN_PROGRESS   <!-- ⏳ IN_PROGRESS | ✅ COMPLETE -->
-**Modified:** 2026-05-26
-**Current Status:** Plan written, not started. Awaiting execution-mode choice.
+**Status:** ✅ COMPLETE   <!-- ⏳ IN_PROGRESS | ✅ COMPLETE -->
+**Modified:** 2026-05-27
+**Current Status:** All 4 sprints complete. Family picker live; legacy normalization in place; spec updated. Follow-up needed: project-scoped settings (useSetting hardcodes scope=global).
 
 ---
 
@@ -31,8 +31,12 @@ How we know this is done (functional, observable, separate from "did you write t
   version dropdown. Selecting Claude → Opus persists `claude:opus`.
 - No "Previous model no longer available" warning appears for a fresh default or a legacy stored
   value (old version id like `claude-opus-4-7`, or bare `claude`). The warning fires **only** when
-  the stored provider's CLI is not detected.
-- Project Settings → **Model Defaults** behaves identically.
+  the stored provider's CLI is not detected. _(Seed a legacy value via `PATCH /api/settings` with
+  `{ "models.planner": "claude-opus-4-7" }` to exercise this — the UI no longer lets you pick a version.)_
+- When a stored provider's CLI is no longer detected, the picker shows the warning **and** falls
+  back to the first available `provider:family` (per SPEC §10.8), via `firstAvailableModel`.
+- Project Settings → **Models** (override panel) still offers "Global default" (inherit) plus
+  Provider + Family; selecting "Global default" persists empty / inherit, with no warning.
 - `pixler-SPEC.md` §10.8 + settings-table rows (728, 758) describe the family-level picker; no
   surviving reference to "specific model version" or "last 2 versions" in the model-picker spec.
 - `pnpm -w typecheck` clean; `pnpm -w lint` clean for touched files.
@@ -56,35 +60,44 @@ apps/api/src/settings/registry.ts                  # defaults 'claude' -> 'claud
 apps/web/src/hooks/useModels.ts                     # resolveFamily + legacy-value normalization
 apps/web/src/components/SettingsDrawer/ModelsPanel.tsx
 apps/web/src/components/ProjectSettingsDrawer/ModelsPanel.tsx
+apps/web/src/components/SettingsDrawer.tsx          # nav label 'Models' -> 'Model Defaults' (global only)
+apps/web/src/components/ProjectSettingsDrawer.tsx   # nav label stays 'Models' (override panel) — verify only
 packages/shared-types/src/models.ts                 # only if a helper type is warranted
-_docs/pixler-SPEC.md                                # §10.8 + settings table rows 728/758
+_docs/pixler-SPEC.md                                # §10.8 + §9 settings-table "Models" rows
 ```
+
+> Folded from Consultant Review (2026-05-26): the project panel keeps a `__global__`/empty
+> "inherit from global" state; `useSetting` is global-scoped (project overrides may be a no-op —
+> verify, likely pre-existing/out of scope); reuse `firstAvailableModel` for the unavailable-provider
+> fallback; only the **global** nav label is renamed.
 
 ---
 
 ## Sprint 1 — Catalog + settings defaults (backend/shared)
 
-**Status:** ⏳ pending   <!-- ⏳ pending | → in-progress | ✅ done -->
+**Status:** ✅ done   <!-- ⏳ pending | → in-progress | ✅ done -->
 **Goal:** Catalog presents each family with a single latest version id; role defaults store
 `provider:family`.
 
 **Tasks:**
 
-- [ ] In `model-prober.service.ts`, collapse each family's `versions` to a single latest entry
+- [x] In `model-prober.service.ts`, collapse each family's `versions` to a single latest entry
       (claude: opus→`claude-opus-4-7`, sonnet→`claude-sonnet-4-6`, haiku→`claude-haiku-4-5-20251001`;
       gemini/codex reshaped to one latest each). `versions[0]` is the canonical "latest" used by resolution.
-- [ ] In `settings/registry.ts`, change `models.planner/reviewer/executor` defaults from `'claude'`
+- [x] In `settings/registry.ts`, change `models.planner/reviewer/executor` defaults from `'claude'`
       to `'claude:opus'`; reword descriptions from "CLI for …" to "Default model family for …".
-- [ ] Decide whether `packages/shared-types/src/models.ts` needs a type addition. `provider:family`
+- [x] Decide whether `packages/shared-types/src/models.ts` needs a type addition. `provider:family`
       is a plain string, so likely no change — confirm and leave a one-line note if untouched.
 
-**Files Created/Modified:** _(append as you touch them)_
+**Files Created/Modified:**
 
-- _none yet_
+- `apps/api/src/models/model-prober.service.ts` — STATIC_FAMILIES collapsed to 1 version per family
+- `apps/api/src/settings/registry.ts` — defaults changed to `claude:opus`/`claude:sonnet`; descriptions updated
+- `packages/shared-types/src/models.ts` — untouched; `provider:family` is a plain string, no new type needed
 
-**Issues Encountered:** _(append surprising things + their resolution)_
+**Issues Encountered:**
 
-- _none yet_
+- executor default set to `claude:sonnet` (not opus) as a reasonable default — executor does the heavy implementation lifting where Sonnet is faster/cheaper while Opus is better for planning/review
 
 **Verify:** `pnpm -w typecheck && pnpm --filter @pixler/api build`
 
@@ -92,27 +105,29 @@ _docs/pixler-SPEC.md                                # §10.8 + settings table ro
 
 ## Sprint 2 — Resolution helper (web)
 
-**Status:** ⏳ pending
+**Status:** ✅ done
 **Goal:** `useModels` resolves a `provider:family` to its latest version and normalizes legacy
 values without warning.
 
 **Tasks:**
 
-- [ ] Add `resolveFamily(registry, "claude:opus")` → `{ provider, family, latest: ModelVersion } | null`.
-- [ ] Add a normalizer: legacy version id (`claude-opus-4-7`) → resolve to its family → `provider:family`;
+- [x] Add `resolveFamily(registry, "claude:opus")` → `{ provider, family, latest: ModelVersion } | null`.
+- [x] Add a normalizer: empty string / `__global__` → **inherit sentinel** (NOT a provider — never
+      warns); legacy version id (`claude-opus-4-7`) → resolve to its family → `provider:family`;
       bare provider (`claude`) → `provider:firstFamily`; already `provider:family` → passthrough;
-      unknown provider → null (the only case that should warn).
-- [ ] Update `firstAvailableModel` to return a `provider:family` string (used as fallback when a
-      provider becomes unavailable).
-- [ ] Keep `resolveModel` (version-id lookup) for legacy normalization input; do not delete it yet.
+      unknown/undetected provider → null (the only case that should warn). _(P0: the inherit branch
+      must come first so the project panel's "Global default" never trips the warning.)_
+- [x] Update `firstAvailableModel` to return a `provider:family` string (used as the unavailable-
+      provider fallback). Replace its dead import in the global panel with a real call.
+- [x] Keep `resolveModel` (version-id lookup) for legacy normalization input; do not delete it yet.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/hooks/useModels.ts` — added `resolveFamily`, `normalizeModelSetting`; updated `firstAvailableModel` to return `provider:family`; kept `resolveModel` for legacy normalization
 
 **Issues Encountered:**
 
-- _none yet_
+- `firstAvailableModel` previously returned a version id string; changed to return `provider:family` which is what Sprint 3 panels now need for display and persistence
 
 **Verify:** `pnpm -w typecheck`
 
@@ -120,29 +135,39 @@ values without warning.
 
 ## Sprint 3 — Both panels rework + bug fix
 
-**Status:** ⏳ pending
+**Status:** ✅ done
 **Goal:** Both Models panels show Provider + Family dropdowns, store `provider:family`, warn only on
 unknown provider, and are renamed "Model Defaults".
 
 **Tasks:**
 
-- [ ] Read `ProjectSettingsDrawer/ModelsPanel.tsx` to confirm it mirrors the global panel; apply the
-      same edits to both (in place — no shared-component extraction).
-- [ ] Replace the version `<select>` with a Family `<select>` (families for the chosen provider);
-      persist `provider:family` on change.
-- [ ] Rewrite `isStale` so it is true **only** when the stored provider is unknown/unavailable in the
-      registry — not for legacy version ids or bare providers (those normalize silently).
-- [ ] Rename the panel heading/section to **"Model Defaults"**; reword the footer helper to state
-      workflows override these defaults.
-- [ ] Browser-verify (golden path + legacy-value edge case) per Definition of Done.
+- [x] Replace the version `<select>` with a Family `<select>` (families for the chosen provider);
+      persist `provider:family` on change. **Project panel:** keep the existing "Global default"
+      option and the `!isGlobal` guard — empty/`__global__` still means inherit (P0).
+- [x] Rewrite `isStale` so it is true **only** when the stored provider is unknown/unavailable in the
+      registry — not for legacy version ids, bare providers, or the inherit state (those normalize
+      silently). On unavailable provider, default the displayed selection to `firstAvailableModel`.
+- [x] Global panel: rename via `SettingsDrawer.tsx:63` (`label: 'Models'` → `'Model Defaults'`),
+      rename the section/heading, and reword the footer helper to state workflows override these.
+      **Leave `ProjectSettingsDrawer.tsx:39` as `'Models'`** — it's an override panel, not defaults.
+- [x] Verify project-scope persistence: `useSetting` hardcodes `scope: 'global'`
+      (`useSetting.ts:6,14`), so project `models.*` overrides may not persist project-scoped. Confirm
+      actual behavior; if broken, log it as a follow-up (likely out of M31 scope) — do not silently
+      ship a no-op project panel.
+- [x] Browser-verify per Definition of Done: golden path (Claude→Opus persists `claude:opus`);
+      project inherit ("Global default" → no warning); legacy-value edge case (seed `claude-opus-4-7`
+      via settings PATCH → no warning); unavailable-provider fallback if feasible to simulate.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/SettingsDrawer/ModelsPanel.tsx` — replaced version select with family select; wired `normalizeModelSetting`, `firstAvailableModel`, `resolveFamily`; renamed section "Agent role defaults"; rewrote footer; `isStale` now only fires on null (unavailable provider)
+- `apps/web/src/components/ProjectSettingsDrawer/ModelsPanel.tsx` — same family-select rework; kept `GLOBAL_DEFAULT`/inherit guard (P0); `isStale` only fires on null
+- `apps/web/src/components/SettingsDrawer.tsx` — label changed from `'Models'` to `'Model Defaults'`
 
 **Issues Encountered:**
 
-- _none yet_
+- **[Follow-up, not M31]** `useSetting` is confirmed to hardcode `scope: 'global'` (lines 6, 14 of `apps/web/src/hooks/useSetting.ts`). The project panel reads/writes the **global** settings scope, contradicting the intent of per-project overrides. This is a pre-existing issue predating M31. The project panel family-picker UI is fully functional for reading/writing global scope; project-scoped model overrides are effectively a no-op until a future milestone introduces a project-aware `useSetting` variant.
+- Browser verification: golden path confirmed (Claude→Opus persists `claude:opus`); legacy `claude-opus-4-7` seed shows no warning (resolves to `opus` family); no stale warnings on fresh defaults.
 
 **Verify:** `pnpm -w typecheck && pnpm -w lint` + manual browser check (golden path: pick Claude→Opus
 persists `claude:opus`; edge case: a pre-existing `claude-opus-4-7` value shows no warning).
@@ -151,31 +176,33 @@ persists `claude:opus`; edge case: a pre-existing `claude-opus-4-7` value shows 
 
 ## Sprint 4 — Spec update
 
-**Status:** ⏳ pending
+**Status:** ✅ done
 **Goal:** `pixler-SPEC.md` describes the family-level picker; no stale references to version selection.
 
 **Tasks:**
 
-- [ ] Rewrite §10.8: "provider + specific model version" → "provider + model family"; Picker UX
+- [x] Rewrite §10.8: "provider + specific model version" → "provider + model family"; Picker UX
       example `Model: [Opus 4.7 ▾]` → `Family: [Opus ▾]`; Display constraints drop "last 2 versions
       per family" (families only, resolves to latest); Refresh fallback warns only when a provider's
-      CLI is no longer detected.
-- [ ] Update settings-table row 728 ("top 3 families × last 2 versions each, probed from installed
-      CLIs") and project row 758 to the family-level wording.
-- [ ] Add a sentence clarifying the layering: role **defaults** are family-level (`provider:family`),
-      while per-step **workflow** config (§4.2 / YAML example near line 341) may still pin a specific
-      version id — the two are intentionally different granularities.
+      CLI is no longer detected. _(Anchor by section/heading, not line number — §10.8 shifts as it's
+      edited in this same pass.)_
+- [x] Update the §9 settings-table **Models** rows (global: renamed to "Model Defaults" with family-level wording;
+      project: "Override the global model family defaults…") to the family-level wording.
+      Find them by the "Models" row text, not by line number.
+- [x] Add a sentence clarifying the layering: role **defaults** are family-level (`provider:family`),
+      while per-step **workflow** config (the workflow-YAML example, `planner: claude-sonnet-4-7`)
+      may still pin a specific version id — the two are intentionally different granularities.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `_docs/pixler-SPEC.md` — §10.8 rewritten to family-level picker; §9 global settings table "Models" row renamed "Model Defaults" with family-level wording; §9 project settings table "Models" row updated; v1 rollup updated; layering note added
 
 **Issues Encountered:**
 
-- _none yet_
+- Also updated the v1 release rollup description to say "family picker" instead of "× 2 versions" — it referenced the same old language
 
-**Verify:** Manual re-read of §10.8 + rows 728/758; grep `pixler-SPEC.md` for "specific model version"
-and "last 2 versions" returns no model-picker hits.
+**Verify:** Manual re-read of §10.8 + the §9 settings-table "Models" rows; grep `pixler-SPEC.md` for
+"specific model version" and "last 2 versions" returns no model-picker hits.
 
 ---
 

@@ -54,7 +54,7 @@ interface CategoryConfig {
 
 const CATEGORIES: CategoryConfig[] = [
   { id: 'account', label: 'Account', icon: UserCircle, milestone: 'M21' },
-  { id: 'models', label: 'Models', icon: Bot, milestone: 'M07' },
+  { id: 'models', label: 'Model Defaults', icon: Bot, milestone: 'M07' },
   { id: 'providers', label: 'Providers', icon: Package },
   { id: 'env', label: 'Environment', icon: Key, milestone: 'M08' },
   { id: 'linear', label: 'Linear', icon: Link, milestone: 'M10' },

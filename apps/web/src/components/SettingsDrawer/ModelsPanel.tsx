@@ -4,7 +4,13 @@ import { Button } from '@pixler/ui/components/button';
 import { Label } from '@pixler/ui/components/label';
 import { Separator } from '@pixler/ui/components/separator';
 import { useSetting } from '../../hooks/useSetting';
-import { useModelRegistry, useRefreshModels, resolveModel, firstAvailableModel } from '../../hooks/useModels';
+import {
+  useModelRegistry,
+  useRefreshModels,
+  resolveFamily,
+  normalizeModelSetting,
+  firstAvailableModel,
+} from '../../hooks/useModels';
 import type { ModelRegistryDto } from '@pixler/shared-types';
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
@@ -27,12 +33,25 @@ function ModelPicker({
   description: string;
   registry: ModelRegistryDto;
 }) {
-  const { value: modelId = '', set: setModelId } = useSetting<string>(settingKey);
+  const { value: storedValue = '', set: setSetting } = useSetting<string>(settingKey);
 
   const availableProviders = registry.filter((p) => p.available);
-  const resolved = modelId ? resolveModel(registry, modelId) : null;
-  const selectedProvider = resolved?.provider ?? availableProviders[0];
-  const [localProvider, setLocalProvider] = useState(selectedProvider?.provider ?? '');
+
+  // Normalize the stored value: '' / '__global__' → inherit; legacy version id → family;
+  // bare provider → firstFamily; provider:family → passthrough; unknown → null (warn).
+  const normalized = normalizeModelSetting(registry, storedValue);
+  const isStale = normalized === null; // only true when provider is missing/unavailable
+
+  // For display, use normalized value or fall back to firstAvailableModel
+  const displayValue = isStale
+    ? (firstAvailableModel(registry) ?? '')
+    : (normalized ?? '');
+
+  // Derive selectedProvider and selectedFamily from displayValue
+  const resolved = displayValue ? resolveFamily(registry, displayValue) : null;
+  const [localProvider, setLocalProvider] = useState(
+    resolved?.provider.provider ?? availableProviders[0]?.provider ?? '',
+  );
 
   useEffect(() => {
     if (!localProvider && availableProviders[0]) {
@@ -40,17 +59,31 @@ function ModelPicker({
     }
   }, [availableProviders, localProvider]);
 
-  const providerObj = registry.find((p) => p.provider === localProvider);
-  const modelOptions = providerObj?.families.flatMap((f) =>
-    f.versions.map((v) => ({ id: v.id, label: `${f.label} — ${v.label}` })),
-  ) ?? [];
+  // When the normalized value changes externally (e.g. after a refresh), sync localProvider
+  useEffect(() => {
+    if (resolved?.provider.provider) {
+      setLocalProvider(resolved.provider.provider);
+    }
+  }, [resolved?.provider.provider]);
 
-  const isStale = modelId && !resolveModel(registry, modelId);
+  const providerObj = registry.find((p) => p.provider === localProvider);
+  const families = providerObj?.families ?? [];
+
+  // Derive currently selected family id
+  const resolvedForProvider = displayValue ? resolveFamily(registry, displayValue) : null;
+  const selectedFamilyId =
+    resolvedForProvider?.provider.provider === localProvider
+      ? (resolvedForProvider.family.id ?? families[0]?.id ?? '')
+      : (families[0]?.id ?? '');
 
   const handleProviderChange = (prov: string) => {
     setLocalProvider(prov);
-    const first = registry.find((p) => p.provider === prov)?.families[0]?.versions[0]?.id;
-    if (first) setModelId(first);
+    const firstFamily = registry.find((p) => p.provider === prov)?.families[0];
+    if (firstFamily) setSetting(`${prov}:${firstFamily.id}`);
+  };
+
+  const handleFamilyChange = (familyId: string) => {
+    setSetting(`${localProvider}:${familyId}`);
   };
 
   return (
@@ -59,7 +92,7 @@ function ModelPicker({
       {isStale && (
         <div className="flex items-center gap-1 text-[11px] text-warning">
           <AlertTriangle className="size-3" />
-          Previous model no longer available — please re-select.
+          Previous provider no longer detected — falling back to first available.
         </div>
       )}
       <div className="flex gap-2">
@@ -77,14 +110,14 @@ function ModelPicker({
           ))}
         </select>
         <select
-          value={modelId}
-          onChange={(e) => setModelId(e.target.value)}
-          disabled={modelOptions.length === 0}
+          value={selectedFamilyId}
+          onChange={(e) => handleFamilyChange(e.target.value)}
+          disabled={families.length === 0}
           className="flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
-          aria-label="Model"
+          aria-label="Family"
         >
-          {modelOptions.map((m) => (
-            <option key={m.id} value={m.id}>{m.label}</option>
+          {families.map((f) => (
+            <option key={f.id} value={f.id}>{f.label}</option>
           ))}
         </select>
       </div>
@@ -138,7 +171,7 @@ export function ModelsPanel() {
         </div>
       )}
 
-      <Section label="Agent roles">
+      <Section label="Agent role defaults">
         <ModelPicker
           label="Planner"
           settingKey="models.planner"
@@ -162,7 +195,8 @@ export function ModelsPanel() {
       <Separator />
 
       <p className="text-[11px] text-muted-foreground">
-        Individual projects can override these defaults in{' '}
+        These are defaults only — individual workflow steps can override the model used for each role.
+        Per-project overrides are set in{' '}
         <span className="font-medium">Project Settings → Models</span>.
       </p>
     </div>

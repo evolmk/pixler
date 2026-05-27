@@ -12,21 +12,23 @@ interface CachedRegistry {
   probed_at: number;
 }
 
+// Each family carries exactly one entry — the latest version for that family.
+// versions[0] is the canonical "latest" used by resolution.
 const STATIC_FAMILIES: Record<string, ModelFamily[]> = {
   claude: [
-    { id: 'opus', label: 'Opus', versions: [{ id: 'claude-opus-4-7', label: '4.7' }, { id: 'claude-opus-4-5', label: '4.5' }] },
-    { id: 'sonnet', label: 'Sonnet', versions: [{ id: 'claude-sonnet-4-6', label: '4.6' }, { id: 'claude-sonnet-4-5-20250514', label: '4.5' }] },
-    { id: 'haiku', label: 'Haiku', versions: [{ id: 'claude-haiku-4-5-20251001', label: '4.5' }, { id: 'claude-haiku-3-5-20241022', label: '3.5' }] },
+    { id: 'opus', label: 'Opus', versions: [{ id: 'claude-opus-4-7', label: '4.7' }] },
+    { id: 'sonnet', label: 'Sonnet', versions: [{ id: 'claude-sonnet-4-6', label: '4.6' }] },
+    { id: 'haiku', label: 'Haiku', versions: [{ id: 'claude-haiku-4-5-20251001', label: '4.5' }] },
   ],
   gemini: [
-    { id: 'pro', label: 'Pro', versions: [{ id: 'gemini-2.0-pro', label: '2.0' }, { id: 'gemini-1.5-pro', label: '1.5' }] },
-    { id: 'flash', label: 'Flash', versions: [{ id: 'gemini-2.0-flash', label: '2.0' }, { id: 'gemini-1.5-flash', label: '1.5' }] },
-    { id: 'nano', label: 'Nano', versions: [{ id: 'gemini-2.0-nano', label: '2.0' }, { id: 'gemini-1.5-nano', label: '1.5' }] },
+    { id: 'pro', label: 'Pro', versions: [{ id: 'gemini-2.0-pro', label: '2.0' }] },
+    { id: 'flash', label: 'Flash', versions: [{ id: 'gemini-2.0-flash', label: '2.0' }] },
+    { id: 'nano', label: 'Nano', versions: [{ id: 'gemini-2.0-nano', label: '2.0' }] },
   ],
   codex: [
-    { id: 'gpt-4o', label: 'GPT-4o', versions: [{ id: 'gpt-4o', label: '4o' }, { id: 'gpt-4o-mini', label: '4o-mini' }] },
-    { id: 'o1', label: 'o1', versions: [{ id: 'o1', label: 'o1' }, { id: 'o1-mini', label: 'o1-mini' }] },
-    { id: 'gpt-4', label: 'GPT-4', versions: [{ id: 'gpt-4-turbo', label: '4-turbo' }, { id: 'gpt-4', label: '4' }] },
+    { id: 'gpt-4o', label: 'GPT-4o', versions: [{ id: 'gpt-4o', label: '4o' }] },
+    { id: 'o1', label: 'o1', versions: [{ id: 'o1', label: 'o1' }] },
+    { id: 'gpt-4', label: 'GPT-4', versions: [{ id: 'gpt-4-turbo', label: '4-turbo' }] },
   ],
 };
 

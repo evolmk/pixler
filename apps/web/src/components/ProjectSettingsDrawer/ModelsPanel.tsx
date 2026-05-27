@@ -3,7 +3,13 @@ import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { Label } from '@pixler/ui/components/label';
 import { useSetting } from '../../hooks/useSetting';
-import { useModelRegistry, useRefreshModels, resolveModel } from '../../hooks/useModels';
+import {
+  useModelRegistry,
+  useRefreshModels,
+  resolveFamily,
+  normalizeModelSetting,
+  firstAvailableModel,
+} from '../../hooks/useModels';
 import type { ModelRegistryDto } from '@pixler/shared-types';
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
@@ -15,6 +21,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
+// Sentinel value used in the provider select to represent "inherit from global"
 const GLOBAL_DEFAULT = '__global__';
 
 function ProjectModelPicker({
@@ -28,13 +35,24 @@ function ProjectModelPicker({
   description: string;
   registry: ModelRegistryDto;
 }) {
-  const { value: modelId = '', set: setModelId } = useSetting<string>(settingKey);
-  const isGlobal = !modelId || modelId === GLOBAL_DEFAULT;
+  const { value: storedValue = '', set: setSetting } = useSetting<string>(settingKey);
+
+  // P0: normalize must handle inherit states first — '' / '__global__' → ''
+  const normalized = normalizeModelSetting(registry, storedValue);
+  const isGlobal = normalized === ''; // inherit from global (empty or __global__)
+  const isStale = !isGlobal && normalized === null; // unavailable provider → warn
 
   const availableProviders = registry.filter((p) => p.available);
-  const resolved = !isGlobal ? resolveModel(registry, modelId) : null;
-  const selectedProvider = resolved?.provider ?? availableProviders[0];
-  const [localProvider, setLocalProvider] = useState(selectedProvider?.provider ?? '');
+
+  // For display: use normalized value when valid; fallback to firstAvailableModel when stale
+  const displayValue = isStale
+    ? (firstAvailableModel(registry) ?? '')
+    : (normalized ?? '');
+
+  const resolved = displayValue ? resolveFamily(registry, displayValue) : null;
+  const [localProvider, setLocalProvider] = useState(
+    resolved?.provider.provider ?? availableProviders[0]?.provider ?? '',
+  );
 
   useEffect(() => {
     if (!localProvider && availableProviders[0]) {
@@ -42,17 +60,35 @@ function ProjectModelPicker({
     }
   }, [availableProviders, localProvider]);
 
-  const providerObj = registry.find((p) => p.provider === localProvider);
-  const modelOptions = providerObj?.families.flatMap((f) =>
-    f.versions.map((v) => ({ id: v.id, label: `${f.label} — ${v.label}` })),
-  ) ?? [];
+  // Sync localProvider when the stored/normalized value changes externally
+  useEffect(() => {
+    if (resolved?.provider.provider) {
+      setLocalProvider(resolved.provider.provider);
+    }
+  }, [resolved?.provider.provider]);
 
-  const isStale = !isGlobal && modelId && !resolveModel(registry, modelId);
+  const providerObj = registry.find((p) => p.provider === localProvider);
+  const families = providerObj?.families ?? [];
+
+  // Derive currently selected family id
+  const resolvedForProvider = displayValue ? resolveFamily(registry, displayValue) : null;
+  const selectedFamilyId =
+    resolvedForProvider?.provider.provider === localProvider
+      ? (resolvedForProvider.family.id ?? families[0]?.id ?? '')
+      : (families[0]?.id ?? '');
 
   const handleProviderChange = (prov: string) => {
+    if (prov === GLOBAL_DEFAULT) {
+      setSetting('');
+      return;
+    }
     setLocalProvider(prov);
-    const first = registry.find((p) => p.provider === prov)?.families[0]?.versions[0]?.id;
-    if (first) setModelId(first);
+    const firstFamily = registry.find((p) => p.provider === prov)?.families[0];
+    if (firstFamily) setSetting(`${prov}:${firstFamily.id}`);
+  };
+
+  const handleFamilyChange = (familyId: string) => {
+    setSetting(`${localProvider}:${familyId}`);
   };
 
   return (
@@ -61,19 +97,13 @@ function ProjectModelPicker({
       {isStale && (
         <div className="flex items-center gap-1 text-[11px] text-warning">
           <AlertTriangle className="size-3" />
-          Previous model no longer available.
+          Previous provider no longer detected — falling back to first available.
         </div>
       )}
       <div className="flex gap-2">
         <select
           value={isGlobal ? GLOBAL_DEFAULT : localProvider}
-          onChange={(e) => {
-            if (e.target.value === GLOBAL_DEFAULT) {
-              setModelId('');
-            } else {
-              handleProviderChange(e.target.value);
-            }
-          }}
+          onChange={(e) => handleProviderChange(e.target.value)}
           className="w-40 shrink-0 rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Provider"
         >
@@ -84,14 +114,14 @@ function ProjectModelPicker({
         </select>
         {!isGlobal && (
           <select
-            value={modelId}
-            onChange={(e) => setModelId(e.target.value)}
-            disabled={modelOptions.length === 0}
+            value={selectedFamilyId}
+            onChange={(e) => handleFamilyChange(e.target.value)}
+            disabled={families.length === 0}
             className="flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
-            aria-label="Model"
+            aria-label="Family"
           >
-            {modelOptions.map((m) => (
-              <option key={m.id} value={m.id}>{m.label}</option>
+            {families.map((f) => (
+              <option key={f.id} value={f.id}>{f.label}</option>
             ))}
           </select>
         )}
@@ -118,7 +148,7 @@ export function ModelsPanel() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
-          Overrides the global defaults for this project. Select "Global default" to inherit.
+          Overrides the global model defaults for this project. Select "Global default" to inherit.
         </p>
         <Button
           variant="outline"
