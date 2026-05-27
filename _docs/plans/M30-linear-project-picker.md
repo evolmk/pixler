@@ -1,8 +1,8 @@
 # M30 — Linear project linking & issue picker
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-26
-**Current Status:** Sprints 1–3 complete. Starting Sprint 4 (NewWorkspaceDialog race fix).
+**Current Status:** All 4 sprints complete. typecheck + lint clean.
 
 ---
 
@@ -288,7 +288,7 @@ opens Project Settings.
 
 ## Sprint 4 — Fix NewWorkspaceDialog "Waiting for setup script…" race
 
-**Status:** ⏳ pending
+**Status:** ✅ complete
 **Goal:** The dialog reaches the `'creating'` step, shows "Waiting for setup script…", and never
 dismisses — even though the workspace reaches `ready` (visible in the sidebar). Root cause
 identified in the original audit: `useWorkspaceEvents(createdId, handleEvent)` in
@@ -300,28 +300,28 @@ actual state.
 
 **Tasks:**
 
-- [ ] In `NewWorkspaceDialog.tsx`, after `setCreatedId(ws.id)`, also refetch the workspace state
+- [x] In `NewWorkspaceDialog.tsx`, after `setCreatedId(ws.id)`, also refetch the workspace state
   once via the workspaces query cache (or fetch directly). If the workspace is already `ready`
   or `error`, close the dialog immediately — don't wait for an event.
-- [ ] Alternatively (or additionally), use the response from `create.mutateAsync` itself: the
+- [x] Alternatively (or additionally), use the response from `create.mutateAsync` itself: the
   POST returns the created workspace; if its initial state is already `ready`, skip the
   `'creating'` step entirely and close.
-- [ ] Update the empty-log placeholder text: if the workspace is `ready` (per the refetch), show
+- [x] Update the empty-log placeholder text: if the workspace is `ready` (per the refetch), show
   "Workspace ready — closing…" with a 1s timer; only show "Waiting for setup script…" if state
   is `creating`/`pending`.
-- [ ] Verify the `workspace.state-changed` event handler still works for the non-race case
-  (slow setup script).
-- [ ] Optional: instrument `useWorkspaceEvents.ts` with a one-shot replay of the last known
+- [x] Verify the `workspace.state-changed` event handler still works for the non-race case
+  (slow setup script). (Verified by code review — `handleEvent` still closes on state-changed → ready/error. The poll also re-checks to close if the state has already advanced, so both paths are handled.)
+- [x] Optional: instrument `useWorkspaceEvents.ts` with a one-shot replay of the last known
   state when the subscription registers, so future dialogs don't hit the same race. Skip if it
-  expands scope unreasonably.
+  expands scope unreasonably. (Skipped — the poll-on-mount approach in NewWorkspaceDialog is cleaner and doesn't require backend changes to useWorkspaceEvents.)
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/NewWorkspaceDialog.tsx` — poll on createdId mount, check response state, update placeholder text
 
 **Issues Encountered:**
 
-- _none yet_
+- _none_
 
 **Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser in `lazar-ui`: New Workspace → Create —
 confirm the dialog closes within ~1s of the workspace appearing in the sidebar. Also test the

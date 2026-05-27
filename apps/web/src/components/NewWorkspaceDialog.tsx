@@ -18,9 +18,9 @@ import { useWorkflows } from '../hooks/useWorkflows';
 import { useProjectLinearLink } from '../hooks/useProjectLinearLink';
 import { useLayoutStore } from '../stores/layout';
 import { LinearIssuePicker } from './LinearIssuePicker';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { slugify } from '@pixler/shared-types';
-import type { WorkspaceMode, WorkspaceEvent } from '@pixler/shared-types';
+import type { WorkspaceMode, WorkspaceEvent, WorkspaceState } from '@pixler/shared-types';
 
 interface NewWorkspaceDialogProps {
   open: boolean;
@@ -43,6 +43,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
   const [error, setError] = useState('');
   const [setupLog, setSetupLog] = useState<string[]>([]);
   const [createdId, setCreatedId] = useState<string | null>(null);
+  const [wsState, setWsState] = useState<WorkspaceState | null>(null);
 
   const create = useCreateWorkspace();
   const logRef = useRef<HTMLDivElement>(null);
@@ -58,10 +59,32 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
         return next;
       });
     }
-    if (event.type === 'workspace.state-changed' && (event.to === 'ready' || event.to === 'error')) {
-      setTimeout(() => onOpenChange(false), 1000);
+    if (event.type === 'workspace.state-changed') {
+      setWsState(event.to as WorkspaceState);
+      if (event.to === 'ready' || event.to === 'error') {
+        setTimeout(() => onOpenChange(false), 1000);
+      }
     }
   }, [onOpenChange]);
+
+  // Poll once after creating to handle the race where state-changed fires before socket subscribes
+  useEffect(() => {
+    if (!createdId) return;
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await fetch(`/api/workspaces/${createdId}`);
+        if (!res.ok || cancelled) return;
+        const ws = await res.json() as { state: WorkspaceState };
+        if (!cancelled && (ws.state === 'ready' || ws.state === 'error')) {
+          setWsState(ws.state);
+          setTimeout(() => onOpenChange(false), 500);
+        }
+      } catch { /* ignore */ }
+    };
+    void check();
+    return () => { cancelled = true; };
+  }, [createdId, onOpenChange]);
 
   useWorkspaceEvents(createdId, handleEvent);
 
@@ -78,6 +101,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
     setError('');
     setSetupLog([]);
     setCreatedId(null);
+    setWsState(null);
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -97,6 +121,11 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
         name: customName.trim() || undefined,
         useWorktree,
       });
+      // If already ready (e.g. no setup script), close immediately
+      if (ws.state === 'ready' || ws.state === 'error') {
+        setTimeout(() => onOpenChange(false), 500);
+        return;
+      }
       setCreatedId(ws.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create workspace');
@@ -266,7 +295,9 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
               className="h-48 overflow-y-auto rounded-md border border-border bg-black/80 p-3 font-mono text-xs text-green-400"
             >
               {setupLog.length === 0 ? (
-                <p className="text-muted-foreground">Waiting for setup script…</p>
+                <p className="text-muted-foreground">
+                  {wsState === 'ready' ? 'Workspace ready — closing…' : 'Waiting for setup script…'}
+                </p>
               ) : (
                 setupLog.map((line, i) => <p key={i}>{line}</p>)
               )}
