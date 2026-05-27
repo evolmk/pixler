@@ -31,3 +31,4 @@
 | M27 | 2026-05-25 | Error logging — FileLoggerService, dated JSON-lines log files, frontend global error handler |
 | M28 | 2026-05-25 | Auth (Linear OAuth/PAT + GitHub OAuth/PAT/CLI), YAML workflow engine, model picker with CLI probing |
 | M29 | 2026-05-25 | Terminal-driven workflow execution + resume/retry — SQLite persistence, prompt accordion, stop/retry with context |
+| M30 | 2026-05-26 | Linear project linking & issue picker — OAuth error surface, per-project link via settings, LinearIssuePicker + CreateLinearIssueDialog, NewWorkspaceDialog race fix, wider Settings drawers |
