@@ -52,7 +52,12 @@ export function NewProjectDialog({ open, onOpenChange, onProjectAdded }: NewProj
       onProjectAdded?.(project.id);
       handleOpenChange(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to add project');
+      const msg = e instanceof Error ? e.message : 'Failed to add project';
+      if (msg.toLowerCase().includes('already exists')) {
+        setError('This repo is already in Pixler. Close this dialog and select it from the sidebar.');
+      } else {
+        setError(msg);
+      }
     }
   };
 

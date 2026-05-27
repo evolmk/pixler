@@ -28,12 +28,14 @@ interface NewWorkspaceDialogProps {
 
 type Step = 'form' | 'creating';
 
+const AUTO_WORKFLOW = '__auto__';
+
 export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicketId }: NewWorkspaceDialogProps) {
   const [step, setStep] = useState<Step>('form');
   const [mode, setMode] = useState<WorkspaceMode>('chat');
   const [ticketId, setTicketId] = useState(prefillTicketId ?? '');
   const [customName, setCustomName] = useState('');
-  const [selectedWorkflow, setSelectedWorkflow] = useState('');
+  const [selectedWorkflow, setSelectedWorkflow] = useState(AUTO_WORKFLOW);
   const [useWorktree, setUseWorktree] = useState(true);
   const [error, setError] = useState('');
   const [setupLog, setSetupLog] = useState<string[]>([]);
@@ -66,7 +68,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
     setMode('chat');
     setTicketId('');
     setCustomName('');
-    setSelectedWorkflow('');
+    setSelectedWorkflow(AUTO_WORKFLOW);
     setUseWorktree(true);
     setError('');
     setSetupLog([]);
@@ -159,7 +161,7 @@ export function NewWorkspaceDialog({ open, onOpenChange, projectId, prefillTicke
                     <SelectValue placeholder="Auto-detect from ticket label" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Auto-detect from ticket label</SelectItem>
+                    <SelectItem value={AUTO_WORKFLOW}>Auto-detect from ticket label</SelectItem>
                     {activeWorkflows.map((wf) => (
                       <SelectItem key={wf.name} value={wf.name}>{wf.name}</SelectItem>
                     ))}

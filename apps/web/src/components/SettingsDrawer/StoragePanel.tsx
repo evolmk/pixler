@@ -26,12 +26,17 @@ function PathRow({ label, settingKey, placeholder }: { label: string; settingKey
   );
 }
 
-type ConfirmAction = 'prompts' | 'settings' | 'database' | null;
+type ConfirmAction = 'prompts' | 'settings' | 'database' | 'factory-reset' | null;
 
 const ACTION_LABELS: Record<NonNullable<ConfirmAction>, string> = {
   prompts: 'Reset all prompts',
   settings: 'Reset all settings',
   database: 'Wipe database',
+  'factory-reset': 'Factory reset',
+};
+
+const ACTION_DESCRIPTIONS: Partial<Record<NonNullable<ConfirmAction>, string>> = {
+  'factory-reset': 'Removes all projects, workspaces, settings, and stored credentials. App returns to first-run state.',
 };
 
 export function StoragePanel() {
@@ -43,6 +48,7 @@ export function StoragePanel() {
       prompts: '/api/settings/reset-prompts',
       settings: '/api/settings/reset',
       database: '/api/db/wipe',
+      'factory-reset': '/api/db/wipe',
     };
     try {
       const res = await fetch(endpoints[action], { method: 'POST' });
@@ -92,6 +98,41 @@ export function StoragePanel() {
             )
           ))}
         </div>
+      </Section>
+
+      <Section label="Factory Reset">
+        <p className="text-xs text-muted-foreground">{ACTION_DESCRIPTIONS['factory-reset']}</p>
+        {result && confirming === null && (
+          <p className="text-xs text-muted-foreground">{result}</p>
+        )}
+        {confirming === 'factory-reset' ? (
+          <div className="rounded-md border border-destructive/60 bg-destructive/5 p-3 space-y-3">
+            <p className="text-xs font-medium text-destructive">
+              This will permanently delete all data. This cannot be undone.
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => void runAction('factory-reset')}
+                className="rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors"
+              >
+                Yes, factory reset
+              </button>
+              <button
+                onClick={() => setConfirming(null)}
+                className="rounded-md border border-border px-3 py-1.5 text-xs hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirming('factory-reset')}
+            className="rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors"
+          >
+            Factory Reset
+          </button>
+        )}
       </Section>
     </div>
   );

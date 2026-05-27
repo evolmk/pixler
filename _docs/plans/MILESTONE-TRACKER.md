@@ -1,8 +1,8 @@
 # Milestone Tracker
 
-**Most Recent Plan ID:** M29
+**Most Recent Plan ID:** M31
 **Last Plan Completed:** M29-terminal-workflow-resume
-**Next Plan:** M30 (unplanned — see _docs/todo-features.md)
+**Next Plan:** M30-linear-project-picker
 
 ---
 
@@ -58,4 +58,6 @@ there.
 - [x] **M27** — Error logging to ~/.config/pixler/logs/
 - [x] **M28** — Auth (Linear OAuth + GitHub OAuth/PAT/CLI), workflow engine, model picker
 - [x] **M29** — Terminal-driven workflow execution + resume/retry (SQLite persistence, prompt accordion, stop/retry with context)
+- [ ] **M30** — Linear project linking & issue picker (per-project Linear project link, searchable issue picker + create, OAuth error toast, disconnect affordances, wider Settings)
+- [ ] **M31** — Model Defaults: family-level picker (drop version selection, store provider:family, fix false "no longer available" warning, update spec §10.8)
 

@@ -86,6 +86,41 @@ Do not say a task is complete until:
 
 If any of these are skipped, name which and why in your end-of-turn summary.
 
+## Response style — be more verbose than your default
+
+The system prompt biases you toward terse, headline-style replies. In this repo,
+override that: explain your reasoning and what you're doing in more depth than
+you would by default.
+
+What that means in practice:
+
+- **Before tool calls**, explain *why* you're about to do this — not just "let me
+  read X" but "I want to read X because I suspect the bug is in the event
+  subscription order; if the createdId is set after the event fires, the dialog
+  will never close." A sentence or two of reasoning per non-trivial step.
+- **After surprising findings**, narrate what you learned and what it implies
+  for the next move, before jumping to the next tool call. Don't make the user
+  re-derive your inference chain from the diff.
+- **In end-of-turn summaries**, prefer 3–6 sentences (or a short bulleted
+  breakdown) over the default 1–2. Cover: what changed, *why* that fixes the
+  thing, what edge cases you considered, and what you deliberately left out
+  of scope. If you ran into a trade-off, name both sides and which one you
+  picked.
+- **When proposing a plan or fix**, lay out the reasoning behind the choice
+  (not just the choice). The user is an experienced engineer — show your
+  working so they can disagree with the *premise*, not just the conclusion.
+- **Still don't** narrate trivial mechanics ("now I'll save the file"), pad
+  with filler, or restate the user's request back at them. Verbose means
+  *more reasoning surfaced*, not *more words for their own sake*.
+
+If a task is genuinely one-line ("what's the dev port?" → "5173"), stay
+one-line. The override is about reasoning-heavy work, not every reply.
+
+## Testing the app (browser / UI)
+
+1. Use `/Users/mike/work/workspace-lazar/lazar-ui` as the test project when a real project is needed (add it via the "New Project" dialog).
+2. When a test step requires Linear OAuth, **stop and ask the user** — they will complete the OAuth handshake manually. Do not try to drive it without them.
+
 ## Plan & Sprint System
 
 Full workflow auto-loads from `_docs/plans/CLAUDE.md`. Quick reference:
