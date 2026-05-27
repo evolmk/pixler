@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
   ActivitySquare,
@@ -45,6 +45,66 @@ import { StoragePanel } from './SettingsDrawer/StoragePanel';
 import { AboutPanel } from './SettingsDrawer/AboutPanel';
 import { WorkflowsPanel } from './SettingsDrawer/WorkflowsPanel';
 
+// ─── Resizable settings pane ────────────────────────────────────────────────
+const SETTINGS_WIDTH_KEY = 'pixler:settings-pane-width';
+const DEFAULT_WIDTH = 680;
+const MIN_WIDTH = 400;
+const MAX_WIDTH = 1100;
+
+function useResizableWidth() {
+  const [width, setWidth] = useState<number>(() => {
+    try {
+      const stored = localStorage.getItem(SETTINGS_WIDTH_KEY);
+      if (stored) {
+        const n = parseInt(stored, 10);
+        if (!isNaN(n) && n >= MIN_WIDTH && n <= MAX_WIDTH) return n;
+      }
+    } catch {
+      // ignore SSR / private-browsing errors
+    }
+    return DEFAULT_WIDTH;
+  });
+
+  // Keep a ref so mouseMove closure always sees current width, not stale closure value
+  const widthRef = useRef(width);
+  widthRef.current = width;
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = widthRef.current;
+
+    const onMouseMove = (mv: MouseEvent) => {
+      // Handle is on the LEFT edge of a right-side drawer:
+      // dragging left (smaller clientX) expands; dragging right shrinks.
+      const delta = startX - mv.clientX;
+      const clamped = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidth + delta));
+      setWidth(clamped);
+      widthRef.current = clamped;
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      try {
+        localStorage.setItem(SETTINGS_WIDTH_KEY, String(widthRef.current));
+      } catch {
+        // ignore
+      }
+    };
+
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, []);
+
+  return { width, handleMouseDown };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface CategoryConfig {
   id: string;
   label: string;
@@ -78,6 +138,7 @@ export function SettingsDrawer() {
   const settingsTab = useLayoutStore((s) => s.settingsTab);
   const setOpen = useLayoutStore((s) => s.setSettingsOpen);
   const [activeId, setActiveId] = useState(settingsTab);
+  const { width, handleMouseDown } = useResizableWidth();
 
   useEffect(() => {
     if (open) setActiveId(settingsTab);
@@ -87,7 +148,21 @@ export function SettingsDrawer() {
 
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
-      <DrawerContent className="flex-row p-0 sm:max-w-4xl">
+      {/*
+        Override vaul's built-in w-3/4 + sm:max-w-sm via inline style.
+        maxWidth:'none' is required or the Tailwind max-w class still constrains.
+      */}
+      <DrawerContent
+        className="flex-row p-0"
+        style={{ width: `${width}px`, maxWidth: 'none' }}
+      >
+        {/* Drag-to-resize handle — sits on the left edge of the drawer */}
+        <div
+          onMouseDown={handleMouseDown}
+          className="absolute left-0 top-0 z-20 h-full w-1 cursor-ew-resize transition-colors hover:bg-primary/30"
+          aria-hidden="true"
+        />
+
         {/* Icon + label rail */}
         <nav className="flex w-44 shrink-0 flex-col gap-0.5 border-r border-border px-2 py-3">
           {CATEGORIES.map((cat) => (
