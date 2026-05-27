@@ -33,3 +33,4 @@
 | M29 | 2026-05-25 | Terminal-driven workflow execution + resume/retry — SQLite persistence, prompt accordion, stop/retry with context |
 | M30 | 2026-05-26 | Linear project linking & issue picker — OAuth error surface, per-project link via settings, LinearIssuePicker + CreateLinearIssueDialog, NewWorkspaceDialog race fix, wider Settings drawers |
 | M31 | 2026-05-26 | Model Defaults: family-level picker — drop version selection, store provider:family, fix false "no longer available" warning, update spec §10.8 |
+| M32 | 2026-05-26 | Project out of URL — currentProject Zustand store w/ localStorage, router collapsed to `/` + `/w/$id`, workspace route resolves project server-side |

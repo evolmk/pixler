@@ -1,8 +1,8 @@
 # Milestone Tracker
 
 **Most Recent Plan ID:** M32
-**Last Plan Completed:** M31-model-defaults-family-picker
-**Next Plan:** M32-project-out-of-url
+**Last Plan Completed:** M32-project-out-of-url
+**Next Plan:** —
 
 ---
 
@@ -60,5 +60,5 @@ there.
 - [x] **M29** — Terminal-driven workflow execution + resume/retry (SQLite persistence, prompt accordion, stop/retry with context)
 - [x] **M30** — Linear project linking & issue picker (settings-based per-project link, searchable issue picker + create via extended `LinearMutationsService`, OAuth error toast, wider Settings w/ icon+label nav, fixes `NewWorkspaceDialog` "Waiting for setup script…" race)
 - [x] **M31** — Model Defaults: family-level picker (drop version selection, store provider:family, fix false "no longer available" warning, update spec §10.8)
-- [ ] **M32** — Project out of URL (localStorage-backed current project, router collapses to `/` + `/w/$workspaceId`)
+- [x] **M32** — Project out of URL (localStorage-backed current project, router collapses to `/` + `/w/$workspaceId`)
 
