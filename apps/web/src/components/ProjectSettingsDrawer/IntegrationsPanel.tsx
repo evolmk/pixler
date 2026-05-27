@@ -1,4 +1,3 @@
-import { useParams } from '@tanstack/react-router';
 import { CheckCircle, AlertCircle, X } from 'lucide-react';
 import { Label } from '@pixler/ui/components/label';
 import { Button } from '@pixler/ui/components/button';
@@ -6,6 +5,7 @@ import { useLinearStatus, useLinearTeams, useLinearProjects } from '../../hooks/
 import { useGithubStatus } from '../../hooks/useGithubStatus';
 import { useSetting } from '../../hooks/useSetting';
 import { useProjectLinearLink } from '../../hooks/useProjectLinearLink';
+import { useCurrentProject } from '../../hooks/useCurrentProject';
 import { LinearProjectPicker } from '../LinearProjectPicker';
 
 type AgentMode = 'cli' | 'mcp' | 'both';
@@ -26,8 +26,7 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 }
 
 export function IntegrationsPanel() {
-  const params = useParams({ strict: false }) as { projectId?: string };
-  const projectId = params.projectId;
+  const { projectId } = useCurrentProject();
 
   const { data: ghStatus } = useGithubStatus();
   const { data: status } = useLinearStatus();

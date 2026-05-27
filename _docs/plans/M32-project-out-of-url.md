@@ -1,8 +1,8 @@
 # M32 — Project out of URL (localStorage-backed current project)
 
-**Status:** ⏳ IN_PROGRESS
+**Status:** ✅ COMPLETE
 **Modified:** 2026-05-26
-**Current Status:** Plan written, ready to execute.
+**Current Status:** All sprints complete. Router collapsed to `/` + `/w/$id`; current project lives in localStorage via Zustand; workspace route resolves project server-side; browser-verified.
 
 ---
 
@@ -145,7 +145,7 @@ manually to test both paths).
 
 ## Sprint 2 — Migrate all call sites off `useParams({ projectId })`
 
-**Status:** ⏳ pending
+**Status:** ✅ done
 **Goal:** Every component that today reads `projectId` from URL params reads
 from `useCurrentProject()` instead. Every `navigate({ to: '/p/$projectId' })`
 call switches to `setProjectId(id)` (no navigation) or
@@ -154,40 +154,53 @@ tree contains zero references to `/p/$projectId`.
 
 **Tasks:**
 
-- [ ] `TopBar.tsx`: `params.projectId` → `useCurrentProject().projectId`.
-      The "switch to project P" click handler calls `setProjectId(p.id)`
-      and `navigate({ to: '/' })` if currently on a workspace route (so the
-      URL doesn't keep showing the previous project's workspace). Project
-      switcher's `data-active` reads from the store.
-- [ ] `WorkspacesSidebar.tsx`: same swap. Clicking a workspace navigates to
-      `/w/$workspaceId`.
-- [ ] `usePaletteActions.ts`: `projectId` source becomes the store.
-      `actions.openWorkspace(id)` navigates to `/w/$id`.
-- [ ] `useDeepLink.ts`: rewrite `pixler://workspace/<id>` → navigate to
-      `/w/<id>` (no fake `projectId: '_'` hack). `pixler://project/<id>`
-      → `setProjectId(id)` + `navigate({ to: '/' })`.
-- [ ] Bulk migrate the remaining components — each has the same one-line
-      change (`useParams` → `useCurrentProject`):
-      `ActivityTab`, `CommandPalette`, `NewWorkspaceDialog`,
-      `GuidedNewWorkspaceDialog`, `CloneProgress`, `LinearProjectPicker`,
-      `LinearIssuePicker`, `CreateLinearIssueDialog`, `LinearTicketList`,
-      `ActivityFeed`, `TeamConfigDiffModal`, `ProjectSettingsDrawer/*`.
-- [ ] `NewProjectDialog.tsx`: after a project is created, call
-      `setProjectId(id)` instead of `navigate({ to: '/p/$projectId', ... })`.
-- [ ] `routes/index.tsx`: becomes the picker/shell-switcher wrapper from
-      Sprint 1's plan. The "auto-select first project on mount" effect
-      changes to call `setProjectId(projects[0].id)` instead of navigating.
-- [ ] Final grep: `grep -rn "/p/\$projectId" apps/web/src` returns zero
-      hits. `grep -rn "useParams" apps/web/src` should only return hits
-      for `workspaceId`, not `projectId`.
+- [x] `TopBar.tsx`: switched to `useCurrentProject()`; project switcher
+      calls `setProjectId(p.id)` and bounces to `/` if currently on a `/w/`
+      route. `data-active` reads from store. `onProjectAdded` writes store.
+- [x] `WorkspacesSidebar.tsx`: switched to `useCurrentProject()`.
+      Note: `WorkspaceCard` has no click-to-open handler today
+      (selection is via palette/deep link/context menu) — pre-existing,
+      unchanged by M32.
+- [x] `usePaletteActions.ts`: `projectId` from store.
+- [x] `useDeepLink.ts`: rewrote to `/w/<id>` for workspace; for project,
+      `setProjectId(event.id)` + navigate to `/`.
+- [x] `CommandPalette.tsx`, `ActivityTab.tsx`, `ActivityFeed.tsx` (prop
+      removed — was only used for navigate), `ProjectSettingsDrawer/{General,Integrations,Plans}Panel.tsx`:
+      all switched to `useCurrentProject()` (or just dropped `useParams`
+      where the prop was unused).
+- [x] Container/leaf components that take `projectId` as a prop
+      (`NewWorkspaceDialog`, `GuidedNewWorkspaceDialog`, `CloneProgress`,
+      `LinearProjectPicker`, `LinearIssuePicker`, `CreateLinearIssueDialog`,
+      `LinearTicketList`, `TeamConfigDiffModal`) need no change — their
+      callers pass the right value.
+- [x] `NewProjectDialog` callers in `TopBar` + `routes/index.tsx` write to
+      store on add.
+- [x] `routes/index.tsx`: auto-selects first project to store, renders
+      picker only when no projects exist.
+- [x] Final grep clean: zero `/p/\$projectId` references; `useParams`
+      remaining hits are all for `workspaceId`.
 
 **Files Created/Modified:**
 
-- _none yet_
+- `apps/web/src/components/TopBar.tsx`
+- `apps/web/src/components/WorkspacesSidebar.tsx`
+- `apps/web/src/components/CommandPalette.tsx`
+- `apps/web/src/components/ActivityTab.tsx`
+- `apps/web/src/components/ActivityFeed.tsx`
+- `apps/web/src/components/ProjectSettingsDrawer/GeneralPanel.tsx`
+- `apps/web/src/components/ProjectSettingsDrawer/IntegrationsPanel.tsx`
+- `apps/web/src/components/ProjectSettingsDrawer/PlansPanel.tsx`
+- `apps/web/src/hooks/usePaletteActions.ts`
+- `apps/web/src/hooks/useDeepLink.ts`
+- `apps/web/src/hooks/useCurrentProject.ts` (mapped null→undefined for ergonomics)
 
 **Issues Encountered:**
 
-- _none yet_
+- `useCurrentProject` originally returned `string | null`; many call sites
+  pass `projectId` to hooks typed as `string | undefined`. Mapped null→
+  undefined in the hook return so callers don't need conversion.
+- `ActivityFeed`'s `projectId` prop was used only for the (now removed)
+  navigate to `/p/$projectId/w/...`. Removed the prop; updated caller.
 
 **Verify:** `pnpm -w typecheck && pnpm -w lint`. Browser walkthrough:
 1. Hard-load `/` with a stored project → shell renders, URL stays `/`.
@@ -203,25 +216,22 @@ tree contains zero references to `/p/$projectId`.
 
 ## Sprint 3 — Shell handles workspace→project resolution + edge cases
 
-**Status:** ⏳ pending
+**Status:** ✅ done
 **Goal:** Hard-loading `/w/<id>` for any workspace works without the project
 being pre-set in the store. The shell silently updates the store when the
 loaded workspace's `project_id` differs from the current value.
 
 **Tasks:**
 
-- [ ] In `ProjectShell` (or a small `useWorkspaceProjectSync` hook called
-      from it), when rendered under the `/w/$workspaceId` route: call
-      `useWorkspace(workspaceId)`, and once data lands, if
-      `data.project_id !== currentProjectId`, call `setProjectId(data.project_id)`.
-      Loading state (workspace fetch in flight) renders a minimal spinner;
-      do **not** flash the project picker.
-- [ ] Handle the "workspace not found" case (404 from
-      `GET /workspaces/:id`): render a small "Workspace not found —
-      [back to project] / [home]" view. Don't auto-redirect.
-- [ ] Edge case: stored `projectId` references a project that was deleted.
-      `useCurrentProject` already clears stale ids once `useProjects` loads
-      (Sprint 1 task) — verify the picker shows correctly after clearing.
+- [x] Project-resolution + 404 handling implemented in `routes/workspace.tsx`
+      during Sprint 1 (was a build prerequisite). Loading shows
+      "Loading workspace…"; 404 shows "Workspace not found" with a
+      "Back to home" button.
+- [x] Browser-verified: clearing `localStorage.pixler.currentProjectId` and
+      hard-loading `/w/<id>` restores the project from the workspace's
+      `project_id`. The `/w/garbage-id` URL shows the not-found view; clicking
+      "Back to home" returns to `/`.
+- [x] Stale stored-id cleanup verified in `useCurrentProject`.
 
 **Files Created/Modified:**
 

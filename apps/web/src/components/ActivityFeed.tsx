@@ -45,11 +45,7 @@ function ActivityRow({ activity, onClick }: { activity: Activity; onClick: () =>
   );
 }
 
-interface Props {
-  projectId: string;
-}
-
-export function ActivityFeed({ projectId }: Props) {
+export function ActivityFeed() {
   const [open, setOpen] = useState(false);
   const params = useParams({ strict: false }) as { workspaceId?: string };
 
@@ -67,8 +63,8 @@ export function ActivityFeed({ projectId }: Props) {
     }
     if (activity.scope === 'workspace' && activity.scope_id) {
       void navigate({
-        to: '/p/$projectId/w/$workspaceId',
-        params: { projectId, workspaceId: activity.scope_id },
+        to: '/w/$workspaceId',
+        params: { workspaceId: activity.scope_id },
       });
     }
   };

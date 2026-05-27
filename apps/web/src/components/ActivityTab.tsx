@@ -59,7 +59,7 @@ function ActivityRow({ activity, onClick }: { activity: Activity; onClick: () =>
 }
 
 export function ActivityTab() {
-  const params = useParams({ strict: false }) as { projectId?: string; workspaceId?: string };
+  const params = useParams({ strict: false }) as { workspaceId?: string };
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'workspace'>('all');
   const markSeen = useMarkSeen();
@@ -75,8 +75,8 @@ export function ActivityTab() {
     if (!activity.seen) {
       markSeen.mutate({ ids: [activity.id] });
     }
-    if (activity.scope === 'workspace' && activity.scope_id && params.projectId) {
-      void navigate({ to: '/p/$projectId/w/$workspaceId', params: { projectId: params.projectId, workspaceId: activity.scope_id } });
+    if (activity.scope === 'workspace' && activity.scope_id) {
+      void navigate({ to: '/w/$workspaceId', params: { workspaceId: activity.scope_id } });
     }
   };
 

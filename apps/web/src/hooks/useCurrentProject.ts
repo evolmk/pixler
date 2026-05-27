@@ -4,13 +4,16 @@ import { useProjects } from './useProjects';
 
 export function useCurrentProject() {
   const projectId = useCurrentProjectStore((s) => s.projectId);
-  const setProjectId = useCurrentProjectStore((s) => s.setProjectId);
+  const setProjectIdRaw = useCurrentProjectStore((s) => s.setProjectId);
   const { data: projects, isSuccess } = useProjects();
 
   useEffect(() => {
     if (!isSuccess || !projectId || !projects) return;
-    if (!projects.some((p) => p.id === projectId)) setProjectId(null);
-  }, [isSuccess, projectId, projects, setProjectId]);
+    if (!projects.some((p) => p.id === projectId)) setProjectIdRaw(null);
+  }, [isSuccess, projectId, projects, setProjectIdRaw]);
 
-  return { projectId, setProjectId };
+  return {
+    projectId: projectId ?? undefined,
+    setProjectId: (id: string | null) => setProjectIdRaw(id),
+  };
 }

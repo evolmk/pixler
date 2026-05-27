@@ -28,6 +28,7 @@ import { useLayoutStore } from '../stores/layout';
 import { useThemeStore } from '../stores/theme';
 import { useSetting } from './useSetting';
 import { useTakeCheckpoint } from './useCheckpoints';
+import { useCurrentProject } from './useCurrentProject';
 import type { ThemeMode, ThemeName } from '@pixler/ui-styles';
 import { themeNames } from '@pixler/ui-styles';
 
@@ -74,8 +75,8 @@ export function usePaletteActions() {
     loadKeyboard((kbPreset as KeyPreset) ?? 'default', (kbBindings as Record<string, string>) ?? {});
   }, [kbPreset, kbBindings]);
 
-  const params = useParams({ strict: false }) as { projectId?: string; workspaceId?: string };
-  const projectId = params.projectId;
+  const params = useParams({ strict: false }) as { workspaceId?: string };
+  const { projectId } = useCurrentProject();
   const workspaceId = params.workspaceId;
   const navigate = useNavigate();
   const takeCheckpoint = useTakeCheckpoint(workspaceId);

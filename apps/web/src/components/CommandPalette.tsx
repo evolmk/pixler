@@ -18,6 +18,7 @@ import { useLinearTickets } from '../hooks/useLinearTickets';
 import { useWorkspaceFiles } from '../hooks/useWorkspaceFiles';
 import { getAction, type PaletteAction, type PaletteGroup } from '../lib/palette/registry';
 import { useLayoutStore } from '../stores/layout';
+import { useCurrentProject } from '../hooks/useCurrentProject';
 
 const GROUP_LABELS: Record<PaletteGroup, string> = {
   recent: 'Recent',
@@ -37,19 +38,12 @@ const GROUP_ORDER: PaletteGroup[] = [
   'files',
 ];
 
-function useActiveParams() {
-  const params = useParams({ strict: false }) as {
-    projectId?: string;
-    workspaceId?: string;
-  };
-  return params;
-}
-
 export function CommandPalette() {
   const { open, setOpen, recent, runAction, getActions } = usePalette();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
-  const { projectId, workspaceId } = useActiveParams();
+  const { projectId } = useCurrentProject();
+  const { workspaceId } = useParams({ strict: false }) as { workspaceId?: string };
   const setNewWorkspaceOpen = useLayoutStore((s) => s.setNewWorkspaceOpen);
 
   const { data: workspaces = [] } = useWorkspaces(projectId);
@@ -90,22 +84,17 @@ export function CommandPalette() {
 
   const handleSelectWorkspace = (id: string) => {
     setOpen(false);
-    if (projectId) {
-      void navigate({ to: '/p/$projectId/w/$workspaceId', params: { projectId, workspaceId: id } });
-    }
+    void navigate({ to: '/w/$workspaceId', params: { workspaceId: id } });
   };
 
   const handleSelectFile = (filePath: string) => {
     setOpen(false);
-    // Future: open file in editor — for now just close palette
     console.log('[palette] open file:', filePath);
   };
 
-  const handleSelectTicket = (identifier: string) => {
+  const handleSelectTicket = (_identifier: string) => {
     setOpen(false);
-    if (projectId) {
-      void navigate({ to: '/p/$projectId', params: { projectId } });
-    }
+    if (projectId) void navigate({ to: '/' });
   };
 
   // Build static action sections

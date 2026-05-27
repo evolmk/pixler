@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useParams } from '@tanstack/react-router';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { Input } from '@pixler/ui/components/input';
@@ -19,11 +18,12 @@ import { Separator } from '@pixler/ui/components/separator';
 import { useProject } from '../../hooks/useProject';
 import { usePatchProject, useRemoveProject } from '../../hooks/useProjects';
 import { useLayoutStore } from '../../stores/layout';
+import { useCurrentProject } from '../../hooks/useCurrentProject';
 
 
 export function GeneralPanel() {
-  const params = useParams({ strict: false }) as { projectId?: string };
-  const { data: project, isLoading } = useProject(params.projectId);
+  const { projectId } = useCurrentProject();
+  const { data: project, isLoading } = useProject(projectId);
   const patch = usePatchProject();
   const remove = useRemoveProject();
   const setOpen = useLayoutStore((s) => s.setProjectSettingsOpen);

@@ -1,4 +1,3 @@
-import { useParams } from '@tanstack/react-router';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
 import { Label } from '@pixler/ui/components/label';
@@ -9,10 +8,10 @@ import { useSetting } from '../../hooks/useSetting';
 import { useProject } from '../../hooks/useProject';
 import { resolvePlanFolder } from '../../lib/resolvePlanFolder';
 import { FolderPicker } from '../FolderPicker';
+import { useCurrentProject } from '../../hooks/useCurrentProject';
 
 export function PlansPanel() {
-  const params = useParams({ strict: false }) as { projectId?: string };
-  const projectId = params.projectId;
+  const { projectId } = useCurrentProject();
   const { data: project } = useProject(projectId);
 
   const { value: storageMode = 'auto', set: setStorageMode } = useSetting<string>('plans.storageMode');

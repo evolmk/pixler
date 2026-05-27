@@ -3,9 +3,9 @@ import { motion } from 'motion/react';
 import { staggerContainer, staggerItem } from '../lib/motion';
 import { Maximize2, Minimize2, Plus } from 'lucide-react';
 import { Button } from '@pixler/ui/components/button';
-import { useParams } from '@tanstack/react-router';
 import { useLayoutStore } from '../stores/layout';
 import { useWorkspaces } from '../hooks/useWorkspaces';
+import { useCurrentProject } from '../hooks/useCurrentProject';
 import { WorkspaceCard } from './WorkspaceCard';
 import { GuidedNewWorkspaceDialog } from './GuidedNewWorkspaceDialog';
 import { RemoveWorkspaceModal } from './RemoveWorkspaceModal';
@@ -19,8 +19,7 @@ export function WorkspacesSidebar() {
   const setFullBleed = useLayoutStore((s) => s.setFullBleed);
   const isExpanded = fullBleed === 'sidebar';
 
-  const params = useParams({ strict: false }) as { projectId?: string };
-  const projectId = params.projectId;
+  const { projectId } = useCurrentProject();
 
   const newOpen = useLayoutStore((s) => s.newWorkspaceOpen);
   const setNewOpen = useLayoutStore((s) => s.setNewWorkspaceOpen);
@@ -113,7 +112,7 @@ export function WorkspacesSidebar() {
 
       {projectId && <LinearTicketList projectId={projectId} />}
 
-      {projectId && <ActivityFeed projectId={projectId} />}
+      {projectId && <ActivityFeed />}
 
       <BigTerminalToggle />
 

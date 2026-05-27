@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Bell, BookOpen, ChevronDown, Command, FolderPlus, HelpCircle, Keyboard, Monitor, Moon, Plus, Settings, Settings2, Sun } from 'lucide-react';
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { Button } from '@pixler/ui/components/button';
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ import { useThemeStore } from '../stores/theme';
 import { useLayoutStore } from '../stores/layout';
 import { useSetting } from '../hooks/useSetting';
 import { useProjects } from '../hooks/useProjects';
+import { useCurrentProject } from '../hooks/useCurrentProject';
 import { usePaletteStore } from '../stores/palette';
 import { TokenStatusPill } from './TokenStatusPill';
 import { NewProjectDialog } from './NewProjectDialog';
@@ -57,9 +58,16 @@ export function TopBar() {
   const { set: persistMode } = useSetting<ThemeMode>('appearance.mode');
   const { data: projects = [] } = useProjects();
   const navigate = useNavigate();
-  const params = useParams({ strict: false }) as { projectId?: string; workspaceId?: string };
-  const activeProject = projects.find((p) => p.id === params.projectId);
+  const location = useLocation();
+  const params = useParams({ strict: false }) as { workspaceId?: string };
+  const { projectId, setProjectId } = useCurrentProject();
+  const activeProject = projects.find((p) => p.id === projectId);
   const workspaceId = params.workspaceId;
+
+  const switchProject = (id: string) => {
+    setProjectId(id);
+    if (location.pathname.startsWith('/w/')) void navigate({ to: '/' });
+  };
   const openInIde = useOpenInIde(workspaceId ?? '');
   const { data: unseenCount = 0 } = useUnseenCount();
 
@@ -108,9 +116,9 @@ export function TopBar() {
             projects.map((p) => (
               <DropdownMenuItem
                 key={p.id}
-                onClick={() => navigate({ to: '/p/$projectId', params: { projectId: p.id } })}
+                onClick={() => switchProject(p.id)}
                 className="gap-2 text-xs"
-                data-active={p.id === params.projectId}
+                data-active={p.id === projectId}
               >
                 {p.name}
               </DropdownMenuItem>
@@ -140,7 +148,7 @@ export function TopBar() {
       <NewProjectDialog
         open={newProjectOpen}
         onOpenChange={setNewProjectOpen}
-        onProjectAdded={(id) => navigate({ to: '/p/$projectId', params: { projectId: id } })}
+        onProjectAdded={(id) => setProjectId(id)}
       />
 
       {/* + Workspace */}
